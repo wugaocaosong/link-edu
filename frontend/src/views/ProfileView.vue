@@ -188,7 +188,6 @@
 </template>
 
 <script setup>
-import PaperTitle from '../components/PaperTitle.vue'
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { startTour } from '../utils/onboarding.js'
@@ -344,13 +343,13 @@ async function save() {
 
 function setSetting(key, value) {
   settings[key] = value
-  persistSettings({ [key]: value })
+  persistSettings()
 }
 
-function persistSettings(partial) {
+function persistSettings() {
   settingsError.value = ''
   try {
-    saveSettings(partial)
+    saveSettings({ ...settings })
   } catch {
     settingsError.value = '设置保存失败，请检查浏览器存储权限后重试。'
   }

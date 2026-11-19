@@ -20,6 +20,7 @@ function createDashboard(overrides = {}) {
   }
   const router = { push: mock.fn() }
   const imports = {
+    '../components/TagWall.vue': {},
     '../components/PaperTitle.vue': {},
     '../components/PixelClassPreview.vue': {},
     '../utils/uiVersion.js': { useUiVersion: () => ({ isStudio: vue.ref(true) }) },

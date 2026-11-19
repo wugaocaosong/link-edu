@@ -3,7 +3,7 @@
     <PaperTitle text="我的知识书架" legacy-text="知识库" />
     <div v-if="loadError" class="rag-feedback" role="alert"><span>{{ loadError }}</span><button type="button" :disabled="listLoading" @click="refresh">重试连接</button></div>
     <details class="glass rag-hero"><summary>知识库状态</summary>
-
+      <h1 class="sr-only">知识库</h1>
       <p v-if="status">
         已索引 {{ status.indexed_chunks ?? '—' }} 条资料片段 · 混合检索
         {{ status.hybrid_enabled ? '开' : '关' }} · 精排 {{ status.rerank_enabled ? '开' : '关' }}
@@ -142,7 +142,6 @@
 </template>
 
 <script setup>
-import PaperTitle from '../components/PaperTitle.vue'
 import { onMounted, ref } from 'vue'
 import {
   deleteRagDocument,

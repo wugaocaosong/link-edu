@@ -55,7 +55,6 @@ api.defaults.adapter=async config=>{
   return{config,status:200,statusText:'OK',headers:{},data}
 }
 const router=createRouter({history:createMemoryHistory(),routes:[{path:'/',component:AppShell,children:[
-  {path:'training',redirect:classroomEntry},
   {path:'profile',component:()=>import('../src/views/ProfileView.vue')},
   {path:'dashboard',component:()=>import('../src/views/DashboardView.vue')},
   {path:'knowledge',component:()=>import('../src/views/RagKnowledgeView.vue')},
@@ -66,6 +65,5 @@ const router=createRouter({history:createMemoryHistory(),routes:[{path:'/',compo
   {path:'ai-review',component:()=>import('../src/views/ClassroomReviewView.vue'),meta:{crumb:'AI 评课 / 报告'}},
   {path:':pathMatch(.*)*',redirect:'/classroom'},
 ]}]})
-window.__studioFixture.router = router
-await router.push(new URLSearchParams(location.search).get('page') || '/classroom')
+await router.push('/classroom')
 createApp(App).use(pinia).use(router).mount('#app')

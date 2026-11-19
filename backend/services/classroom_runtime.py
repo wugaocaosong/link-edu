@@ -15,6 +15,7 @@ from services.classroom_providers import chat
 from services.classroom_dialogue_stream import chat_stream
 from services.classroom_stream import StreamControl, StreamCancelled
 from services.classroom_speech import ASR, speak, normalize
+from services.classroom_speech_analysis import classify_teaching_utterance, aggregate_voice_features
 from services.classroom_knowledge import search
 from services.classroom_reports import request_report
 from services.classroom_motion import sanitize_motion
@@ -110,6 +111,7 @@ class LiveClassroom:
         self.asr_finished = False
         self.speech_started_at = None
         self.utterance_seconds = 0
+        self.voice_frames = []
         self.vision_busy = False
         self.last_image = -15
         self.last_pose = -2
@@ -389,6 +391,7 @@ class LiveClassroom:
         kind = item['type']
         if kind == 'speech_started':
             self.teacher_speaking = True
+            self.voice_frames = []
             self.speech_started_at = time.monotonic()
             self.last_voice = time.monotonic()
             self.record('teacher_speech_start', {'source': 'asr_vad'})
@@ -421,7 +424,12 @@ class LiveClassroom:
                 self.pending = None
                 seconds = max(0, min(60, float(item.get('speech_seconds', self.utterance_seconds))))
                 self.content_seconds += seconds
-                self.record('transcript', {'text': self.last_final, 'source': 'asr_final', 'speech_seconds': round(seconds, 2)})
+                voice_cues = aggregate_voice_features(self.voice_frames)
+                speech_analysis = classify_teaching_utterance(self.last_final)
+                self.record('transcript', {'text': self.last_final, 'source': 'asr_final',
+                    'speech_seconds': round(seconds, 2), 'teaching_speech': speech_analysis,
+                    'voice_cues': voice_cues})
+                self.voice_frames = []
                 self.utterance_seconds = 0
                 # A brief spoken invitation accepts the raised question; substantive teaching triggers reevaluation.
                 if pending and pending['action'] == 'raise' and accepts_raised_question(self.last_final, pending['student_id']):
@@ -496,6 +504,20 @@ class LiveClassroom:
                     raise ValueError('音频发送速率超过实时上限')
                 self.asr.audio(encoded)
                 self.audio_bytes += count
+                features = item.get('voice_features')
+                if self.teacher_speaking and isinstance(features, dict) and len(self.voice_frames) < 500:
+                    try:
+                        rms = float(features.get('rms_dbfs'))
+                        pitch = features.get('pitch_hz')
+                        frame = {'rms_dbfs': max(-100.0, min(0.0, rms))}
+                        crossing = features.get('zero_crossing_rate')
+                        if isinstance(crossing, (int, float)):
+                            frame['zero_crossing_rate'] = max(0.0, min(1.0, float(crossing)))
+                        if isinstance(pitch, (int, float)) and 60 <= float(pitch) <= 500:
+                            frame['pitch_hz'] = float(pitch)
+                        self.voice_frames.append(frame)
+                    except (TypeError, ValueError):
+                        pass
             return
         event_key = str(item.get('event_id', ''))[:96]
         if not event_key or event_key in self.seen:
