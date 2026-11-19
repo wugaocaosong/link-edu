@@ -45,6 +45,9 @@ def create_app(config_class=Config):
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(content_bp)
+    if app.config.get('ADAPTIVE_ENABLED'):
+        from adaptive_routes import adaptive_bp
+        app.register_blueprint(adaptive_bp)
     from classroom_routes import register_classroom
     register_classroom(app)
     from assistant_routes import register_assistant

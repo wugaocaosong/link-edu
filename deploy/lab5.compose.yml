@@ -1,0 +1,23 @@
+name: link-lab5
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: link-lab5-mysql
+    ports:
+      - "127.0.0.1:13316:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: lab5-local-only
+      MYSQL_DATABASE: link_lab5
+      MYSQL_USER: link_lab5
+      MYSQL_PASSWORD: lab5-local-only
+    volumes:
+      - lab5_mysql:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-plab5-local-only"]
+      interval: 5s
+      timeout: 3s
+      retries: 40
+volumes:
+  lab5_mysql:
+    name: link_lab5_mysql

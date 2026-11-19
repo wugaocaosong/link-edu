@@ -1,10 +1,11 @@
 <template>
   <div class="page-rag">
     <PaperTitle text="我的知识书架" legacy-text="知识库" />
+    <div v-if="loadError" class="rag-feedback" role="alert"><span>{{ loadError }}</span><button type="button" :disabled="listLoading" @click="refresh">重试连接</button></div>
     <details class="glass rag-hero"><summary>知识库状态</summary>
 
       <p v-if="status">
-        已索引 {{ status.indexed_chunks }} 条切片 · 混合检索
+        已索引 {{ status.indexed_chunks ?? '—' }} 条资料片段 · 混合检索
         {{ status.hybrid_enabled ? '开' : '关' }} · 精排 {{ status.rerank_enabled ? '开' : '关' }}
         <template v-if="status.graph?.initialized">
           · 图谱 {{ status.graph.entity_count }} 个实体 / {{ status.graph.relation_count }} 条关系
@@ -41,7 +42,7 @@
             <input v-model="upload.license_note" type="text" placeholder="校内使用 / 公开许可等" />
           </label>
           <button type="submit" :disabled="!upload.file || uploading">
-            {{ uploading ? '上传中…' : '异步入库' }}
+            {{ uploading ? '上传中…' : '添加资料' }}
           </button>
           <p v-if="uploadMessage" class="rag-hint">{{ uploadMessage }}</p>
         </form>
@@ -90,16 +91,20 @@
       </section>
     </div>
 
-    <section class="glass rag-panel">
+    <section class="glass rag-panel" :aria-busy="listLoading">
       <h2>资料列表</h2>
-      <table class="rag-table" v-if="documents.length">
+      <p v-if="listLoading" class="rag-hint" role="status">正在加载资料…</p>
+      <div v-else-if="documentsError" class="rag-feedback" role="alert"><span>{{ documentsError }}</span><button type="button" @click="refresh">重新加载</button></div>
+      <p v-if="actionError" class="rag-error" role="alert">{{ actionError }}</p>
+      <div v-if="documents.length && !listLoading && !documentsError" class="rag-table-scroll" role="region" aria-label="知识库资料" tabindex="0">
+      <table class="rag-table">
         <thead>
           <tr>
-            <th>标题</th>
-            <th>分类</th>
-            <th>状态</th>
-            <th>切片</th>
-            <th></th>
+            <th scope="col">标题</th>
+            <th scope="col">分类</th>
+            <th scope="col">状态</th>
+            <th scope="col">片段数</th>
+            <th scope="col"><span class="sr-only">操作</span></th>
           </tr>
         </thead>
         <tbody>
@@ -109,13 +114,14 @@
             <td>{{ doc.status }}</td>
             <td>{{ doc.chunk_count }}</td>
             <td>
-              <button type="button" @click="preview(doc)">切片</button>
-              <button v-if="canManage" type="button" class="danger" @click="remove(doc)">删除</button>
+              <button type="button" :disabled="actionId !== null" @click="preview(doc)">{{ actionId === doc.id ? '处理中…' : '查看内容' }}</button>
+              <button v-if="canManage" type="button" class="danger" :disabled="actionId !== null" @click="remove(doc)">删除</button>
             </td>
           </tr>
         </tbody>
       </table>
-      <p v-else class="rag-hint">暂无资料{{ canManage ? '，请上传' : '' }}。</p>
+      </div>
+      <p v-else-if="!listLoading && !documentsError" class="rag-hint">暂无资料{{ canManage ? '，可在上方添加教学参考资料' : '，请稍后查看或联系资料管理员' }}。</p>
     </section>
 
     <dialog ref="chunkDialog" class="rag-dialog">
@@ -130,6 +136,7 @@
           <pre v-if="chunk.extra?.parent_summary">{{ chunk.extra.parent_summary }}</pre>
         </li>
       </ul>
+      <p v-else class="rag-hint">这份资料暂时没有可预览的内容。</p>
     </dialog>
   </div>
 </template>
@@ -152,6 +159,10 @@ const categories = ref({})
 const canManage = ref(false)
 const documents = ref([])
 const loadError = ref('')
+const listLoading = ref(false)
+const documentsError = ref('')
+const actionError = ref('')
+const actionId = ref(null)
 const upload = ref({ file: null, title: '', category: 'other', valid_until: '', license_note: '' })
 const uploading = ref(false)
 const uploadMessage = ref('')
@@ -167,19 +178,28 @@ const previewChunks = ref([])
 const chunkDialog = ref(null)
 
 async function refresh() {
+  if (listLoading.value) return
+  listLoading.value = true
+  loadError.value = ''
+  documentsError.value = ''
   try {
     const data = await fetchRagStatus()
     status.value = data
     categories.value = data.categories || {}
     canManage.value = Boolean(data.can_manage)
   } catch (error) {
+    status.value = null
+    canManage.value = false
     loadError.value = error.response?.data?.message || '无法加载知识库状态'
   }
   try {
     const list = await listRagDocuments({ page_size: 50 })
     documents.value = list.items || []
-  } catch {
-    /* 只读用户可能仅有检索权限时仍展示试检索 */
+  } catch (error) {
+    documents.value = []
+    documentsError.value = error.response?.data?.message || '资料列表加载失败，请检查连接后重试。'
+  } finally {
+    listLoading.value = false
   }
 }
 
@@ -227,10 +247,19 @@ async function onRetrieve() {
 }
 
 async function preview(doc) {
-  previewDoc.value = doc
-  const data = await listRagChunks(doc.id, { limit: 30 })
-  previewChunks.value = data.items || []
-  chunkDialog.value?.showModal()
+  if (actionId.value !== null) return
+  actionId.value = doc.id
+  actionError.value = ''
+  try {
+    const data = await listRagChunks(doc.id, { limit: 30 })
+    previewDoc.value = doc
+    previewChunks.value = data.items || []
+    chunkDialog.value?.showModal()
+  } catch (error) {
+    actionError.value = error.response?.data?.message || '资料内容加载失败，请重试。'
+  } finally {
+    actionId.value = null
+  }
 }
 
 async function previewEvidence(chunkId) {
@@ -257,15 +286,28 @@ function closePreview() {
 }
 
 async function remove(doc) {
+  if (actionId.value !== null) return
   if (!window.confirm(`删除「${doc.title}」？`)) return
-  await deleteRagDocument(doc.id)
-  await refresh()
+  actionId.value = doc.id
+  actionError.value = ''
+  try {
+    await deleteRagDocument(doc.id)
+    await refresh()
+  } catch (error) {
+    actionError.value = error.response?.data?.message || '删除失败，资料仍然保留，请稍后重试。'
+  } finally {
+    actionId.value = null
+  }
 }
 
 onMounted(refresh)
 </script>
 
 <style scoped>
+.rag-feedback { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:14px 16px; border:1px solid var(--workspace-border); border-radius:12px; color:var(--workspace-ink); }
+.rag-feedback button { flex:none; padding:8px 12px; background:var(--workspace-surface); color:inherit; border:1px solid var(--workspace-border); border-radius:8px; }
+.rag-table-scroll { overflow-x:auto; max-width:100%; }
+.rag-table-scroll .rag-table { min-width:480px; }
 .page-rag {
   display: flex;
   flex-direction: column;

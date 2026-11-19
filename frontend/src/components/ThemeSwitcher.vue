@@ -4,7 +4,7 @@
       <legend class="sr-only">选择界面风格</legend>
       <label v-for="option in UI_THEMES" :key="option.id" class="theme-option" :class="{ selected: theme === option.id }">
         <input type="radio" name="ui-theme" :value="option.id" :checked="theme === option.id" @change="change(option.id, $event.target)" />
-        <span class="theme-swatch" :class="`theme-swatch--${option.id}`" aria-hidden="true"><i></i><b></b></span>
+        <span class="theme-swatch" :class="`theme-swatch--${option.id}`" aria-hidden="true"><i></i><b></b><span class="theme-miniature"><span class="theme-miniature__hero"></span><span class="theme-miniature__cards"><em></em><em></em><em></em></span></span></span>
         <span class="theme-option-copy"><strong>{{ option.name }}</strong><small>{{ option.description }}</small></span>
       </label>
     </fieldset>

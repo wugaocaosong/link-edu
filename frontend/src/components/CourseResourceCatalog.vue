@@ -1,16 +1,27 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import ClassroomDialog from './ClassroomDialog.vue'
+import StudioArt from './StudioArt.vue'
+import { useUiVersion } from '../utils/uiVersion.js'
+import { matchesResource, resourceCoverIndex } from '../utils/studioPresentation.js'
 import { fetchResources } from '../services/dashboard'
 import { resolveResourceLink } from '../utils/resourceLinks.js'
 
+const props = defineProps({ query: { type: String, default: '' } })
+const emit = defineEmits(['count'])
+const { isStudio } = useUiVersion()
 const items = ref([])
+const page = ref(1)
+const pageSize = 6
 const tab = ref('全部')
 const detail = ref(null)
 const loading = ref(true)
 const resourceError = ref('')
 const tabs = ['全部', '教案', '素材', '报告', '档案']
-const visible = computed(() => tab.value === '全部' ? items.value : items.value.filter(item => item.category === tab.value))
+const visible = computed(() => items.value.filter(item => (tab.value === '全部' || item.category === tab.value) && matchesResource(item, props.query)))
+const pageCount = computed(() => Math.max(1, Math.ceil(visible.value.length / pageSize)))
+const pageItems = computed(() => isStudio.value ? visible.value.slice((page.value - 1) * pageSize, page.value * pageSize) : visible.value)
+watch([tab, () => props.query], () => { page.value = 1 })
 const link = computed(() => resolveResourceLink(detail.value?.file_url, window.location.origin))
 const detailOpen = computed({ get: () => Boolean(detail.value), set: value => { if (!value) detail.value = null } })
 
@@ -20,8 +31,10 @@ async function loadResources() {
   detail.value = null
   try {
     items.value = await fetchResources()
+    emit('count', items.value.length)
   } catch (error) {
     items.value = []
+    emit('count', null)
     resourceError.value = error?.response?.data?.message || '资源加载失败，请稍后重试。'
   } finally {
     loading.value = false
@@ -40,13 +53,18 @@ onMounted(loadResources)
       <span>{{ resourceError }}</span>
       <button type="button" class="text-action" @click="loadResources">重新加载资源</button>
     </div>
-    <p v-else-if="!visible.length" class="course-search-feedback" role="status">当前分类暂无资源。</p>
+    <p v-else-if="!visible.length" class="course-search-feedback" role="status">{{ query ? '没有找到匹配资料，试试其他关键词或分类。' : '当前分类暂无资源。' }}</p>
     <ul v-else class="resource-list">
-      <li v-for="item in visible" :key="item.id" class="glare-row">
-        <div><em>{{ item.category }}</em><strong>{{ item.title }}</strong><span>{{ item.description }}</span></div>
-        <button type="button" @click="detail = item">查看详情</button>
+      <li v-for="item in pageItems" :key="item.id" class="glare-row studio-resource-card">
+        <StudioArt v-if="isStudio" :index="resourceCoverIndex(item)" />
+        <div class="studio-resource-card__body"><em>{{ item.category }}</em><strong>{{ item.title }}</strong><span>{{ item.description }}</span><button v-if="isStudio" type="button" class="studio-outline" :aria-label="`查看资料：${item.title}`" @click="detail = item">查看资料 <span aria-hidden="true">›</span></button></div>
+        <button v-if="!isStudio" type="button" @click="detail = item">查看详情</button>
       </li>
     </ul>
+    <nav v-if="isStudio && visible.length && !loading && !resourceError" class="studio-pagination" aria-label="课程资源分页">
+      <span>显示 {{ (page - 1) * pageSize + 1 }}–{{ Math.min(page * pageSize, visible.length) }} 项，共 {{ visible.length }} 项</span>
+      <div><button type="button" :disabled="page === 1" aria-label="上一页" @click="page--">‹</button><button v-for="number in pageCount" :key="number" type="button" :aria-current="page === number ? 'page' : undefined" @click="page = number">{{ number }}</button><button type="button" :disabled="page === pageCount" aria-label="下一页" @click="page++">›</button></div>
+    </nav>
     <ClassroomDialog v-model="detailOpen" title="资源详情">
       <template v-if="detail">
         <p>{{ detail.category }}</p>

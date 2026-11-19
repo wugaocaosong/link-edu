@@ -58,7 +58,7 @@ onMounted(loadCourses)
       <template v-if="modal === 'detail' && selected">
         <select v-if="categoryCourses.length > 1" aria-label="选择本类课程" :value="selectedId" @change="chooseCourse($event.target.value)"><option v-for="course in categoryCourses" :key="course.id" :value="course.id">{{ course.title }}</option></select>
         <div class="desk-progress"><span>{{ selected.status_label || '未开始' }} · {{ selected.lesson_count }} 课时</span><b>{{ progress }}%</b><progress :value="progress" max="100" aria-label="课程进度">{{ progress }}%</progress></div>
-        <p v-if="selected.description">{{ selected.description }}</p><pre v-if="selected.outline">{{ selected.outline }}</pre>
+        <p v-if="selected.description">{{ selected.description }}</p><details v-if="selected.outline" :key="selected.id" class="desk-outline"><summary>训练任务与自评要点</summary><pre>{{ selected.outline }}</pre></details>
         <div class="desk-sources"><span v-if="selected.source">{{ selected.source }}</span><a v-if="sourceLink" :href="sourceLink" target="_blank" rel="noopener noreferrer">查看出处 ↗</a><a v-if="mooc" :href="mooc.url" target="_blank" rel="noopener noreferrer">{{ mooc.label }} ↗</a></div>
       </template>
       <template v-else-if="modal === 'directory'">
@@ -89,4 +89,16 @@ onMounted(loadCourses)
 .desk-directory strong { flex:1; }.desk-directory small { min-width:60px; }.desk-directory span { font-size:12px; }
 .desk-mooc { margin-top:24px; }
 @media(max-width:700px) { .desk-page__tools { top:68px; left:12px; right:12px; }.desk-search { flex:1; min-width:0; }.desk-search input { width:100%; }.desk-directory button { flex-wrap:wrap; gap:8px; }.desk-directory strong { min-width:60%; } }
+
+.desk-directory {margin:10px 0}
+.desk-directory li {border-color:var(--glass-line)}
+.desk-directory button {padding:9px 7px;gap:10px;border-radius:7px;line-height:1.35}
+.desk-directory button:is(:hover,:focus-visible) {background:var(--glass-tint)}
+.desk-directory small,.desk-directory span,.desk-sources {color:var(--glass-muted)}
+.desk-directory span {margin-left:auto}
+.desk-outline,.desk-mooc {padding:10px 12px;background:var(--glass-tint);border:1px solid var(--glass-line);border-radius:10px;margin-top:12px}
+.desk-outline summary,.desk-mooc summary {font-weight:600}
+.desk-progress {margin:10px 0 14px;gap:6px}
+.desk-sources {font-size:12px;gap:8px 14px;margin-top:14px}
+.course-modal footer button {padding:8px 16px}
 </style>

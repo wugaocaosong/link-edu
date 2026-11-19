@@ -12,6 +12,14 @@ import {
   containRect,
   visiblePoint,
 } from "../services/classroomInteraction.js";
+function moveLight(event) {
+  if (event.pointerType !== 'mouse' || !event.currentTarget.classList.contains('ready-stage') ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  const stage = event.currentTarget
+  const bounds = stage.getBoundingClientRect()
+  stage.style.setProperty('--glow-x', (event.clientX - bounds.left) + 'px')
+  stage.style.setProperty('--glow-y', (event.clientY - bounds.top) + 'px')
+}
 const props = defineProps({
   enabled: Boolean,
   disabled: Boolean,
@@ -307,7 +315,10 @@ onUnmounted(() => {
         @loadedmetadata="draw"
       />
       <canvas ref="canvas" aria-hidden="true" />
-      <div v-if="!enabled" class="camera-placeholder">
+      <div v-if="!enabled" class="camera-placeholder" :class="{ 'ready-stage': previewAllowed && !disabled && !dialogue }" @pointermove="moveLight">
+        <div v-if="previewAllowed && !disabled && !dialogue" class="stage-dust" aria-hidden="true">
+          <i v-for="n in 26" :key="n" :style="{left: (n * 37 % 100) + '%', top: (n * 61 % 100) + '%', animationDelay: -n * .8 + 's'}" />
+        </div>
         <span class="camera-lens" aria-hidden="true"><i class="camera-lens__orbit" /><i class="camera-lens__orbit second" /><Video /></span>
         <strong>{{ disabled ? '本次课堂已结束' : '你的课堂，即将开始' }}</strong>
         <span id="camera-preview-hint">{{ disabled ? '设备已关闭，记录已保留' : cameraConsent ? '预览取景 · 不开启麦克风或计时' : '完成课前准备，开启你的授课画面' }}</span>
@@ -483,5 +494,24 @@ onUnmounted(() => {
   .expanded .camera-placeholder { padding-top:40px; gap:4px; }
   .expanded .camera-lens { display:none; }
 }
+html[data-ui-theme] .classroom-page .camera-placeholder.ready-stage {
+  isolation:isolate; overflow:hidden;
+  --sky:#17152c; --haze:#533e6f; --horizon:#986e85; --shine:#ffc58c;
+  background:radial-gradient(ellipse at 86% 132%,var(--shine),transparent 43%),
+    radial-gradient(ellipse at 18% 115%,var(--horizon),transparent 55%),
+    radial-gradient(ellipse at 52% 85%,var(--haze),transparent 72%),var(--sky);
+}
+html[data-ui-theme="academy"] .camera-placeholder.ready-stage {
+  --sky:#dae6f4; --haze:#abbddc; --horizon:#8db5c7; --shine:#fff1d3;
+}
+.ready-stage .stage-dust {position:absolute;inset:0;z-index:-1;pointer-events:none}
+.stage-dust i {position:absolute;width:3px;height:3px;border-radius:50%;background:#fff4d9;box-shadow:0 0 6px #ffdc9f;animation:stage-float 8s ease-in-out infinite alternate}
+.stage-dust i:nth-child(even){width:2px;height:2px;animation-duration:12s}
+@keyframes stage-float {from{transform:translate(-7px,10px);opacity:.2}to{transform:translate(11px,-20px);opacity:.85}}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+  .ready-stage::after {content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;opacity:0;background:radial-gradient(circle 100px at var(--glow-x,50%) var(--glow-y,50%),#ffd8b129,transparent);transition:opacity .25s}
+  .ready-stage:hover::after {opacity:1}
+}
+.ready-stage strong {font-family:"Songti SC","SimSun",serif;font-weight:700;font-size:clamp(20px,2.5vw,38px);letter-spacing:.08em}
 @media(prefers-reduced-motion:reduce) { *, *::before, *::after { animation:none !important; transition:none !important; } }
 </style>

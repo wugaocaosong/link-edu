@@ -1,0 +1,31 @@
+{
+  "tool": "Built-in image_gen",
+  "created": "2026-10-27",
+  "purpose": "Text-free production illustration assets matching approved UI concepts",
+  "assets": [
+    {
+      "file": "classroom.png",
+      "reference": "exec-69db1724-00fe-47d6-a171-22e0494ebe19.png",
+      "prompt": "Extract and recreate ONLY the beautiful warm pixel-art classroom environment from the reference mockup as a production web background, landscape 1536x1024. Keep warm amber window light on right, plum walls, classroom chalkboard at center, little bookshelves and plant, wooden floor. NO students, NO people, NO desks in foreground (student sprites will be overlaid by web code), no interface, no cards, no buttons, no written text, no logos, no numbers. Empty open lower middle wood floor ready for three student sprites. Rich hand-crafted pixel art with subtle warm sunlight, charming school atmosphere. Full bleed illustration edge to edge.",
+      "transparent_requested": false
+    },
+    {
+      "file": "study.png",
+      "reference": "exec-393f3040-bcf2-4ae3-b196-f12230b103a2.png",
+      "prompt": "Create ONLY a production website panoramic background illustration based on the warm pixel art library banner in reference. Canvas 1536x768 landscape. Warm wooden teacher's study, glowing desk lamp, open BLANK notebook on right, bookshelves, plants, golden sunlight from window; deep muted plum shadows on left third with simple quiet bookshelf for text overlay. Pixel art, rich exquisite details, same colors as reference. Every book spine and notebook must be blank, absolutely NO letters, no words, numbers, logos, text, interface, panels, cards, buttons or people. Full bleed scene. Strong clear pixel-art shapes not blurry. Designed to crop into 1200x220 horizontal header or narrow desk illustration.",
+      "transparent_requested": false
+    },
+    {
+      "file": "badges.png",
+      "reference": "exec-e9c2351b-956c-4019-a744-ef3c6e219dc3.png",
+      "prompt": "Create a production sprite sheet of EXACTLY SIX separate beautiful pixel-art achievement trophies matching the reference's achievement wall. Canvas 1536x1024, exact 3 columns by 2 rows, each cell 512x512, icons centered precisely at each cell's center with 80px clear padding around every cell; no gridlines. Row1 left teacher podium and microphone; row1 middle small notebook with amber flame; row1 right gold pocket clock. Row2 left two lavender speech bubbles with a question mark; row2 middle gold five-point star trophy; row2 right plum archive books. Same small dark lavender round plinth for each icon and golden pixel lighting, polished charming pixel style. All isolated on true transparent background, no scenery, no text labels, no UI, no titles, no interface, no extra symbols outside the six icons. Do not place anything spanning cells.",
+      "transparent_requested": true
+    },
+    {
+      "file": "covers.png",
+      "reference": "exec-393f3040-bcf2-4ae3-b196-f12230b103a2.png",
+      "prompt": "Create a production sprite sheet of EXACTLY SIX square teaching-resource cover illustrations in an exact 3 columns by 2 rows grid. Canvas 1536x1024. Each image fills its EXACT 512x512 square; no gutters, no margins, no frame, no text anywhere. Warm pixel-art teacher study, golden sunlight and plum shadows matching reference resource cards. Each cell is its own separate close-up composition. Row1: left lavender closed spiral lesson notebook with tiny sprout emblem; middle peach and cream question cards with question mark symbols; right lavender assessment booklet with bar chart symbol. Row2: left sage green teaching portfolio with plant emblem; middle open cream lesson planning sheet with colored blocks and lines but no writing; right amber flipchart with a lightbulb symbol. Books and illustrations MUST contain no written words and no fake lettering. Strong centered objects visible at small thumbnail size. Different covers have distinct shapes and dominant colors. Full image only the six equal square artworks.",
+      "transparent_requested": false
+    }
+  ]
+}

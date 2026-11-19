@@ -23,6 +23,13 @@ import { History, PlayerPlay, PlayerStop, PlayerPause, Video, VideoOff, Micropho
 import "../classroom.css";
 
 const route=useRoute(), router=useRouter(), live=useClassroom();
+const showTablet = ref(!route.query.session && !route.query.practice)
+const classroomSurface = ref(null)
+async function enterClassroom() {
+  showTablet.value = false
+  await nextTick()
+  classroomSurface.value?.focus({ preventScroll: true })
+}
 const selectedCourse = ref(null), courseContextError = ref(''), courseContextLoading = ref(false);
 let courseRequest = 0;
 watch(() => route.query.courseId, async value => {
@@ -193,7 +200,13 @@ onBeforeRouteLeave(()=>{
 </script>
 
 <template>
-  <div class="classroom-page camera-first screen-first">
+  <Transition name="tablet-focus">
+    <section v-if="showTablet" class="hall-entry" aria-label="演绎厅">
+      <router-link class="hall-back" to="/courses" aria-label="返回办公桌"><img src="/assets/desk/wood-arrow.webp" alt="" /></router-link>
+      <div class="hall-scene"><button type="button" @click="enterClassroom" aria-label="Class Begin！"><span aria-hidden="true" v-for="(letter,i) in 'Class Begin!'" :key="i">{{ letter }}</span></button></div>
+    </section>
+  </Transition>
+  <div v-show="!showTablet" ref="classroomSurface" tabindex="-1" class="classroom-page camera-first screen-first">
     <PaperTitle text="模拟授课" legacy-text="模拟课堂" />
     <p v-if="courseContextError" class="class-alert" role="alert">{{ courseContextError }} <router-link to="/courses">返回选课</router-link></p>
     <div v-if="selectedCourse" class="classroom-course-context"><span>训练技能 · {{ selectedCourse.title }}</span><router-link :to="{path:'/courses', query:{courseId:String(selectedCourse.id)}}">更换课程 ↗</router-link></div>
@@ -282,3 +295,24 @@ onBeforeRouteLeave(()=>{
     </ClassroomDialog>
   </div>
 </template>
+
+<style scoped>
+.hall-back {position:absolute;z-index:2;top:4px;left:50%;translate:-50% 0;display:grid;place-items:center;width:clamp(46px,5vw,74px);aspect-ratio:1}
+.hall-back img {width:100%;transform:rotate(90deg);filter:drop-shadow(0 3px 4px #301e1880)}
+.hall-back:is(:hover,:focus-visible) img {scale:1.08}
+@media(max-width:800px){.hall-back{top:68px}}
+.hall-entry { position:relative; isolation:isolate; overflow:hidden; width:100%; height:100%; min-height:0; background:#352418; }
+.hall-scene { position:absolute; inset:0; display:grid; place-items:center; background:url('/assets/desk/hall-tablet.webp') center/cover; }
+.hall-scene button { border:1px solid #efd39f; border-radius:14px; background:#241c18db; color:#ffe6be; padding:.55em 1.1em; font:600 clamp(25px,3.5vw,58px)/1.2 Georgia,serif; cursor:pointer; box-shadow:0 4px 22px #0004; }
+.hall-scene button { border:0;background:transparent;box-shadow:none;color:#ffebb5;font:1000 italic clamp(44px,7.5vw,116px)/1.1 'Arial Rounded MT Bold','Trebuchet MS',system-ui,sans-serif;letter-spacing:-.055em;text-shadow:0 .04em #844a35,0 .08em #472b27,0 .11em .1em #160e0c;transform:rotate(-4deg);white-space:pre; }
+.hall-scene button span {display:inline-block}
+.hall-scene button span:nth-child(3n){transform:translateY(-.065em) rotate(5deg);color:#ffc47b}
+.hall-scene button span:last-child{transform:rotate(11deg);color:#ffac7c}
+.hall-scene button:hover span:nth-child(odd){transform:translateY(-.09em)}
+.hall-scene button:focus-visible { outline:3px solid white; outline-offset:6px; }
+.tablet-focus-leave-active { position:absolute; inset:0; z-index:5; pointer-events:none; transition:opacity .72s ease-in; }
+.tablet-focus-leave-active .hall-scene { animation:none; transition:transform .72s cubic-bezier(.25,.6,.2,1); }
+.tablet-focus-leave-to { opacity:0; }
+.tablet-focus-leave-to .hall-scene { transform:scale(1.36); }
+@media(prefers-reduced-motion:reduce){.hall-scene,.tablet-focus-leave-active,.tablet-focus-leave-active .hall-scene {animation:none;transition:none;}}
+</style>

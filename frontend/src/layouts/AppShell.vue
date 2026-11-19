@@ -1,5 +1,5 @@
 <template>
-  <main v-ambient-ui="!isAcademy && !isStudio" class="dashboard app-shell" :class="{ immersive: immersive, 'protected-shell': protectedShell, 'studio-ui': isStudio, 'desk-fullscreen': isStudio && route.path === '/courses' }">
+  <main v-ambient-ui="!isAcademy && !isStudio" class="dashboard app-shell" :class="{ immersive: immersive, 'sidebar-folded': sidebarFolded, 'protected-shell': protectedShell, 'studio-ui': isStudio, 'desk-fullscreen': isStudio && ['/courses','/dashboard'].includes(route.path) }">
     <a class="skip-content" href="#workspace-content">跳到页面内容</a>
     <AmbientVideo
       v-if="!immersive && !protectedShell && !isAcademy && !isStudio"
@@ -11,8 +11,8 @@
     />
     <div v-if="!immersive && !protectedShell && !isAcademy && !isStudio" class="app-shell-bg-shade" aria-hidden="true"></div>
     <Aurora v-if="!isAcademy && !isStudio" />
-    <aside class="sidebar">
-      <BrandMark />
+    <aside id="primary-sidebar" class="sidebar">
+      <BrandMark home-link />
       <nav aria-label="主导航">
         <router-link
           v-for="item in nav"
@@ -31,6 +31,7 @@
     </aside>
 
     <section class="workspace" :class="{ 'workspace--immersive': immersive }">
+      <button class="fold-nav" type="button" aria-controls="primary-sidebar" :aria-expanded="!sidebarFolded" :aria-label="sidebarFolded ? '展开导航' : '收起导航'" @click="sidebarFolded = !sidebarFolded">{{ sidebarFolded ? '☰' : '‹' }}</button>
       <header v-if="!immersive" class="topbar">
         <span class="page-crumb">{{ isStudio ? pageTitle : crumb }}</span>
         <select class="mobile-page-nav" aria-label="切换页面" :value="route.path" @change="router.push($event.target.value)">
@@ -51,7 +52,7 @@
           />
           <kbd class="cir-search__kbd">Enter</kbd>
         </form>
-        <details ref="appearance" class="appearance-settings" @click.stop @keydown.esc.stop.prevent="closeAppearance">
+        <details ref="appearance" class="shell-appearance" @click.stop @keydown.esc.stop.prevent="closeAppearance">
           <summary><span aria-hidden="true">◐</span> 外观</summary>
           <div class="appearance-panel"><strong>界面外观</strong><ThemeSwitcher /><UiVersionSwitcher /></div>
         </details>
@@ -72,7 +73,8 @@
           <div v-if="menuOpen" id="profile-menu" class="profile-menu" @click.stop>
             <button type="button" @click="goProfile('archive')">个人中心</button>
             <button type="button" @click="goProfile('settings')">设置</button>
-            <button type="button" @click="goProfile('contact')">联系我们</button>
+            <button type="button" @click="goProfile('contact')">帮助与反馈</button>
+            <button type="button" @click="menuOpen = false; productsOpen = true">谱联产品</button>
             <button class="mobile-logout" type="button" @click="logout">退出登录</button>
           </div>
         </div>
@@ -80,7 +82,7 @@
 
       <div id="workspace-content" class="page-frame" tabindex="-1" :aria-label="pageTitle">
         <router-view v-slot="{ Component }">
-          <transition name="page-sweep" mode="out-in">
+          <transition name="page-sweep" :mode="enteringHallFromDesk ? undefined : 'out-in'" :css="!enteringHallFromDesk">
             <div class="page-slot" :key="route.path === '/classroom' ? route.path : route.fullPath">
               <component :is="Component" />
             </div>
@@ -90,6 +92,9 @@
     </section>
 
     <HelpChat />
+    <NModal v-model:show="productsOpen" preset="card" title="谱联产品" :style="{width:'min(480px, calc(100vw - 32px))', maxHeight:'85dvh', overflowY:'auto'}">
+      <ProductLinks current="link" />
+    </NModal>
     <OnboardingTour />
   </main>
 </template>
@@ -97,6 +102,9 @@
 <script setup>
 import { computed, onMounted, onUnmounted, provide, shallowRef, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { NModal } from 'naive-ui'
+import ProductLinks from '../components/products/ProductLinks.vue'
+const productsOpen = ref(false)
 import BrandMark from '../components/BrandMark.vue'
 import HelpChat from '../components/HelpChat.vue'
 import OnboardingTour from '../components/OnboardingTour.vue'
@@ -118,24 +126,28 @@ const router = useRouter()
 const auth = useAuthStore()
 provide(classroomHelpKey, shallowRef(null))
 const search = ref('')
+const sidebarFolded = ref(false)
+const enteringHallFromDesk = ref(false)
+watch(() => route.path, (to, from) => {
+  enteringHallFromDesk.value = from === '/courses' && to === '/classroom'
+}, { flush: 'sync' })
 const menuOpen = ref(false)
 const appearance = ref(null)
 const profileTrigger = ref(null)
 
 const nav = [
-  { label: '工作台', to: '/dashboard', icon: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z' },
-  { label: '课程中心', to: '/courses', icon: 'M12 5C9 3 6 3 3 4v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1zm0 0v15' },
-  { label: '教学训练', to: '/classroom', icon: 'M3 3h18v15H3zM10 7l5 3.5-5 3.5zM8 21h8m-4-3v3' },
-  { label: 'AI 评课', to: '/ai-review', icon: 'M4 3v17h17M9 15V9m5 6V5m5 10v-5' },
-  { label: '成长档案', to: '/growth', icon: 'M3 20l8-8 4 3 6-11m-6 0h6v6' },
-  { label: '资源库', to: '/resources', icon: 'M3 7V3h7l3 3h8v14H3z' },
-  { label: '知识库', to: '/knowledge', icon: 'M12 3l9 5-9 5-9-5zM3 12l9 5 9-5M3 16l9 5 9-5' },
+  ...(import.meta.env.VITE_ADAPTIVE_ENABLED === 'true' ? [{ label: '自适应学习', to: '/adaptive', icon: 'M4 19V5h16v14H4zm4-9h8M8 14h5' }] : []),
+  { label: '标签墙', to: '/dashboard', icon: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z' },
+  { label: '办公桌', to: '/courses', icon: 'M12 5C9 3 6 3 3 4v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1zm0 0v15' },
+  { label: '演绎厅', to: '/classroom', icon: 'M3 3h18v15H3zM10 7l5 3.5-5 3.5zM8 21h8m-4-3v3' },
+  { label: '档案袋', to: '/ai-review', icon: 'M4 3v17h17M9 15V9m5 6V5m5 10v-5' },
+  { label: '小书架', to: '/resources', icon: 'M12 3l9 5-9 5-9-5zM3 12l9 5 9-5M3 16l9 5 9-5' },
 ]
 
 const crumb = computed(() => {
   if (route.path === '/profile') {
     if (route.query.tab === 'settings') return '设置'
-    if (route.query.tab === 'contact') return '联系我们'
+    if (route.query.tab === 'contact') return '帮助与反馈'
     return '个人中心'
   }
   return route.meta.crumb || '工作台  /  总览'
@@ -149,7 +161,7 @@ const roleLabel = computed(() => auth.user?.role_label || '师范生')
 const profileInitial = computed(() => displayName.value.slice(0, 1))
 
 function isActive(path) {
-  return route.path === path
+  return route.path === path || (path === '/resources' && route.path === '/knowledge')
 }
 
 function goSearch() {
@@ -200,3 +212,50 @@ onUnmounted(() => {
   window.removeEventListener('click', closeMenu)
 })
 </script>
+
+<style>
+.fold-nav {display:none}
+@media(min-width:801px){
+ .app-shell .workspace{position:relative}
+ .app-shell .fold-nav{position:absolute;z-index:12;display:grid;place-items:center;left:2px;top:22%;width:26px;height:40px;border:1px solid #b99163;border-radius:0 12px 12px 0;background:#392a21e6;color:#fff1cf;font:700 20px/1 system-ui;cursor:pointer}
+ html[data-ui-theme] .app-shell.sidebar-folded{grid-template-columns:minmax(0,1fr)!important}
+ html[data-ui-theme] .app-shell.sidebar-folded .sidebar{display:none!important}
+ html[data-ui-theme] .app-shell.sidebar-folded .workspace{grid-column:1/-1;width:100%;margin-left:0}
+ html[data-ui-theme] .app-shell.studio-ui.desk-fullscreen:not(.protected-shell) .workspace{position:relative;padding:0!important}
+ html[data-ui-theme] .app-shell.studio-ui.desk-fullscreen:not(.protected-shell) .topbar{position:absolute;inset:8px 12px auto auto;z-index:8;width:auto;background:transparent!important}
+ html[data-ui-theme] .app-shell.desk-fullscreen .page-frame,html[data-ui-theme] .app-shell.desk-fullscreen .page-slot{height:100%!important;padding:0;border-radius:0}
+ html[data-ui-theme] .app-shell.studio-ui.desk-fullscreen .desk-page__tools{position:absolute;left:12px;top:8px}
+ html[data-ui-theme] .app-shell.desk-fullscreen .desk-heading{display:none}
+ html[data-ui-theme] .app-shell.studio-ui.desk-fullscreen .course-desk{height:100%;border:none;border-radius:0}
+}
+/* Use the same workspace bounds through the last frame of the tablet zoom. */
+html[data-ui-theme] .app-shell.studio-ui:not(.protected-shell):has(.hall-entry) .workspace {
+  position: relative;
+  padding: 0 !important;
+}
+html[data-ui-theme] .app-shell.studio-ui:not(.protected-shell):has(.hall-entry) .topbar {
+  position: absolute;
+  inset: 8px 12px auto auto;
+  width: auto;
+  z-index: 8;
+  margin: 0;
+  background: transparent;
+}
+html[data-ui-theme] .app-shell.studio-ui:has(.hall-entry) :is(.page-frame,.page-slot) {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  padding: 0;
+  border-radius: 0;
+}
+.desk-to-hall .page-frame{view-transition-name:lesson-scene}
+.desk-to-hall .page-sweep-enter-active,.desk-to-hall .page-sweep-leave-active,.desk-to-hall .hall-scene{animation:none!important}
+::view-transition-old(lesson-scene){animation:desk-lower .7s ease-in-out both}
+::view-transition-new(lesson-scene){animation:tablet-rise .7s ease-in-out both}
+@keyframes desk-lower{to{transform:translateY(-17%) scale(1.07);opacity:0}}
+@keyframes tablet-rise{from{transform:translateY(17%) scale(.97);opacity:0}}
+html[data-ui-theme] .app-shell.studio-ui.desk-fullscreen:has(.tag-wall) .workspace {position:relative;padding:0!important;height:100dvh}
+html[data-ui-theme] .app-shell.studio-ui.desk-fullscreen:has(.tag-wall) .topbar {position:absolute;inset:6px 10px auto auto;width:auto;max-width:100%;padding:0;min-height:0;margin:0;background:transparent;z-index:8}
+.app-shell:has(.tag-wall) .topbar :is(.page-crumb,.cir-search){display:none}
+html[data-ui-theme] .app-shell.studio-ui.desk-fullscreen .page-dashboard:has(.tag-wall) {height:100%!important;padding:0;overflow:hidden}
+</style>

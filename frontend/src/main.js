@@ -20,6 +20,8 @@ import './functional-ui.css'
 import './themes/academy.css'
 import './themes/studio.css'
 import './themes/compact.css'
+import './themes/workspace.css'
+import './themes/warm-studio.css'
 import { initializeTheme } from './utils/uiTheme.js'
 import { initializeUiVersion } from './utils/uiVersion.js'
 
@@ -37,6 +39,7 @@ const router = createRouter({
       component: AppShell,
       meta: { auth: true },
       children: [
+        ...(import.meta.env.VITE_ADAPTIVE_ENABLED === 'true' ? [{ path: 'adaptive', component: () => import('./views/AdaptiveView.vue'), meta: { crumb: '自适应学习 / 学习路径' } }] : []),
         { path: 'dashboard', component: DashboardView, meta: { crumb: '工作台  /  总览' } },
         { path: 'courses', component: CoursesView, meta: { crumb: '课程中心  /  选课' } },
         { path: 'training', redirect: classroomEntry },

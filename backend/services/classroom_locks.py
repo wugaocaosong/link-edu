@@ -9,7 +9,7 @@ _threads = {'budget': threading.RLock(), 'server': threading.RLock()}
 _server_handle = None
 
 def _file(name):
-    folder = Path(__file__).resolve().parents[1] / 'instance'
+    folder = Path(os.environ['LINK_RUNTIME_DIRECTORY']) if os.environ.get('LINK_RUNTIME_DIRECTORY') else Path(__file__).resolve().parents[1] / 'instance'
     folder.mkdir(parents=True, exist_ok=True)
     handle = (folder / f'classroom-{name}.lock').open('a+b')
     handle.seek(0, 2)

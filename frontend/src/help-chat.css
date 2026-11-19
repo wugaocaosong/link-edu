@@ -59,4 +59,11 @@
 .help-dock .help-chat__log p { font-size:14px; }
 .help-dock .help-chat__guide p,.help-dock input { font-size:13px; }
 @media(max-width:600px) { .help-dock:has(.help-chat) .digital-human-fab { visibility:hidden; } }
-@media(max-width:600px) { .help-dock .help-fab.digital-human-fab { top:14px;right:18px;bottom:auto;width:58px;height:74px; } :fullscreen .help-dock .help-fab.digital-human-fab { top:auto;bottom:8px;right:8px; } }
+@media(max-width:600px) { .help-dock .help-fab.digital-human-fab { top:auto;right:8px;bottom:12px;width:64px;height:88px; } :fullscreen .help-dock .help-fab.digital-human-fab { top:auto;bottom:8px;right:8px; } }
+
+.help-dock .assistant-tools-toggle {margin-left:auto;border:1px solid #baa6ca66;border-radius:16px;padding:5px 12px;background:#89669b20;color:inherit;font-size:12px}
+.help-dock .help-chat__bar .close-x {margin-left:0}
+.assistant-tools-panel {flex:0 1 auto;max-height:46%;overflow:auto;border-bottom:1px solid #a68eaa38}
+.help-dock .help-chat__log {padding:18px 16px;gap:14px}
+.help-chat__log article {align-self:flex-start;max-width:92%}
+.help-chat__form {flex:none}

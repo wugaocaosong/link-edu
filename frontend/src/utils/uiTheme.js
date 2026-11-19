@@ -2,7 +2,7 @@ import { computed, readonly, shallowRef } from 'vue'
 import { loadSettings, saveSettings } from './settings.js'
 
 export const UI_THEMES = Object.freeze([
-  { id: 'classic', name: '经典紫橙', description: '原有深色玻璃、动态背景与空间效果' },
+  { id: 'classic', name: '经典紫橙', description: '深色界面、紫橙点缀与暖色强调' },
   { id: 'academy', name: '银蓝学院', description: '钴蓝导航、银蓝底色与清晰的浅色面板' },
 ])
 export const normalizeTheme = (value) => UI_THEMES.some(theme => theme.id === value) ? value : 'classic'

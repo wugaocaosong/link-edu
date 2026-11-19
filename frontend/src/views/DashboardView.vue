@@ -1,6 +1,7 @@
 <template>
   <div class="page-dashboard" :aria-busy="dashboardStatus === 'loading'">
-    <div class="dash-grid">
+    <TagWall v-if="isStudio" :key="auth.user?.id" :owner="auth.user?.id" :greeting="greeting.title || greeting.periodZh + '，' + greeting.name" :weekly="weekly" :course="continueTraining" :feedback="aiFeedback" :growth="growthTrajectory" :entries="availableEntries" :status="dashboardStatus" @panel="openPanel" @resume="resumeTraining" @retry="loadDashboard" />
+    <div v-else class="dash-grid">
       <section class="welcome" data-tour="start">
         <div class="welcome-copy">
           <PaperTitle :text="greeting.title || `${greeting.periodZh}，${greeting.name}`" legacy-visible />
@@ -262,6 +263,7 @@
 </template>
 
 <script setup>
+import TagWall from "../components/TagWall.vue"
 import PaperTitle from '../components/PaperTitle.vue'
 import PixelClassPreview from '../components/PixelClassPreview.vue'
 import { useUiVersion } from '../utils/uiVersion.js'

@@ -6,6 +6,8 @@ import { transformSync } from 'esbuild'
 import * as vue from 'vue'
 import { useReducedMotion, useMotionReveal } from '../src/utils/useReducedMotion.js'
 import * as uiTheme from '../src/utils/uiTheme.js'
+import * as uiVersion from '../src/utils/uiVersion.js'
+import * as studioPresentation from '../src/utils/studioPresentation.js'
 
 const source = readFileSync(new URL('../src/views/GrowthView.vue', import.meta.url), 'utf8')
 
@@ -26,6 +28,8 @@ function createGrowth(fetchGrowth) {
     '../components/fx/ModelShowcase.vue': {},
     '../utils/useReducedMotion.js': { useReducedMotion, useMotionReveal },
     '../utils/uiTheme.js': uiTheme,
+    '../utils/uiVersion.js': uiVersion,
+    '../utils/studioPresentation.js': studioPresentation,
     vue: { ...vue, onMounted() {}, watch() {} },
     'vue-router': { useRouter: () => ({ push: target => navigation.push(target) }) },
     'echarts/core': { use() {} },
@@ -68,4 +72,35 @@ test('growth loading failure clears old data and never fabricates scores or jour
   for (const key of ['points', 'records', 'journals', 'heatmap', 'milestones', 'summaries']) {
     assert.deepEqual(state[key].value, [])
   }
+})
+
+test('an older range response cannot replace the newest range', async () => {
+  const pending = []
+  const { state } = createGrowth(() => new Promise(resolve => pending.push(resolve)))
+  const first = state.load()
+  const second = state.load()
+  pending[1]({ points: [{ score: 91 }], heatmap: [{ date: '2026-10-22', count: 1 }] })
+  await second
+  pending[0]({ points: [{ score: 65 }], heatmap: [{ date: '2026-09-22', count: 1 }] })
+  await first
+  assert.equal(state.points.value[0].score, 91)
+  assert.equal(state.calendarMonth.value, '2026-10')
+  assert.equal(state.growthLoading.value, false)
+})
+
+test('month calendar aligns Monday first and distinguishes missing coverage from zero activity', () => {
+  const cells = studioPresentation.monthCalendar([{ date: '2026-10-09', count: 0 }, { date: '2026-10-22', count: 2 }], '2026-10')
+  assert.equal(cells.length, 35)
+  assert.equal(cells[0].placeholder, true)
+  assert.equal(cells[3].date, '2026-10-01')
+  assert.equal(cells.find(cell => cell.date === '2026-10-09').unavailable, false)
+  assert.equal(cells.find(cell => cell.date === '2026-10-10').unavailable, true)
+  assert.equal(cells.find(cell => cell.date === '2026-10-22').count, 2)
+})
+
+test('month calendar handles leap years and month lists crossing years', () => {
+  const cells = studioPresentation.monthCalendar([], '2024-02')
+  assert.equal(cells.filter(cell => !cell.placeholder).length, 29)
+  assert.deepEqual(studioPresentation.calendarMonths([{ date: '2026-01-01' }, { date: '2025-12-31' }, { date: '2026-01-02' }]), ['2025-12', '2026-01'])
+  assert.deepEqual(studioPresentation.monthCalendar([], '2026-13'), [])
 })

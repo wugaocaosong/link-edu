@@ -8,6 +8,14 @@ import SplitTitle from "../components/fx/SplitTitle.vue";
 import ModelShowcase from "../components/fx/ModelShowcase.vue";
 import { libraryResources, libraryTabs } from "../data/libraryResources";
 import { boardCoverFor } from "../data/libraryBoardCovers";
+import StudioBanner from '../components/StudioBanner.vue';
+import StudioArt from '../components/StudioArt.vue';
+import { useUiVersion } from '../utils/uiVersion.js';
+import { matchesResource, resourceCoverIndex } from '../utils/studioPresentation.js';
+const { isStudio } = useUiVersion();
+const query = ref('');
+const courseCount = ref(null);
+const libraryPage = ref(1);
 
 const tab = ref("全部");
 const collection = ref('library');
@@ -71,6 +79,10 @@ const boardCards = computed(() =>
     })),
   ),
 );
+const filteredCards = computed(() => boardCards.value.filter(item => matchesResource(item, query.value)));
+const libraryPages = computed(() => Math.max(1, Math.ceil(filteredCards.value.length / 6)));
+const pageCards = computed(() => filteredCards.value.slice((libraryPage.value - 1) * 6, libraryPage.value * 6));
+watch([tab, query, collection], () => { libraryPage.value = 1 });
 
 function metaLabel(item) {
   if (item.pages) return `${item.format} · ${item.pages} 页`;
@@ -134,15 +146,20 @@ onUnmounted(() => {
 
 <template>
   <div class="sparse-page resource-page">
-<PaperTitle text="灵感资料室" legacy-text="资源库" />
+<PaperTitle v-if="!isStudio" text="灵感资料室" legacy-text="资源库" />
 
     <div class="page-scroll">
+    <StudioBanner title="教学资源库" subtitle="为每一次课堂，准备更好的开始。" variant="library">
+      <span class="studio-banner__note">{{ collection === 'library' ? `${libraryResources.length} 份精选资料` : courseCount === null ? '教案、素材、报告与成长档案' : `${courseCount} 份课程资料` }}</span>
+    </StudioBanner>
     <div class="resource-collection-row" data-tour="resources"><div class="collection-switch" aria-label="资料来源">
       <button type="button" :aria-pressed="collection === 'library'" @click="collection = 'library'">精选资料</button>
       <button type="button" :aria-pressed="collection === 'courses'" @click="collection = 'courses'">课程资源</button>
+      <router-link to="/knowledge">知识库</router-link>
     </div>
-    <span class="resource-count">{{ libraryResources.length }} 份资料</span><ModelShowcase kind="archive" label="立体资料卡片" /></div>
-    <CourseResourceCatalog v-if="collection === 'courses'" />
+    <label v-if="isStudio" class="studio-resource-search"><span class="sr-only">搜索资料</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/></svg><input v-model="query" type="search" placeholder="搜索资料" /></label>
+    <template v-if="!isStudio"><span class="resource-count">{{ libraryResources.length }} 份资料</span><ModelShowcase kind="archive" label="立体资料卡片" /></template></div>
+    <CourseResourceCatalog v-if="collection === 'courses'" :query="query" @count="courseCount = $event" />
     <div v-if="collection === 'library'" class="resource-toolbar">
       <div class="resource-tabs" role="tablist" aria-label="资源分类">
         <button
@@ -155,12 +172,12 @@ onUnmounted(() => {
           @click="tab = item"
         >{{ item }}</button>
       </div>
-      <button class="reset-layout" type="button" @click="layoutKey += 1">
+      <button v-if="!isStudio" class="reset-layout" type="button" @click="layoutKey += 1">
         重置卡片位置
       </button>
     </div>
 
-    <section v-if="collection === 'library'" class="resource-deck" aria-label="可拖动资源卡片墙">
+    <section v-if="collection === 'library' && !isStudio" class="resource-deck" aria-label="可拖动资源卡片墙">
 
 
       <DraggableResourceCard
@@ -173,7 +190,20 @@ onUnmounted(() => {
       />
     </section>
 
-    <section v-if="collection === 'library'" class="resource-board" aria-label="分类资料浏览">
+    <section v-if="collection === 'library' && isStudio" class="studio-library" aria-label="精选资料">
+      <div class="studio-resource-grid">
+        <article v-for="item in pageCards" :key="item.id" class="studio-resource-card">
+          <StudioArt :index="resourceCoverIndex(item)" />
+          <div class="studio-resource-card__body"><em>{{ item.category }}</em><h2>{{ item.title }}</h2><p>{{ item.description }}</p><button class="studio-outline" type="button" :aria-label="`查看资料：${item.title}`" @click="open(item)">查看资料 <span aria-hidden="true">›</span></button></div>
+        </article>
+      </div>
+      <p v-if="!pageCards.length" class="dock-hint" role="status">没有找到匹配资料，试试其他关键词或分类。</p>
+      <nav v-if="filteredCards.length" class="studio-pagination" aria-label="精选资料分页">
+        <span>显示 {{ (libraryPage - 1) * 6 + 1 }}–{{ Math.min(libraryPage * 6, filteredCards.length) }} 项，共 {{ filteredCards.length }} 项</span>
+        <div><button type="button" :disabled="libraryPage === 1" aria-label="上一页" @click="libraryPage--">‹</button><button v-for="number in libraryPages" :key="number" type="button" :aria-current="libraryPage === number ? 'page' : undefined" @click="libraryPage = number">{{ number }}</button><button type="button" :disabled="libraryPage === libraryPages" aria-label="下一页" @click="libraryPage++">›</button></div>
+      </nav>
+    </section>
+    <section v-if="collection === 'library' && !isStudio" class="resource-board" aria-label="分类资料浏览">
       <header class="resource-board__head">
         <div>
 

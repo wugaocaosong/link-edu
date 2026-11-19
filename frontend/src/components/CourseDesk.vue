@@ -1,12 +1,41 @@
 <script setup>
-import { computed, ref, useId, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, useId, nextTick, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { DESK_SKILLS } from '../services/courseDesk.js'
+const destinations = [
+  { edge: 'up', label: '标签墙', to: '/dashboard' },
+  { edge: 'left', label: '档案袋', to: '/ai-review' },
+  { edge: 'right', label: '小书架', to: '/resources' },
+  { edge: 'down', label: '演绎厅', to: '/classroom' },
+]
 const props = defineProps({ selected: String, available: { type: Array, default: () => [] } })
 const emit = defineEmits(['select'])
-const root = ref(null), stageSize = ref({ width: 1000, height: 563 })
-let resize
-onMounted(() => { resize = new ResizeObserver(([e]) => { const { width, height } = e.contentRect; const s = Math.min(width / 1000, height / 563); stageSize.value = { width: 1000 * s, height: 563 * s } }); resize.observe(root.value) })
-onBeforeUnmount(() => resize?.disconnect())
+const root = ref(null)
+const router = useRouter()
+let tabletReady
+onMounted(() => {
+  const tablet = new Image()
+  tablet.src = '/assets/desk/hall-tablet.webp'
+  tabletReady = tablet.decode().catch(() => {})
+})
+async function navigateEdge(event, dest) {
+  if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
+  event.preventDefault()
+  if (dest.edge !== 'down' || !document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return router.push(dest.to)
+  }
+  await tabletReady
+  document.documentElement.classList.add('desk-to-hall')
+  try {
+    const transition = document.startViewTransition(async () => {
+      await router.push(dest.to)
+      await nextTick()
+    })
+    await transition.finished
+  } finally {
+    document.documentElement.classList.remove('desk-to-hall')
+  }
+}
 const hovered = ref(null), failed = ref(false), uid = useId().replace(/[^a-z0-9]/gi,'')
 const enabled = id => props.available.includes(id)
 const illuminated = computed(() => hovered.value || props.selected)
@@ -22,7 +51,7 @@ function move(event, index) {
 </script>
 <template>
   <div ref="root" class="course-desk" :class="{'course-desk--fallback': failed}" data-testid="course-desk">
-    <div class="course-desk__stage" :style="{ width: stageSize.width + 'px', height: stageSize.height + 'px' }">
+    <div class="course-desk__stage">
     <img class="course-desk__texture" src="/assets/desk/prep-desk.png" width="1672" height="941" alt="铺有教案本、黑板、投影仪和教学文具的备课桌" fetchpriority="high" @error="failed = true" />
     <svg v-if="!failed" class="course-desk__objects" viewBox="0 0 1000 563" preserveAspectRatio="none" aria-hidden="true">
       <defs><filter :id="`${uid}-glow`"><feGaussianBlur stdDeviation="2" /></filter>
@@ -39,12 +68,29 @@ function move(event, index) {
       <button v-for="(skill,i) in DESK_SKILLS" :key="skill.id" :data-skill="skill.id" type="button" :style="{'--x':`${skill.x}%`, '--y':`${skill.y}%`}" :class="{'is-selected':selected === skill.id}" :disabled="!enabled(skill.id)" :aria-pressed="selected === skill.id" :aria-label="`${skill.label} · ${skill.object}${enabled(skill.id) ? '' : '（暂无匹配课程）'}`" @focus="hovered = skill.id" @blur="hovered = null" @pointerenter="hovered = skill.id" @pointerleave="hovered = null" @keydown="move($event, i)" @click="select(skill.id)">{{ skill.label }}</button>
     </div>
     </div>
+    <nav class="desk-directions" aria-label="办公桌方向导航">
+      <a v-for="dest in destinations" :key="dest.edge" :class="dest.edge" :href="router.resolve(dest.to).href" @click="navigateEdge($event, dest)" :aria-label="dest.label">
+        <img src="/assets/desk/wood-arrow.webp" alt="" />
+      </a>
+    </nav>
   </div>
 </template>
 <style scoped>
+.desk-directions { position:absolute; inset:0; z-index:2; pointer-events:none; }
+.desk-directions a { position:absolute; display:grid; place-items:center; width:clamp(52px,5vw,80px); height:clamp(52px,5vw,80px); pointer-events:auto; color:#392412; }
+.desk-directions img { position:absolute; width:100%; transform:rotate(var(--angle,0deg)); filter:drop-shadow(0 3px 3px #29170880); transition:scale .18s; }
+.desk-directions span { position:relative; font-size:clamp(11px,.85vw,14px); font-weight:800; }
+.desk-directions a:hover img,.desk-directions a:focus-visible img { scale:1.08; }
+.desk-directions .left { left:4px; top:50%; translate:0 -50%; }
+.desk-directions .right { right:4px; top:50%; translate:0 -50%; --angle:180deg; }
+.desk-directions .up,.desk-directions .down { left:50%; translate:-50% 0; }
+.desk-directions .up { top:2px; --angle:90deg; }
+.desk-directions .down { bottom:2px; --angle:-90deg; }
+@media(max-width:700px){.desk-directions { bottom:auto; aspect-ratio:1672/941; }}
+
 .course-desk { position:relative; isolation:isolate; width:100%; height:100%; overflow:hidden; background:#3b2c2a; }
 .course-desk::before { content:""; position:absolute; inset:-20px; background:linear-gradient(#24182744,#24182744),url("/assets/desk/prep-desk.png") center/cover; filter:blur(18px); }
-.course-desk__stage { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); }
+.course-desk__stage { position:absolute; inset:0; }
 .course-desk__labels button { white-space:nowrap; }
 .course-desk__texture,.course-desk__objects { position:absolute; inset:0; width:100%; height:100%; object-fit:fill; }
 .course-desk__objects { pointer-events:none; }

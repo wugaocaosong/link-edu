@@ -1,8 +1,9 @@
 <template>
   <div class="sparse-page page-growth">
-<PaperTitle text="每一步，都算数" legacy-text="成长档案" />
+<PaperTitle v-if="!isStudio" text="每一步，都算数" legacy-text="成长档案" />
 
     <div class="page-scroll">
+      <div v-if="isStudio" class="studio-growth-title"><h1>成长档案</h1><p>每一步练习，都在积累下一次从容。</p></div>
       <details class="growth-alert"><summary>历史规则评分 · 查看来源</summary>
         以下轨迹保留旧演示 / 规则评分。真实 AI 课堂按证据覆盖评价，不与此分数直接比较。
         <router-link to="/ai-review">查看模拟课堂评课 →</router-link>
@@ -25,24 +26,25 @@
       <div class="growth-dash">
         <section ref="chartPanel" class="growth-chart-panel glass" aria-label="得分趋势">
           <div class="growth-chart-panel__head">
-            <ModelShowcase kind="orbit" label="成长轨道模型" />
+            <ModelShowcase v-if="!isStudio" kind="orbit" label="成长轨道模型" />
             <div>
               <h2>得分趋势</h2>
-              <p>{{ rangeLabel }}</p>
+              <p>{{ rangeLabel }}<span v-if="isStudio"> · 历史规则评分</span></p>
             </div>
             <div class="range-switch">
-              <button type="button" :class="{ active: range === '7d' }" @click="range = '7d'">7 日</button>
-              <button type="button" :class="{ active: range === '30d' }" @click="range = '30d'">30 日</button>
-              <button type="button" :class="{ active: range === 'all' }" @click="range = 'all'">全部</button>
+              <button type="button" :aria-pressed="range === '7d'" :class="{ active: range === '7d' }" @click="range = '7d'">7 日</button>
+              <button type="button" :aria-pressed="range === '30d'" :class="{ active: range === '30d' }" @click="range = '30d'">30 日</button>
+              <button type="button" :aria-pressed="range === 'all'" :class="{ active: range === 'all' }" @click="range = 'all'">全部</button>
             </div>
           </div>
-          <p v-if="loadError" class="dock-hint" role="alert">{{ loadError }}</p>
-          <p v-else-if="!points.length" class="dock-hint">当前范围暂无训练评分。</p>
+          <p v-if="growthLoading" class="dock-hint" role="status">正在整理成长记录…</p>
+          <p v-else-if="loadError" class="dock-hint" role="alert">{{ loadError }} <button type="button" @click="load">重新加载</button></p>
+          <div v-else-if="!points.length" class="studio-growth-empty"><div><h3>每一份反馈，都是成长的起点</h3><p>当前范围暂无训练评分。完成训练后，在这里回看变化。</p><router-link class="studio-primary" to="/classroom">去模拟课堂 <span aria-hidden="true">›</span></router-link></div><div v-if="isStudio" class="studio-growth-empty__art" aria-hidden="true"></div></div>
           <VChart v-else-if="chartSeen" class="growth-line" :option="lineOption" autoresize />
           <div v-else class="growth-line" aria-hidden="true"></div>
         </section>
 
-        <section class="growth-heat-panel glass" aria-label="训练日历">
+        <section class="growth-heat-panel glass" aria-label="训练日历" :aria-busy="growthLoading">
           <div class="growth-heat-panel__head">
             <div>
               <h2>训练日历</h2>
@@ -59,29 +61,35 @@
             </div>
           </div>
 
+          <div v-if="isStudio" class="studio-month-switch"><h3>{{ calendarMonthLabel }}</h3><div><button type="button" aria-label="上个月" :disabled="monthIndex <= 0" @click="calendarMonth = months[monthIndex - 1]">‹</button><button type="button" aria-label="下个月" :disabled="monthIndex < 0 || monthIndex >= months.length - 1" @click="calendarMonth = months[monthIndex + 1]">›</button></div></div>
+          <div class="studio-calendar-layout"><div class="studio-calendar-main">
           <div class="growth-heat-weekdays" aria-hidden="true">
             <span v-for="day in heatWeekdays" :key="day">{{ day }}</span>
           </div>
           <div class="growth-heat-grid">
             <button
-              v-for="cell in paddedHeatmap"
+              v-for="cell in displayHeatmap"
               :key="cell.key"
               type="button"
-              :disabled="cell.placeholder"
+              :disabled="cell.placeholder || cell.unavailable || growthLoading"
+              :aria-label="cell.placeholder ? undefined : cell.unavailable ? `${cell.date} 不在当前数据范围` : heatCellTitle(cell)"
+              :aria-pressed="!!cell.date && cell.date === selectedHeatDate"
               :class="{
                 on: cell.count > 0,
                 selected: cell.date && cell.date === selectedHeatDate,
-                muted: cell.placeholder,
+                muted: cell.placeholder || cell.unavailable,
               }"
-              :title="cell.placeholder ? '' : heatCellTitle(cell)"
+              :title="cell.placeholder ? '' : cell.unavailable ? `${cell.date} 不在当前数据范围` : heatCellTitle(cell)"
               @click="toggleHeatDay(cell)"
             >
               <i :data-level="cell.level || 0"></i>
               <em v-if="!cell.placeholder">{{ cell.dayLabel }}</em>
             </button>
           </div>
-
-          <p v-if="selectedHeatCell" class="growth-heat-detail">
+          </div>
+          <aside v-if="isStudio" class="studio-calendar-note"><div><span class="studio-label">{{ selectedHeatCell ? '当日训练' : '训练手账' }}</span><h3>{{ selectedHeatCell?.label || selectedHeatCell?.date || '把练习，记在这里' }}</h3><template v-if="selectedHeatCell"><p>训练 <strong>{{ selectedHeatCell.count || 0 }}</strong> 次 · 约 {{ selectedHeatCell.minutes || 0 }} 分钟</p><button type="button" class="studio-outline" @click="recordsPanel?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' })">查看当天记录</button><button type="button" class="ghost-link" @click="clearHeatFilter">清除筛选</button></template><p v-else>{{ heatmap.length ? '选择日期，回看当天的练习与收获。' : '当前范围还没有训练记录。' }}</p></div><div class="studio-calendar-note__art" aria-hidden="true"></div></aside>
+          </div>
+          <p v-if="selectedHeatCell && !isStudio" class="growth-heat-detail">
             <strong>{{ selectedHeatCell.label || selectedHeatCell.date }}</strong>
             训练 {{ selectedHeatCell.count || 0 }} 次
             · 约 {{ selectedHeatCell.minutes || 0 }} 分钟
@@ -90,7 +98,7 @@
         </section>
 
         <div class="growth-split">
-          <section class="growth-records glass" aria-label="训练回放记录">
+          <section ref="recordsPanel" class="growth-records glass" aria-label="训练回放记录">
             <div class="growth-records__head">
               <div>
                 <h2>训练记录</h2>
@@ -201,6 +209,13 @@ import ModelShowcase from '../components/fx/ModelShowcase.vue'
 import { useReducedMotion, useMotionReveal } from '../utils/useReducedMotion.js'
 import { fetchGrowth } from '../services/dashboard'
 import { api } from '../services/api'
+import { useUiVersion } from '../utils/uiVersion.js'
+import { calendarMonths, monthCalendar } from '../utils/studioPresentation.js'
+const { isStudio } = useUiVersion()
+const recordsPanel = ref(null)
+const growthLoading = ref(true)
+let loadRequest = 0
+const calendarMonth = ref('')
 
 use([CanvasRenderer, LineChart, GridComponent, TooltipComponent, LegendComponent])
 
@@ -252,14 +267,19 @@ const paddedHeatmap = computed(() => {
   })
   return padded
 })
+const months = computed(() => calendarMonths(heatmap.value))
+const monthIndex = computed(() => months.value.indexOf(calendarMonth.value))
+const calendarMonthLabel = computed(() => calendarMonth.value ? `${calendarMonth.value.slice(0, 4)} 年 ${Number(calendarMonth.value.slice(5))} 月` : '训练日历')
+const displayHeatmap = computed(() => isStudio.value ? monthCalendar(heatmap.value, calendarMonth.value) : paddedHeatmap.value)
 
 const selectedHeatCell = computed(() => (
   heatmap.value.find((cell) => cell.date === selectedHeatDate.value) || null
 ))
 
 const heatSummaryText = computed(() => {
-  const total = heatmap.value.reduce((sum, cell) => sum + (cell.count || 0), 0)
-  const activeDays = heatmap.value.filter((cell) => cell.count > 0).length
+  const cells = isStudio.value && calendarMonth.value ? heatmap.value.filter(cell => cell.date?.startsWith(calendarMonth.value)) : heatmap.value
+  const total = cells.reduce((sum, cell) => sum + (cell.count || 0), 0)
+  const activeDays = cells.filter((cell) => cell.count > 0).length
   if (selectedHeatCell.value) {
     return `已选 ${selectedHeatCell.value.label || selectedHeatCell.value.date}`
   }
@@ -448,19 +468,24 @@ function goTraining() {
 }
 
 async function load() {
+  const request = ++loadRequest
+  growthLoading.value = true
   showAllRecords.value = false
   selectedPointIndex.value = -1
   selectedHeatDate.value = ''
   try {
     const data = await fetchGrowth(range.value)
+    if (request !== loadRequest) return
     loadError.value = ''
     points.value = data.points || []
     milestones.value = data.milestones || []
     heatmap.value = data.heatmap || []
+    calendarMonth.value = calendarMonths(heatmap.value).at(-1) || `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`
     records.value = data.records || []
     summaries.value = data.summaries || []
     journals.value = data.journals || []
   } catch (error) {
+    if (request !== loadRequest) return
     points.value = []
     milestones.value = []
     heatmap.value = []
@@ -469,11 +494,14 @@ async function load() {
     journals.value = []
     selectedHeatDate.value = ''
     loadError.value = error?.response?.data?.message || '成长档案加载失败，请检查后端服务后重试。'
+  } finally {
+    if (request === loadRequest) growthLoading.value = false
   }
   if (points.value.length) selectedPointIndex.value = points.value.length - 1
 }
 
 watch(range, load)
+watch(calendarMonth, () => { clearHeatFilter(); showAllRecords.value = false })
 async function loadPracticePlans(){
   try{practicePlans.value=(await api.get('/classroom/practice-plans',{timeout:15000,skipBusy:true})).data.items||[];practiceError.value='';}
   catch(error){practicePlans.value=[];practiceError.value=error?.response?.data?.message||'复练任务暂时无法读取。';}
