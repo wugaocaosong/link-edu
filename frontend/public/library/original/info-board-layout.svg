@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" font-family="'Kaiti SC','STKaiti',KaiTi,sans-serif">
+  <rect x="0" y="0" width="900" height="560" fill="#2f4f3e"/>
+  <rect x="14" y="14" width="872" height="532" fill="none" stroke="#c8d8c0" stroke-width="3" rx="8"/>
+  <text x="450" y="52" text-anchor="middle" fill="#fdf6e3" font-size="30" font-weight="bold">数据、信息与知识</text>
+
+  <!-- 主板书 -->
+  <text x="70" y="120" fill="#fdf6e3" font-size="24" font-weight="bold">数据</text>
+  <text x="70" y="150" fill="#fdf6e3" font-size="18">原始记录 · 无含义</text>
+  <text x="82" y="190" fill="#9fd8a8" font-size="22" font-family="monospace">38.5</text>
+  <text x="70" y="230" fill="#c8d8c0" font-size="14">数 / 文 / 图 / 声</text>
+
+  <path d="M 210 185 C 240 160 270 160 300 185" fill="none" stroke="#ffd97a" stroke-width="3" marker-end="none"/>
+  <polygon points="300,185 288,178 288,192" fill="#ffd97a"/>
+  <text x="252" y="150" text-anchor="middle" fill="#ffd97a" font-size="16">加工/解释</text>
+
+  <text x="360" y="120" fill="#fdf6e3" font-size="24" font-weight="bold">信息</text>
+  <text x="360" y="150" fill="#fdf6e3" font-size="18">有含义</text>
+  <text x="352" y="195" fill="#9fd8a8" font-size="17">"昨夜体温38.5℃"</text>
+  <text x="352" y="222" fill="#9fd8a8" font-size="17">"偏高，要注意"</text>
+  <text x="360" y="255" fill="#c8d8c0" font-size="14">能判断了</text>
+
+  <path d="M 545 185 C 575 160 605 160 635 185" fill="none" stroke="#ffd97a" stroke-width="3"/>
+  <polygon points="635,185 623,178 623,192" fill="#ffd97a"/>
+  <text x="588" y="150" text-anchor="middle" fill="#ffd97a" font-size="16">归纳/验证</text>
+
+  <text x="690" y="120" fill="#fdf6e3" font-size="24" font-weight="bold">知识</text>
+  <text x="690" y="150" fill="#fdf6e3" font-size="18">规律与判断</text>
+  <text x="668" y="195" fill="#9fd8a8" font-size="17">"持续高热</text>
+  <text x="668" y="222" fill="#9fd8a8" font-size="17">应及时就医"</text>
+  <text x="690" y="255" fill="#c8d8c0" font-size="14">能解释新情况</text>
+
+  <text x="450" y="310" text-anchor="middle" fill="#ffd97a" font-size="18">加工方向：数据 → 信息 → 知识（不可倒）</text>
+
+  <!-- 副板书：学生判断区 -->
+  <rect x="60" y="345" width="380" height="180" fill="none" stroke="#c8d8c0" stroke-width="2" stroke-dasharray="8 6" rx="6"/>
+  <text x="78" y="378" fill="#fdf6e3" font-size="20" font-weight="bold">副板书 · 学生判断区</text>
+  <text x="78" y="412" fill="#c8d8c0" font-size="17">"背下来就是知识？" ✗</text>
+  <text x="78" y="442" fill="#c8d8c0" font-size="17">"信息越多越有用？" ✗</text>
+  <text x="78" y="472" fill="#c8d8c0" font-size="17">判据①有含义？ ②能解释新情况？</text>
+  <text x="78" y="504" fill="#9fd8a8" font-size="16">学生关键词：＿＿＿ ＿＿＿</text>
+
+  <!-- 擦改区 -->
+  <rect x="480" y="345" width="330" height="180" fill="none" stroke="#c8d8c0" stroke-width="2" stroke-dasharray="8 6" rx="6"/>
+  <text x="498" y="378" fill="#fdf6e3" font-size="20" font-weight="bold">擦改区</text>
+  <text x="498" y="412" fill="#c8d8c0" font-size="17">判断题演算 / 临时举例</text>
+  <text x="498" y="442" fill="#c8d8c0" font-size="17">例：步数 8,000 步 →</text>
+  <text x="498" y="472" fill="#c8d8c0" font-size="17">"今天活动量达标" →</text>
+  <text x="498" y="504" fill="#c8d8c0" font-size="17">"每天 8 千步有益健康"</text>
+</svg>

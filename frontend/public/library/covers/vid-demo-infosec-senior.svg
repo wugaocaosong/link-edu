@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500" role="img" aria-label="高中《信息系统安全防范》视频封面">
+  <defs>
+    <pattern id="p" width="24" height="24" patternUnits="userSpaceOnUse">
+      <rect width="24" height="24" fill="#FFFDF8"/>
+      <circle cx="3" cy="4" r="0.7" fill="#E8E0D0"/>
+      <circle cx="17" cy="18" r="0.6" fill="#EFE8DA"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="500" fill="url(#p)"/>
+  <rect x="0" y="0" width="800" height="10" fill="#3E7A52"/>
+  <rect x="56" y="58" width="193" height="34" rx="17" fill="#E6F1EA"/>
+  <text x="152.5" y="81" text-anchor="middle" font-family="system-ui,'PingFang SC','Microsoft YaHei',sans-serif" font-size="14" fill="#3E7A52">案例视频 · 高中信息</text>
+
+  <text x="56" y="176" font-family="'Songti SC','SimSun',serif" font-size="38" font-weight="700" fill="#2C2730">高中《信息系统安全防范》</text>
+  <text x="56" y="222" font-family="system-ui,'PingFang SC',sans-serif" font-size="16" fill="#8B8578">高中信息课例 · 时长 10′43″</text>
+
+  <line x1="56" y1="268" x2="200" y2="268" stroke="#3E7A52" stroke-width="3"/>
+
+  <g font-family="system-ui,'PingFang SC',sans-serif" font-size="13" fill="#A29A8C">
+    <text x="56" y="430">临客整理 · 二〇二六年</text>
+    <text x="56" y="456">网络收集教学视频 · 仅站内学习使用</text>
+  </g>
+
+  <text x="726" y="440" text-anchor="middle" font-family="'Songti SC','SimSun',serif" font-size="150" font-weight="700" fill="#E6F1EA">范</text>
+  <circle cx="726" cy="150" r="46" fill="none" stroke="#3E7A52" stroke-width="1.2" stroke-dasharray="5 7" opacity="0.5"/>
+  <circle cx="726" cy="150" r="28" fill="#3E7A52" opacity="0.12"/>
+  <path d="M719 137 L741 150 L719 163 Z" fill="#3E7A52" opacity="0.7"/>
+</svg>

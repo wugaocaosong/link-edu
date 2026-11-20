@@ -7,7 +7,7 @@ const props = defineProps({
 
 function inlineParts(text) {
   const normalized = text.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '$1/$2').replace(/\\[()]/g, '');
-  const pattern = /\[([^\]]+)]\((https?:\/\/[^)]+)\)|\*\*([^*]+)\*\*|`([^`]+)`/g;
+  const pattern = /\[([^\]]+)]\((https?:\/\/[^)]+|\/[^)\s]+)\)|\*\*([^*]+)\*\*|`([^`]+)`/g;
   const parts = [];
   let cursor = 0;
   let match;
