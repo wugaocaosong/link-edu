@@ -78,7 +78,8 @@ onMounted(loadCourses)
 .desk-search input { color:inherit; background:transparent; border:0; width:clamp(100px,13vw,210px); height:42px; outline-offset:4px; }
 .desk-directory-toggle,.desk-secondary { padding:12px 16px; color:#fff1dd; background:#241b2deb; border:1px solid #bba6c888; border-radius:24px; white-space:nowrap; }
 .desk-feedback { position:absolute; left:50%; top:45%; transform:translate(-50%,-50%); padding:18px; border-radius:16px; color:#fff; background:#241b2deb; }
-.desk-feedback button { padding:8px; margin:8px; }
+.desk-feedback {pointer-events:none;}
+.desk-feedback button { pointer-events:auto; padding:8px; margin:8px; }
 .desk-progress { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; margin:22px 0; font-size:14px; }
 .desk-progress progress { width:100%; height:8px; accent-color:#9873b2; }
 .desk-sources { display:flex; gap:16px; flex-wrap:wrap; margin-top:24px; font-size:14px; }

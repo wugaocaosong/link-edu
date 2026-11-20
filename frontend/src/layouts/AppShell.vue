@@ -33,7 +33,6 @@
     <section class="workspace" :class="{ 'workspace--immersive': immersive }">
       <button class="fold-nav" type="button" aria-controls="primary-sidebar" :aria-expanded="!sidebarFolded" :aria-label="sidebarFolded ? '展开导航' : '收起导航'" @click="sidebarFolded = !sidebarFolded">{{ sidebarFolded ? '☰' : '‹' }}</button>
       <header v-if="!immersive" class="topbar">
-        <span class="page-crumb">{{ isStudio ? pageTitle : crumb }}</span>
         <select class="mobile-page-nav" aria-label="切换页面" :value="route.path" @change="router.push($event.target.value)">
           <option v-if="!nav.some(item => item.to === route.path)" :value="route.path" disabled>{{ crumb }}</option>
           <option v-for="item in nav" :key="item.to" :value="item.to">{{ item.label }}</option>
@@ -73,7 +72,7 @@
           <div v-if="menuOpen" id="profile-menu" class="profile-menu" @click.stop>
             <button type="button" @click="goProfile('archive')">个人中心</button>
             <button type="button" @click="goProfile('settings')">设置</button>
-            <button type="button" @click="goProfile('contact')">帮助与反馈</button>
+            <button type="button" @click="goProfile('contact')">留言板</button>
             <button type="button" @click="menuOpen = false; productsOpen = true">谱联产品</button>
             <button class="mobile-logout" type="button" @click="logout">退出登录</button>
           </div>
@@ -82,17 +81,18 @@
 
       <div id="workspace-content" class="page-frame" tabindex="-1" :aria-label="pageTitle">
         <router-view v-slot="{ Component }">
-          <transition name="page-sweep" :mode="enteringHallFromDesk ? undefined : 'out-in'" :css="!enteringHallFromDesk">
+          <transition name="scene-pan" :css="usePageAnimation()">
             <div class="page-slot" :key="route.path === '/classroom' ? route.path : route.fullPath">
               <component :is="Component" />
             </div>
           </transition>
         </router-view>
+        <router-link v-if="route.path === '/resources'" class="shelf-desk-return" to="/courses" aria-label="返回办公桌"><img src="/assets/desk/wood-arrow.webp" alt="" /></router-link>
       </div>
     </section>
 
     <HelpChat />
-    <NModal v-model:show="productsOpen" preset="card" title="谱联产品" :style="{width:'min(480px, calc(100vw - 32px))', maxHeight:'85dvh', overflowY:'auto'}">
+    <NModal v-model:show="productsOpen" preset="card" class="studio-glass products-glass" title="谱联产品" :style="{width:'min(480px, calc(100vw - 32px))', maxHeight:'85dvh', overflowY:'auto'}">
       <ProductLinks current="link" />
     </NModal>
     <OnboardingTour />
@@ -123,14 +123,13 @@ const route = useRoute()
 const { isStudio } = useUiVersion()
 const { isAcademy } = useUiTheme()
 const router = useRouter()
+function usePageAnimation() {
+  return !document.documentElement.dataset.deskTravel
+}
 const auth = useAuthStore()
 provide(classroomHelpKey, shallowRef(null))
 const search = ref('')
 const sidebarFolded = ref(false)
-const enteringHallFromDesk = ref(false)
-watch(() => route.path, (to, from) => {
-  enteringHallFromDesk.value = from === '/courses' && to === '/classroom'
-}, { flush: 'sync' })
 const menuOpen = ref(false)
 const appearance = ref(null)
 const profileTrigger = ref(null)
@@ -147,7 +146,7 @@ const nav = [
 const crumb = computed(() => {
   if (route.path === '/profile') {
     if (route.query.tab === 'settings') return '设置'
-    if (route.query.tab === 'contact') return '帮助与反馈'
+    if (route.query.tab === 'contact') return '留言板'
     return '个人中心'
   }
   return route.meta.crumb || '工作台  /  总览'
@@ -249,10 +248,22 @@ html[data-ui-theme] .app-shell.studio-ui:has(.hall-entry) :is(.page-frame,.page-
   padding: 0;
   border-radius: 0;
 }
-.desk-to-hall .page-frame{view-transition-name:lesson-scene}
-.desk-to-hall .page-sweep-enter-active,.desk-to-hall .page-sweep-leave-active,.desk-to-hall .hall-scene{animation:none!important}
-::view-transition-old(lesson-scene){animation:desk-lower .7s ease-in-out both}
-::view-transition-new(lesson-scene){animation:tablet-rise .7s ease-in-out both}
+ .page-frame {position:relative;}
+.page-frame .scene-pan-leave-active {position:absolute;inset:0;pointer-events:none;animation:desk-lower .7s ease-in-out both;}
+.page-frame .scene-pan-enter-active {animation:tablet-rise .7s ease-in-out both;}
+html[data-desk-travel] .page-frame {view-transition-name:desk-hall;}
+html[data-desk-travel]::view-transition-old(desk-hall) {animation:desk-lower .65s ease-in-out both;}
+html[data-desk-travel]::view-transition-new(desk-hall) {animation:tablet-rise .65s ease-in-out both;}
+html[data-desk-travel=up]::view-transition-old(desk-hall) {animation:tablet-rise .65s ease-in-out reverse both;}
+html[data-desk-travel=up]::view-transition-new(desk-hall) {animation:desk-lower .65s ease-in-out reverse both;}
+.workspace:has(.hall-entry) .topbar {pointer-events:none;}
+.workspace:has(.hall-entry) .topbar > * {pointer-events:auto;}
+.scene-pan-enter-active .hall-scene {animation:none;}
+@media(prefers-reduced-motion:reduce){.page-frame :is(.scene-pan-enter-active,.scene-pan-leave-active){animation:none;}}
+.shelf-desk-return {position:absolute;z-index:3;left:4px;top:50%;translate:0 -50%;width:clamp(44px,5vw,76px);display:grid;place-items:center;border-radius:12px;}
+.shelf-desk-return img {width:100%;filter:drop-shadow(0 3px 3px #29170880);}
+.shelf-desk-return:is(:hover,:focus-visible) img {scale:1.06;}
+.page-frame:has(.shelf-desk-return) .resource-page {padding-inline-start:clamp(50px,6vw,82px);}
 @keyframes desk-lower{to{transform:translateY(-17%) scale(1.07);opacity:0}}
 @keyframes tablet-rise{from{transform:translateY(17%) scale(.97);opacity:0}}
 html[data-ui-theme] .app-shell.studio-ui.desk-fullscreen:has(.tag-wall) .workspace {position:relative;padding:0!important;height:100dvh}

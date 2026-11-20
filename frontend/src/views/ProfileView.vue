@@ -4,14 +4,15 @@
     <p v-if="profileError" class="dock-hint studio-error" role="alert">{{ profileError }} <button type="button" :disabled="profileLoading" @click="load">重新加载</button></p>
 
     <div ref="contentScroll" class="page-scroll" data-tour="profile">
-    <StudioBanner :title="bannerTitle" :subtitle="bannerSubtitle" :variant="page">
-      <template v-if="page === 'center'" #portrait><b class="studio-identity-avatar">{{ initial }}</b></template>
-      <span v-if="page === 'center'" class="studio-banner__note">在每一次练习中，记录自己的成长。</span>
-    </StudioBanner>
+    <header v-if="isStudio && page === 'center'" class="folio-head">
+      <h1>微格训练成绩单</h1>
+      <details><summary>考前说明</summary><p>核对考生信息后，到办公桌选课，在演绎厅完成训练。成绩栏汇总你的等级、徽章和最近评课。</p><button type="button" @click="startTour">查看操作指引</button></details>
+    </header>
+    <h1 v-if="isStudio && page === 'settings'" class="workshop-title">教室装修台</h1>
     <!-- 个人中心：身份、等级、徽章、最近训练 -->
     <div v-if="page === 'center'" class="profile-stack">
       <section class="identity-card">
-        <header v-if="isStudio" class="studio-section-heading"><h2>个人档案</h2><p>完善个人信息，记录你的教师成长之路。</p></header>
+        <header v-if="isStudio" class="studio-section-heading"><h2>考生信息</h2></header>
         <div class="identity-card__face">
           <b>{{ initial }}</b>
           <div>
@@ -39,6 +40,7 @@
       </section>
 
       <section class="level-card">
+        <h2 v-if="isStudio" class="profile-block-title">成绩栏</h2>
         <div class="level-card__meta">
           <strong>{{ profile.level_label || 'Lv.1 微格学员' }}</strong>
           <span>{{ profile.next_hint || '完成训练可提升等级' }}</span>
@@ -88,7 +90,7 @@
     <!-- 设置：只做系统操作 -->
     <div v-else-if="page === 'settings'" class="settings-stack">
       <section class="settings-block appearance-settings">
-        <h3>界面风格</h3>
+        <h3>教室配色</h3>
         <p>随时切换，选择会保存在当前浏览器。</p>
         <ThemeSwitcher cards />
       </section>
@@ -132,12 +134,6 @@
 
     <!-- 联系我们 -->
     <div v-else class="contact-stack">
-      <section class="contact-card contact-project">
-        <h3>项目信息</h3>
-        <dl class="account-dl">
-          <div><dt>产品</dt><dd>临客 LINK · AI 微格教学训练平台</dd></div>
-        </dl>
-      </section>
 
       <section v-if="supportEmail" class="contact-card contact-support">
         <h3>技术支持</h3>
@@ -152,17 +148,25 @@
         <p v-if="copyError" class="dock-hint" role="alert">{{ copyError }}</p>
       </section>
 
-      <section class="contact-card contact-shortcuts">
-        <h3>快捷入口</h3>
-        <div class="contact-actions">
-          <button type="button" @click="openHelp('bot')">常见问题</button>
-          <button type="button" @click="openHelp('human')">记录问题</button>
+
+      <section v-if="isStudio" class="pinned-board" aria-label="我的留言板">
+        <header><h1>留言板</h1><button ref="newNoteButton" type="button" :aria-expanded="writing" @click="openNote">＋ 写留言</button></header>
+        <p v-if="notesError" role="alert">{{ notesError }} <button @click="readNotes">重试</button></p>
+        <p v-if="messageOk" class="board-status" role="status">邮件已发送，留言已贴上。</p>
+        <div class="board-notes">
+          <form v-if="writing" class="pinned-paper note-editor" @submit.prevent="submitMessage">
+            <select v-model="message.topic" aria-label="留言主题"><option v-for="topic in topics" :key="topic">{{ topic }}</option></select>
+            <textarea ref="noteBody" v-model="message.body" maxlength="4000" aria-label="留言内容" rows="4" placeholder="写给项目团队的邮件…" required></textarea>
+            <label>落款 <input v-model="message.name" aria-label="落款" placeholder="匿名"></label>
+            <footer><button type="button" :disabled="messageSaving" @click="closeNote">收起</button><button type="submit" :disabled="messageSaving">{{ messageSaving ? '发送中…' : '发邮件并贴上' }}</button></footer>
+            <p v-if="messageError" role="alert">{{ messageError }}</p>
+          </form>
+          <article v-for="note in notes" :key="note.id" class="pinned-paper"><small>{{ note.topic }}</small><p>{{ note.text }}</p><footer>{{ note.author }} · {{ note.date }}</footer></article>
         </div>
       </section>
-
-      <section class="contact-card contact-form">
-        <h3>留言反馈</h3>
-        <p class="dock-hint">留言保存到你的训练日志，不会发送给外部客服。</p>
+      <section v-else class="contact-card contact-form">
+        <h3>留言板</h3>
+        <p class="dock-hint">留言会发送至项目邮箱，并保存到你的训练日志。</p>
         <form class="profile-grid" @submit.prevent="submitMessage">
           <label>姓名<input v-model="message.name" /></label>
           <label>
@@ -175,13 +179,11 @@
             </select>
           </label>
           <label class="span-2">内容<textarea v-model="message.body" rows="5" placeholder="写清发生了什么、哪一次训练或哪份评课。"></textarea></label>
-          <p v-if="isStudio" class="dock-hint span-2">记录具体情况，便于下次回顾。</p>
-          <button class="primary" type="submit" :disabled="messageSaving">{{ messageSaving ? '正在保存…' : '保存留言' }}</button>
-          <p v-if="messageOk" class="dock-hint" role="status">留言已保存到训练日志。</p>
+          <button class="primary" type="submit" :disabled="messageSaving">{{ messageSaving ? '发送中…' : '发送邮件' }}</button>
+          <p v-if="messageOk" class="dock-hint" role="status">邮件已发送，留言已保存。</p>
           <p v-if="messageError" class="dock-hint" role="alert">{{ messageError }}</p>
         </form>
       </section>
-      <div v-if="isStudio" class="contact-still-life" aria-hidden="true"></div>
     </div>
     </div>
   </div>
@@ -191,12 +193,11 @@
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { startTour } from '../utils/onboarding.js'
-import { addJournal, fetchFeedbacks, fetchProfile, saveProfile } from '../services/dashboard'
+import { sendBoardMessage, fetchJournals, fetchFeedbacks, fetchProfile, saveProfile } from '../services/dashboard'
 import { useAuthStore } from '../stores/auth'
-import { loadSettings, openHelpChat, resetSettings, saveSettings } from '../utils/settings'
+import { loadSettings, resetSettings, saveSettings } from '../utils/settings'
 import { journalSubmitErrorMessage } from '../utils/dashboardState'
 import ThemeSwitcher from '../components/ThemeSwitcher.vue'
-import StudioBanner from '../components/StudioBanner.vue'
 import StudioArt from '../components/StudioArt.vue'
 import { useUiVersion } from '../utils/uiVersion.js'
 import { badgeArtIndex } from '../utils/studioPresentation.js'
@@ -238,6 +239,28 @@ const profile = ref({
 const form = reactive({ name: '', school: '', major: '', grade: '', bio: '', role: 'student' })
 const settings = reactive(loadSettings())
 const message = reactive({ name: '', topic: '训练故障', body: '' })
+let pendingMail
+const topics = ['训练故障','评课异议','课程资源','其他']
+const writing = ref(false), notes = ref([]), notesError = ref('')
+const noteBody = ref(null), newNoteButton = ref(null)
+function openNote() {
+  writing.value = true
+  messageOk.value = false
+  nextTick(() => noteBody.value?.focus())
+}
+function closeNote() {
+  writing.value = false
+  nextTick(() => newNoteButton.value?.focus())
+}
+async function readNotes() {
+  notesError.value = ''
+  try {
+    notes.value = (await fetchJournals()).flatMap(item => {
+      const match = /^\[留言\/([^\]]+)\] (.*?)：([\s\S]*)$/.exec(item.body)
+      return match ? [{ id:item.id, topic:match[1], author:match[2], text:match[3], date:item.entry_date }] : []
+    })
+  } catch { notesError.value = '暂时无法读取墙上的留言。' }
+}
 
 const page = computed(() => {
   const tab = String(route.query.tab || '')
@@ -247,10 +270,9 @@ const page = computed(() => {
 const pageTitle = computed(() => ({
   center: '个人中心',
   settings: '设置',
-  contact: '帮助与反馈',
+  contact: '留言板',
 }[page.value]))
-const bannerTitle = computed(() => ({ center: form.name || '个人中心', settings: '把课堂，调成喜欢的样子', contact: '每一次记录，都让下一次更好' }[page.value]))
-const bannerSubtitle = computed(() => page.value === 'center' ? `${roleLabel.value} · ${form.school || '完善你的个人档案'}` : page.value === 'settings' ? '随时调整，让练习更专注。' : '帮助与反馈')
+watch(() => isStudio.value && page.value === 'contact', active => { if (active) readNotes() }, { immediate:true })
 const initial = computed(() => (form.name || profile.value.name || '临').slice(0, 1))
 const roleLabel = computed(() => (form.role === 'teacher' ? '指导教师' : '师范生'))
 const badges = computed(() => profile.value.badges || [])
@@ -375,9 +397,6 @@ function openReview(id) {
   router.push({ path: '/ai-review', query: { feedbackId: id } })
 }
 
-function openHelp(mode) {
-  openHelpChat(mode)
-}
 
 async function copyEmail() {
   copied.value = false
@@ -400,12 +419,16 @@ async function submitMessage() {
     messageError.value = '请填写留言内容。'
     return
   }
-  const text = `[留言/${message.topic}] ${message.name || form.name || '匿名'}：${body}`
+  const payload = { topic: message.topic, author: message.name || form.name || '匿名', body }
+  const signature = JSON.stringify(payload)
+  if (pendingMail?.signature !== signature) pendingMail = { signature, id: crypto.randomUUID() }
   messageSaving.value = true
   try {
-    await addJournal({ entry_date: new Date().toISOString().slice(0, 10), body: text })
+    await sendBoardMessage({ ...payload, request_id: pendingMail.id })
+    pendingMail = null
     message.body = ''
     messageOk.value = true
+    if (isStudio.value) { closeNote(); await readNotes() }
   } catch (error) {
     messageError.value = journalSubmitErrorMessage(error)
   } finally {

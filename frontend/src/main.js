@@ -21,6 +21,7 @@ import './themes/studio.css'
 import './themes/compact.css'
 import './themes/workspace.css'
 import './themes/warm-studio.css'
+import './themes/studio-scenes.css'
 import { initializeTheme } from './utils/uiTheme.js'
 import { initializeUiVersion } from './utils/uiVersion.js'
 

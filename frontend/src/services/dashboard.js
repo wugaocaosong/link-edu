@@ -80,6 +80,16 @@ export async function saveProfile(payload) {
   return data
 }
 
+export async function fetchJournals() {
+  const { data } = await api.get('/journals')
+  return data.items || []
+}
+
+export async function sendBoardMessage(message) {
+  const { data } = await api.post('/board-messages', message)
+  return data.item
+}
+
 export async function addJournal(payload) {
   const { data } = await api.post('/journals', payload)
   return data.item

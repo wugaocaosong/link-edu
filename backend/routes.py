@@ -3,7 +3,12 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from extensions import db
-from models import User
+from models import BoardMailReceipt, TrainingJournal, User
+from datetime import date
+from uuid import UUID
+from sqlalchemy.exc import IntegrityError
+from services.board_mail import MailUnavailable, send_board_mail
+from tenancy import tenant_id_for_request
 from services.dashboard import build_dashboard_overview, list_courses, list_resources
 from services.growth import build_growth, get_feedback, list_feedbacks
 from services.studio import CORRECTION_OPTIONS, add_journal, build_profile, list_journals, update_profile
@@ -349,6 +354,50 @@ def create_journal():
     if error:
         return jsonify(message=error), 400
     return jsonify(item=row), 201
+
+
+@content_bp.post('/board-messages')
+@jwt_required()
+def send_board_message():
+    user = current_user()
+    if not user:
+        return jsonify(message='用户不存在'), 404
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify(message='留言格式无效'), 400
+    try:
+        request_id = str(UUID(str(data.get('request_id'))))
+    except ValueError:
+        return jsonify(message='缺少有效的留言编号'), 400
+    topic, author, body = (data.get(key) for key in ('topic', 'author', 'body'))
+    if (topic not in ('训练故障', '评课异议', '课程资源', '其他') or
+            not isinstance(author, str) or len(author) > 64 or
+            not isinstance(body, str) or not body.strip() or len(body) > 4000):
+        return jsonify(message='请检查主题、落款及留言内容（最多 4000 字）'), 400
+    key = (user.id, request_id)
+    receipt = db.session.get(BoardMailReceipt, key)
+    if receipt:
+        return jsonify(item=db.session.get(TrainingJournal, receipt.journal_id).to_dict())
+    author = author.strip() or user.name
+    note = TrainingJournal(user_id=user.id, tenant_id=tenant_id_for_request(user),
+                           entry_date=date.today().isoformat(), body=f'[留言/{topic}] {author}：{body.strip()}')
+    try:
+        db.session.add(note)
+        db.session.flush()
+        db.session.add(BoardMailReceipt(user_id=user.id, request_id=request_id, journal_id=note.id))
+        db.session.flush()
+        send_board_mail(topic, author, body.strip())
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        receipt = db.session.get(BoardMailReceipt, key)
+        if not receipt:
+            raise
+        return jsonify(item=db.session.get(TrainingJournal, receipt.journal_id).to_dict())
+    except MailUnavailable as exc:
+        db.session.rollback()
+        return jsonify(message=str(exc)), 503
+    return jsonify(item=note.to_dict()), 201
 
 
 @content_bp.get('/profile')

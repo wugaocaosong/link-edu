@@ -180,6 +180,13 @@ class Resource(db.Model):
         }
 
 
+class BoardMailReceipt(db.Model):
+    __tablename__ = 'board_mail_receipts'
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    request_id = db.Column(db.String(36), primary_key=True)
+    journal_id = db.Column(db.Integer, db.ForeignKey('training_journals.id'), nullable=False)
+
+
 class TrainingJournal(db.Model):
     __tablename__ = 'training_journals'
 

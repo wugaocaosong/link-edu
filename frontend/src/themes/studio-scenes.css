@@ -1,0 +1,133 @@
+/* All scene dialogs share the course desk's plum glass and brass focus ring. */
+html[data-ui-theme] :is(.wall-dialog, .products-glass.n-card, .page-dashboard .dash-sheet, .page-dashboard .dash-modal) {
+  color-scheme:dark;
+  color:#fff3e8;
+  border:1px solid #ffe4ca42;
+  border-radius:20px;
+  background:linear-gradient(130deg,#44343eee,#252330f7);
+  backdrop-filter:blur(20px);
+  box-shadow:0 20px 65px #1b101955;
+  --n-text-color:#fff3e8;
+  --n-title-text-color:#fff3e8;
+  --n-close-icon-color:#fff3e8;
+}
+.products-glass.n-card .n-card-header,
+html[data-ui-theme] :is(.wall-dialog,.dash-sheet,.dash-modal) header {
+  border-bottom:1px solid #fff0dc33;
+  padding-bottom:12px;
+  margin-bottom:14px;
+}
+html[data-ui-theme] :is(.wall-dialog button, .products-glass .pulian-products a) {
+  background:#ffffff0c; color:#fff3e8; border:1px solid #ffe2c538; border-radius:10px;
+}
+html[data-ui-theme] :is(.products-glass .n-base-close,.wall-dialog header button,.page-dashboard .close-x) {
+  width:34px;height:34px;padding:0;border:1px solid #e9bc8b88;border-radius:50%;color:#fff4df;
+}
+html[data-ui-theme] :is(.products-glass,.wall-dialog,.dash-sheet,.dash-modal) :focus-visible {
+  outline:2px solid #ffc278;outline-offset:2px;
+}
+html[data-ui-theme] .wall-dialog button[aria-pressed=true],
+html[data-ui-theme] .wall-dialog .wall-primary {background:#f3bf7e;color:#332335;}
+html[data-ui-theme] .products-glass .pulian-products a:hover {background:#ffffff19;}
+
+html[data-ui-theme][data-ui-version=studio] .app-shell.studio-ui:not(.protected-shell) {
+  & .topbar {justify-content:flex-end;}
+  & .profile-page--center, & .profile-page--contact {
+    height:100%; min-height:0; overflow:hidden; box-sizing:border-box;
+    background-position:center; background-size:cover;
+  }
+  & .profile-page--center {
+    --studio-text:#392b29; --studio-muted:#66544a; --studio-accent:#743645;
+    --studio-gold:#854c20; --studio-line:#643f342f; --studio-inset:#fffaf09e;
+    background-color:#efdfbf;background-image:url('/assets/desk/report-folio.webp');
+    padding:clamp(45px,10vh,100px) clamp(24px,15%,240px) clamp(34px,7vh,74px);
+    color:var(--studio-text);color-scheme:light;
+  }
+  & :is(.profile-page--center,.profile-page--contact) > .page-scroll {
+    height:100%; min-height:0; overflow:auto; padding:8px clamp(8px,1.4vw,24px) 22px; scrollbar-width:thin;
+  }
+  & .folio-head {text-align:center;margin:0 auto 18px;}
+  & .folio-head h1,& .contact-form h3,& .workshop-title {
+    font:700 clamp(25px,2.8vw,42px)/1.35 Georgia,"Songti SC","SimSun",serif;
+  }
+  & .folio-head h1 {margin:0 0 6px;color:#60333b;}
+  & .folio-head details {font-size:14px;color:#634238;}
+  & .folio-head summary {cursor:pointer;}
+  & .profile-stack {gap:14px;grid-template-columns:minmax(0,1fr) minmax(0,1fr);}
+  & .profile-stack > section {background:#fff9edba;border:1px solid #75513a38;padding:clamp(12px,1.4vw,22px);border-radius:4px;}
+  & .profile-stack .profile-grid {gap:10px;}
+  & .profile-stack .badge-grid {grid-template-columns:repeat(auto-fit,minmax(min(100%,88px),1fr));}
+  & .profile-stack .studio-art {max-width:58px;}
+  & .profile-stack .dock-hint,& .profile-stack .profile-copy {color:var(--studio-muted);}
+  & .profile-page--contact {background:#514f35 url('/assets/desk/message-board.webp') center/cover;padding:5vh 4%;}
+  & .contact-stack {display:flex;flex-direction:column;max-width:540px;margin:auto;gap:12px;}
+  & .contact-form {order:-1;background:#fff6e7f5;border:1px solid #e8d6b7;border-radius:3px;
+    color:#382e2c;--studio-text:#382e2c;--studio-muted:#66554a;--studio-line:#8e735a59;--studio-inset:#fffaf1;color-scheme:light;
+    box-shadow:0 8px 22px #21190c55;}
+  & .contact-form .dock-hint {color:var(--studio-muted);}
+  & .contact-form textarea {min-height:110px;}
+  & .profile-page--settings > .page-scroll {padding:clamp(14px,3vw,40px);box-sizing:border-box;}
+  & .workshop-title {color:#fff0d1;margin:0 auto 16px;max-width:1040px;}
+  & .settings-stack {max-width:1040px;gap:12px;}
+  & .settings-stack .settings-block {border-top:3px solid #c4a478;border-radius:5px 5px 12px 12px;}
+  & .settings-stack .theme-swatch {height:clamp(52px,8vh,85px);}
+  @media(max-width:850px){
+    & .profile-page--center {padding:6vh 4vw 4vh;}
+    & .profile-stack {grid-template-columns:minmax(0,1fr);}
+    & .profile-stack > section {grid-column:1;grid-row:auto;}
+  }
+}
+
+html[data-ui-theme][data-ui-version=studio] .app-shell.studio-ui:not(.protected-shell) .workspace:has(.profile-page) {
+  position:relative; height:100dvh; padding:0!important; overflow:hidden;
+  & .topbar {position:absolute;inset:8px 12px auto auto;width:auto;max-width:calc(100% - 24px);min-height:0;margin:0;padding:0;z-index:8;background:transparent;border:0;}
+  & :is(.page-frame,.page-slot,.profile-page) {height:100%;min-height:0;margin:0;max-width:none;border-radius:0;box-sizing:border-box;}
+  & .page-frame,& .page-slot {padding:0;overflow:hidden;}
+  & .profile-page {width:100%;overflow:hidden;background-size:cover;background-position:center;}
+  & .profile-page--center {padding-block:max(74px,25dvh) max(28px,11dvh);padding-inline:clamp(16px,16%,300px);}
+  & .profile-page--center > .page-scroll {overscroll-behavior:contain;scroll-padding-block:12px;}
+  & .profile-stack {align-items:stretch;}
+  & .profile-stack > section {margin:0;min-width:0;}
+  & .profile-page--settings {background:#696c53 url('/assets/desk/decor-workbench.webp') center/cover;padding:74px clamp(12px,12vw,220px) 5vh;}
+  & .profile-page--settings > .page-scroll {height:100%;overflow:auto;scrollbar-width:thin;padding:4px 8px 28px;}
+  & .settings-stack {
+    color-scheme:light; color:#48392c;
+    --studio-panel:#fff4de; --studio-inset:#faf0dc; --studio-text:#423326;
+    --studio-muted:#655746; --studio-accent:#7a552e; --studio-button-ink:#fff9ed; --studio-line:#ae98776e;
+  }
+  & .settings-stack .settings-block {background:#fff4dfef;color:#423326;}
+  & .settings-block button:not(.active), & .settings-stack .theme-option {background:#faf0dd;color:#493829;border-color:#b9a588;}
+  & .settings-stack .theme-option.selected {border-color:#886537;}
+  & .workshop-title {text-shadow:0 2px 5px #25251e;margin-bottom:12px;}
+  & .profile-page--contact {padding:clamp(76px,14vh,150px) 15% 9vh;}
+  & .contact-stack {max-width:none;}
+  & .pinned-board {order:-1;width:100%;color:#fff6de;}
+  & .pinned-board header {display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #ffedc88c;padding-bottom:12px;}
+  & .pinned-board h1 {margin:0;font:700 clamp(26px,4vw,48px)/1.2 Georgia,"SimSun",serif;text-shadow:0 2px 6px #33291c;}
+  & .pinned-board button {background:#fff0cb;color:#483421;border:1px solid #bd9b64;border-radius:4px;padding:8px 14px;cursor:pointer;}
+  & .board-notes {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));align-items:start;gap:22px;padding:26px 6px;}
+  & .pinned-paper {position:relative;max-width:360px;box-sizing:border-box;background:linear-gradient(140deg,#fffae8,#ead9ad);color:#42382b;border-radius:2px;padding:22px 19px 17px;box-shadow:2px 5px 8px #30231161;rotate:-1deg;}
+  & .pinned-paper:nth-child(even) {rotate:1deg;background:linear-gradient(130deg,#ffedcd,#ebcfad);}
+  & .pinned-paper::before {content:"";position:absolute;top:-5px;left:48%;width:13px;height:13px;border-radius:50%;background:radial-gradient(circle at 32% 25%,#ffe0a4,#ae6436 55%,#723e24);box-shadow:1px 3px 3px #55331477;}
+  & .pinned-paper p {white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7;color:inherit;}
+  & .pinned-paper footer {font-size:12px;text-align:right;}
+  & .note-editor {width:100%;display:grid;gap:12px;rotate:0;color-scheme:light;}
+  & .note-editor :is(textarea,input,select) {min-width:0;color:#403422;background:transparent;border:0;border-bottom:1px solid #b5a27d;border-radius:0;font:inherit;padding:4px;}
+  & .note-editor textarea {width:100%;resize:vertical;line-height:28px;background:repeating-linear-gradient(transparent 0 27px,#b9a98577 27px 28px);box-sizing:border-box;}
+  & .note-editor input {width:65%;}
+  & .note-editor footer {display:flex;justify-content:flex-end;gap:8px;}
+  & .note-editor button[type=submit] {background:#664233;color:#fff8df;}
+  @media(min-width:851px) {
+    & .profile-stack {grid-template-areas:"identity level" "identity badges" "identity recent";grid-template-columns:repeat(2,minmax(0,1fr));}
+    & .profile-stack .identity-card {grid-area:identity;}
+    & .profile-stack .level-card {grid-area:level;}
+    & .profile-stack .profile-badges {grid-area:badges;}
+    & .profile-stack .profile-recent {grid-area:recent;}
+  }
+  @media(max-width:700px) {
+    & .profile-page--center {padding-inline:4vw;}
+    & .profile-page--contact,& .profile-page--settings {padding:76px 5% 52px;}
+    & .topbar .cir-search {display:none;}
+    & .topbar {left:8px;right:8px;max-width:none;}
+  }
+}

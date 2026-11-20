@@ -9,7 +9,7 @@ import * as uiTheme from '../src/utils/uiTheme.js'
 import * as uiVersion from '../src/utils/uiVersion.js'
 import * as studioPresentation from '../src/utils/studioPresentation.js'
 
-const source = readFileSync(new URL('../src/views/GrowthView.vue', import.meta.url), 'utf8')
+const source = readFileSync(new URL('../src/views/GrowthArchiveView.vue', import.meta.url), 'utf8')
 
 test('growth archive exposes real range loading and record navigation', () => {
   assert.match(source, /watch\(range, load\)/)

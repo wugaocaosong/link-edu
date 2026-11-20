@@ -1,7 +1,9 @@
 <script setup>
-import { computed, ref, useId, nextTick, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref, useId, onMounted } from 'vue'
 import { DESK_SKILLS } from '../services/courseDesk.js'
+import { useRouter } from 'vue-router'
+import { travelBetweenDeskAndHall } from '../utils/deskHallTransition.js'
+const router = useRouter()
 const destinations = [
   { edge: 'up', label: '标签墙', to: '/dashboard' },
   { edge: 'left', label: '档案袋', to: '/ai-review' },
@@ -11,31 +13,10 @@ const destinations = [
 const props = defineProps({ selected: String, available: { type: Array, default: () => [] } })
 const emit = defineEmits(['select'])
 const root = ref(null)
-const router = useRouter()
-let tabletReady
 onMounted(() => {
   const tablet = new Image()
   tablet.src = '/assets/desk/hall-tablet.webp'
-  tabletReady = tablet.decode().catch(() => {})
 })
-async function navigateEdge(event, dest) {
-  if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return
-  event.preventDefault()
-  if (dest.edge !== 'down' || !document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    return router.push(dest.to)
-  }
-  await tabletReady
-  document.documentElement.classList.add('desk-to-hall')
-  try {
-    const transition = document.startViewTransition(async () => {
-      await router.push(dest.to)
-      await nextTick()
-    })
-    await transition.finished
-  } finally {
-    document.documentElement.classList.remove('desk-to-hall')
-  }
-}
 const hovered = ref(null), failed = ref(false), uid = useId().replace(/[^a-z0-9]/gi,'')
 const enabled = id => props.available.includes(id)
 const illuminated = computed(() => hovered.value || props.selected)
@@ -69,9 +50,11 @@ function move(event, index) {
     </div>
     </div>
     <nav class="desk-directions" aria-label="办公桌方向导航">
-      <a v-for="dest in destinations" :key="dest.edge" :class="dest.edge" :href="router.resolve(dest.to).href" @click="navigateEdge($event, dest)" :aria-label="dest.label">
+      <router-link v-for="dest in destinations" :key="dest.edge" :to="dest.to" custom v-slot="{ href, navigate }">
+        <a :href="href" :class="dest.edge" :aria-label="dest.label" @click="dest.edge === 'down' ? travelBetweenDeskAndHall($event, router, dest.to) : navigate($event)">
         <img src="/assets/desk/wood-arrow.webp" alt="" />
-      </a>
+        </a>
+      </router-link>
     </nav>
   </div>
 </template>
