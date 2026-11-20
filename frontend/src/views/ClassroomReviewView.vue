@@ -1,4 +1,5 @@
 <script setup>
+import SceneLink from '../components/SceneLink.vue'
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { Refresh, Printer, History } from '@vicons/tabler';
@@ -86,9 +87,9 @@ onBeforeUnmount(()=>{disposed=true;requestId++;controller?.abort();clearTimeout(
       <img v-if="archiveSceneOnly" class="archive-scene-papers" :class="{'is-visible':archivePapersVisible}" src="/assets/growth-archive-desk.png" alt="" />
       <ArchivePlantGlow v-if="archiveSceneOnly" :scene-element="archiveSceneElement" />
       <ArchiveCoverBag v-if="archiveSceneOnly && !archiveBagDone" :scene-element="archiveSceneElement" @opened="archivePapersVisible=true" @finished="archiveBagDone=true" />
-      <router-link v-if="archiveSceneOnly" class="archive-desk-return" to="/courses" aria-label="返回办公桌">
+      <SceneLink direction="right" v-if="archiveSceneOnly" class="archive-desk-return" to="/courses" aria-label="返回办公桌">
         <img src="/assets/desk/wood-arrow.webp" alt="" />
-      </router-link>
+      </SceneLink>
     </div>
     <template v-if="!archiveSceneOnly">
       <header class="review-masthead">

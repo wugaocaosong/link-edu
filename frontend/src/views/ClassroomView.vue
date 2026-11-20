@@ -1,6 +1,6 @@
 <script setup>
+import SceneLink from '../components/SceneLink.vue'
 import PaperTitle from '../components/PaperTitle.vue'
-import { travelBetweenDeskAndHall } from '../utils/deskHallTransition.js'
 import { fetchCourses } from '../services/dashboard'
 import { parseCourseId } from '../utils/navigation.js'
 import { computed, inject, onMounted, onUnmounted, ref, watch, watchEffect, nextTick } from "vue";
@@ -203,7 +203,7 @@ onBeforeRouteLeave(()=>{
 <template>
   <Transition name="tablet-focus">
     <section v-if="showTablet" class="hall-entry" aria-label="演绎厅">
-      <a class="hall-back" :href="router.resolve('/courses').href" aria-label="返回办公桌" @click="travelBetweenDeskAndHall($event,router,'/courses')"><img src="/assets/desk/wood-arrow.webp" alt="" /></a>
+      <SceneLink class="hall-back" direction="up" to="/courses" aria-label="返回办公桌"><img src="/assets/desk/wood-arrow.webp" alt="" /></SceneLink>
       <div class="hall-scene"><button type="button" @click="enterClassroom" aria-label="Class Begin！"><span aria-hidden="true" v-for="(letter,i) in 'Class Begin!'" :key="i">{{ letter }}</span></button></div>
     </section>
   </Transition>

@@ -182,6 +182,23 @@ const listItems = computed(() =>
 const canPrevList = computed(() => listPage.value > 0);
 const canNextList = computed(() => listPage.value < listPageCount.value - 1);
 
+const shelfScroll = ref(null);
+const previewBoard = ref(null);
+const previewBelow = ref(false);
+watch(previewBoard, (board, _, cleanup) => {
+  previewBelow.value = false;
+  if (!board || !shelfScroll.value) return;
+  const observer = new IntersectionObserver(([entry]) => {
+    previewBelow.value = !entry.isIntersecting && entry.boundingClientRect.top >= (entry.rootBounds?.bottom ?? 0);
+  }, { root: shelfScroll.value, rootMargin: '0px 0px -56px 0px' });
+  observer.observe(board);
+  cleanup(() => observer.disconnect());
+}, { flush: 'post' });
+function revealPreview() {
+  previewBoard.value?.scrollIntoView({ block:'start', behavior:matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+  previewBoard.value?.focus({ preventScroll:true });
+}
+
 function switchView(mode) {
   viewMode.value = mode;
   listPage.value = 0;
@@ -343,7 +360,7 @@ onUnmounted(() => {
 
 <template>
   <div class="sparse-page resource-page">
-    <div class="page-scroll">
+    <div ref="shelfScroll" class="page-scroll">
     <section class="resource-showcase" aria-labelledby="resource-page-title">
       <header class="resource-collection-row" data-tour="resources">
         <h1 id="resource-page-title">小书架</h1>
@@ -378,8 +395,8 @@ onUnmounted(() => {
             >×</button>
           </div>
           <div class="view-toggle" role="group" aria-label="视图切换">
-            <button type="button" :class="{ active: viewMode === 'deck' }" @click="switchView('deck')">卡片</button>
-            <button type="button" :class="{ active: viewMode === 'list' }" @click="switchView('list')">清单</button>
+            <button type="button" :aria-pressed="viewMode === 'deck'" :class="{ active: viewMode === 'deck' }" @click="switchView('deck')">卡片</button>
+            <button type="button" :aria-pressed="viewMode === 'list'" :class="{ active: viewMode === 'list' }" @click="switchView('list')">清单</button>
           </div>
           <nav v-if="collection === 'library' && viewMode === 'deck' && deckPageCount > 1" class="resource-pager resource-deck-pager" aria-label="资料翻页">
             <button type="button" class="resource-pager__btn" :disabled="!canPrevPage" @click="goPrevPage">
@@ -501,7 +518,7 @@ onUnmounted(() => {
       </section>
     </section>
 
-    <section v-if="collection === 'library'" class="resource-board" aria-label="分类资料浏览">
+    <section v-if="collection === 'library'" ref="previewBoard" tabindex="-1" class="resource-board" aria-label="分类资料浏览">
       <header class="resource-board__head">
         <h2>分类浏览</h2>
       </header>
@@ -556,6 +573,7 @@ onUnmounted(() => {
 
     </div>
 
+    <button v-if="previewBelow" type="button" class="shelf-preview-hint" aria-label="向下查看分类资料预览" @click="revealPreview"><span aria-hidden="true">⌄</span></button>
     <Teleport to="body">
       <dialog v-if="selected" ref="readerRef" class="reader-mask" :aria-labelledby="`reader-title-${selected.id}`" @cancel.prevent="closeReader" @mousedown.self="closeReader">
         <section
@@ -2138,4 +2156,8 @@ button.resource-board-card {
     transition: none;
   }
 }
+.shelf-preview-hint {position:absolute;bottom:max(10px,env(safe-area-inset-bottom));left:50%;translate:-50% 0;z-index:4;display:grid;place-items:center;width:48px;height:44px;border:1px solid #f7dbad90;border-radius:24px;background:#402d20ee;color:#fff2d6;cursor:pointer;box-shadow:0 3px 12px #38200a55;}
+.shelf-preview-hint span {font:700 32px/1 system-ui;animation:shelf-nudge 1.5s ease-in-out infinite;}
+@keyframes shelf-nudge {0%,100%{transform:translateY(-6px)}50%{transform:translateY(-1px)}}
+@media(prefers-reduced-motion:reduce){.shelf-preview-hint span{animation:none;}}
 </style>

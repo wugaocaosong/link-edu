@@ -1,9 +1,7 @@
 <script setup>
+import SceneLink from './SceneLink.vue'
 import { computed, ref, useId, onMounted } from 'vue'
 import { DESK_SKILLS } from '../services/courseDesk.js'
-import { useRouter } from 'vue-router'
-import { travelBetweenDeskAndHall } from '../utils/deskHallTransition.js'
-const router = useRouter()
 const destinations = [
   { edge: 'up', label: '标签墙', to: '/dashboard' },
   { edge: 'left', label: '档案袋', to: '/ai-review' },
@@ -50,11 +48,9 @@ function move(event, index) {
     </div>
     </div>
     <nav class="desk-directions" aria-label="办公桌方向导航">
-      <router-link v-for="dest in destinations" :key="dest.edge" :to="dest.to" custom v-slot="{ href, navigate }">
-        <a :href="href" :class="dest.edge" :aria-label="dest.label" @click="dest.edge === 'down' ? travelBetweenDeskAndHall($event, router, dest.to) : navigate($event)">
+      <SceneLink v-for="dest in destinations" :key="dest.edge" :class="dest.edge" :to="dest.to" :direction="dest.edge" :aria-label="dest.label">
         <img src="/assets/desk/wood-arrow.webp" alt="" />
-        </a>
-      </router-link>
+      </SceneLink>
     </nav>
   </div>
 </template>

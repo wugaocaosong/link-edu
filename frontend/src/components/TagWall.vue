@@ -1,4 +1,5 @@
 <script setup>
+import SceneLink from './SceneLink.vue'
 import { computed, ref, nextTick } from 'vue'
 import { fetchProfile } from '../services/dashboard'
 const props = defineProps(['owner','greeting','weekly','course','feedback','growth','entries','status'])
@@ -168,7 +169,7 @@ function nudge(e,n){
     </template></section>
   </dialog>
   <p v-if="storageError" role="status">浏览器暂时无法保存便签</p>
-  <router-link class="wall-down" to="/courses" aria-label="向下前往办公桌"><img src="/assets/desk/wood-arrow.webp" alt=""></router-link>
+  <SceneLink direction="down" class="wall-down" to="/courses" aria-label="向下前往办公桌"><img src="/assets/desk/wood-arrow.webp" alt=""></SceneLink>
 </section>
 </template>
 <style scoped>

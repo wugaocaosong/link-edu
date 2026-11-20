@@ -87,7 +87,7 @@
             </div>
           </transition>
         </router-view>
-        <router-link v-if="route.path === '/resources'" class="shelf-desk-return" to="/courses" aria-label="返回办公桌"><img src="/assets/desk/wood-arrow.webp" alt="" /></router-link>
+        <SceneLink direction="left" v-if="route.path === '/resources'" class="shelf-desk-return" to="/courses" aria-label="返回办公桌"><img src="/assets/desk/wood-arrow.webp" alt="" /></SceneLink>
       </div>
     </section>
 
@@ -100,6 +100,7 @@
 </template>
 
 <script setup>
+import SceneLink from '../components/SceneLink.vue'
 import { computed, onMounted, onUnmounted, provide, shallowRef, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { NModal } from 'naive-ui'
@@ -124,7 +125,7 @@ const { isStudio } = useUiVersion()
 const { isAcademy } = useUiTheme()
 const router = useRouter()
 function usePageAnimation() {
-  return !document.documentElement.dataset.deskTravel
+  return !document.startViewTransition || !document.documentElement.dataset.deskTravel
 }
 const auth = useAuthStore()
 provide(classroomHelpKey, shallowRef(null))
@@ -251,11 +252,17 @@ html[data-ui-theme] .app-shell.studio-ui:has(.hall-entry) :is(.page-frame,.page-
  .page-frame {position:relative;}
 .page-frame .scene-pan-leave-active {position:absolute;inset:0;pointer-events:none;animation:desk-lower .7s ease-in-out both;}
 .page-frame .scene-pan-enter-active {animation:tablet-rise .7s ease-in-out both;}
-html[data-desk-travel] .page-frame {view-transition-name:desk-hall;}
-html[data-desk-travel]::view-transition-old(desk-hall) {animation:desk-lower .65s ease-in-out both;}
-html[data-desk-travel]::view-transition-new(desk-hall) {animation:tablet-rise .65s ease-in-out both;}
-html[data-desk-travel=up]::view-transition-old(desk-hall) {animation:tablet-rise .65s ease-in-out reverse both;}
-html[data-desk-travel=up]::view-transition-new(desk-hall) {animation:desk-lower .65s ease-in-out reverse both;}
+html[data-desk-travel] {--travel-x:0%;--travel-y:17%;}
+html[data-desk-travel=up] {--travel-y:-17%;}
+html[data-desk-travel=left] {--travel-x:-17%;--travel-y:0%;}
+html[data-desk-travel=right] {--travel-x:17%;--travel-y:0%;}
+html[data-desk-travel] .page-frame {view-transition-name:studio-scene;}
+::view-transition-old(studio-scene) {animation:scene-out .65s ease-in-out both;}
+::view-transition-new(studio-scene) {animation:scene-in .65s ease-in-out both;}
+html[data-desk-travel] .scene-pan-leave-active {animation:scene-out .65s ease-in-out both;}
+html[data-desk-travel] .scene-pan-enter-active {animation:scene-in .65s ease-in-out both;}
+@keyframes scene-out {to {transform:translate(calc(-1 * var(--travel-x)), calc(-1 * var(--travel-y))) scale(1.07);opacity:0;}}
+@keyframes scene-in {from {transform:translate(var(--travel-x),var(--travel-y)) scale(.97);opacity:0;}}
 .workspace:has(.hall-entry) .topbar {pointer-events:none;}
 .workspace:has(.hall-entry) .topbar > * {pointer-events:auto;}
 .scene-pan-enter-active .hall-scene {animation:none;}
@@ -263,7 +270,7 @@ html[data-desk-travel=up]::view-transition-new(desk-hall) {animation:desk-lower 
 .shelf-desk-return {position:absolute;z-index:3;left:4px;top:50%;translate:0 -50%;width:clamp(44px,5vw,76px);display:grid;place-items:center;border-radius:12px;}
 .shelf-desk-return img {width:100%;filter:drop-shadow(0 3px 3px #29170880);}
 .shelf-desk-return:is(:hover,:focus-visible) img {scale:1.06;}
-.page-frame:has(.shelf-desk-return) .resource-page {padding-inline-start:clamp(50px,6vw,82px);}
+
 @keyframes desk-lower{to{transform:translateY(-17%) scale(1.07);opacity:0}}
 @keyframes tablet-rise{from{transform:translateY(17%) scale(.97);opacity:0}}
 html[data-ui-theme] .app-shell.studio-ui.desk-fullscreen:has(.tag-wall) .workspace {position:relative;padding:0!important;height:100dvh}

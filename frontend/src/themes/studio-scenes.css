@@ -131,3 +131,29 @@ html[data-ui-theme][data-ui-version=studio] .app-shell.studio-ui:not(.protected-
     & .topbar {left:8px;right:8px;max-width:none;}
   }
 }
+html[data-ui-theme] .app-shell:not(.protected-shell) .workspace:has(.resource-page) {
+  position:relative; height:100dvh; padding:0!important; overflow:hidden;
+  & .topbar {position:absolute;inset:6px 12px auto auto;z-index:8;width:auto;max-width:calc(100% - 24px);min-height:0;margin:0;padding:0;background:transparent;border:0;}
+  & :is(.page-frame,.page-slot,.resource-page,.resource-page > .page-scroll) {box-sizing:border-box;width:100%;height:100%;min-height:0;max-width:none;margin:0;padding:0;border-radius:0;}
+  & :is(.page-frame,.page-slot,.resource-page) {overflow:hidden;}
+  & .resource-page {position:relative;}
+  & .resource-page > .page-scroll {display:block;overflow:auto;scrollbar-gutter:stable;scrollbar-width:thin;}
+  & .resource-showcase {box-sizing:border-box;min-height:100%;padding:54px 0 0;display:flex;flex-direction:column;gap:0;border-radius:0;background:#684938 url('/assets/desk/resource-reference.png') center/cover;}
+  & .resource-collection-row {display:grid;grid-template-columns:auto auto minmax(0,1fr);align-items:center;gap:8px 14px;margin:0;border-radius:0;padding:9px clamp(10px,2vw,32px);}
+  & .resource-header-tools {grid-column:1/-1;display:grid;grid-template-columns:minmax(110px,240px) max-content minmax(0,1fr);width:100%;margin:0;}
+  & .resource-header-tools .resource-search {width:100%;min-width:0;}
+  & .resource-header-tools .view-toggle {grid-column:2;justify-self:start;}
+  & .resource-header-tools .resource-deck-pager {justify-self:end;position:static;transform:none;}
+  & .resource-collection-row .resource-count {grid-area:1/3;justify-self:end;}
+  & .resource-toolbar {background:#654a39ee;padding-inline:clamp(10px,2vw,32px);}
+  & .resource-deck {flex:1 0 auto;border:0;border-radius:0;}
+  & .resource-list {flex:1;margin:0;padding-inline:clamp(45px,5vw,80px);}
+  & .resource-board {margin-top:0;border-radius:0;}
+  @media(min-width:901px){ & .resource-deck {aspect-ratio:auto;min-height:400px;background-size:cover;} }
+  @media(max-width:700px){
+    & .topbar {inset:5px 8px auto 8px;width:auto;max-width:none;}
+    & .topbar .cir-search {display:none;}
+    & .resource-header-tools {grid-template-columns:minmax(90px,1fr) max-content;}
+    & .resource-header-tools .resource-deck-pager {grid-column:1/-1;}
+  }
+}
