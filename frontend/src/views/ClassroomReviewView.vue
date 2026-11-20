@@ -1,19 +1,28 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Refresh, Printer, ArrowUpRight, History } from '@vicons/tabler';
+import { Refresh, Printer, History } from '@vicons/tabler';
 import { api } from '../services/api';
 import { classroomDestination, formatReportDate, formatReportTime } from '../services/classroomReview.js';
 import ClassroomReport from '../components/ClassroomReport.vue';
+import ArchiveCoverBag from '../components/ArchiveCoverBag.vue';
+import ArchivePlantGlow from '../components/ArchivePlantGlow.vue';
 import ModelShowcase from '../components/fx/ModelShowcase.vue';
 import '../classroom.css';
 import '../classroom-review.css';
 const route=useRoute(), router=useRouter();
 const room=ref(null), history=ref([]), loading=ref(true), busy=ref(false), error=ref(''), historyError=ref('');
+const archiveSceneElement=ref(null);
+const archivePapersVisible=ref(false);
+const archiveBagDone=ref(false);
 let disposed=false, controller=null, pollTimer=null, requestId=0;
 const stateLabel=state=>({completed:'已评课',running:'评课中',insufficient:'数据不足',failed:'生成失败',idle:'待评课'}[state]||'待评课');
 const endedHistory=computed(()=>history.value.filter(item=>item.state==='ended'));
 const selectedId=computed(()=>String(room.value?.session_id||route.query.classroom||''));
+const archiveSceneOnly=computed(()=>!route.query.classroom&&!route.query.sessionId&&!route.query.feedbackId&&!route.query.demo);
+watch(archiveSceneOnly, isSceneOnly=>{
+  if(isSceneOnly){archivePapersVisible.value=false;archiveBagDone.value=false;}
+});
 function selectHistory(event){router.push({path:'/ai-review',query:{classroom:event.target.value}});}
 function schedulePoll(){
   clearTimeout(pollTimer);
@@ -38,18 +47,14 @@ async function loadRoom(id){
 async function initialize(){
   loading.value=true; error.value=''; historyError.value='';
   const id=route.query.classroom;
+  if(id===undefined){loading.value=false;return;}
   if(id!==undefined && (typeof id!=='string' || !/^[1-9]\d*$/.test(id) || !Number.isSafeInteger(Number(id)))){
     error.value='课堂编号无效，请从历史课堂重新进入。';loading.value=false;return;
   }
   const historyPromise=api.get('/classroom/sessions',{timeout:15000,skipBusy:true}).then(({data})=>{
     if(!disposed)history.value=data.items||[];
   }).catch(()=>{if(!disposed)historyError.value='历史列表读取失败，可刷新重试。';});
-  if(id){await Promise.all([historyPromise,loadRoom(id)]);return;}
-  await historyPromise;
-  if(disposed)return;
-  if(endedHistory.value.length){
-    await router.replace(classroomDestination(endedHistory.value[0]));
-  }else loading.value=false;
+  await Promise.all([historyPromise,loadRoom(id)]);
 }
 async function regenerate(objection){
   if(busy.value || !room.value || room.value.report_state==='running' ||
@@ -75,19 +80,26 @@ onMounted(()=>{window.addEventListener('beforeprint',preparePrint);window.addEve
 onBeforeUnmount(()=>{disposed=true;requestId++;controller?.abort();clearTimeout(pollTimer);window.removeEventListener('beforeprint',preparePrint);window.removeEventListener('afterprint',restorePrint);});
 </script>
 <template>
-  <div class="classroom-review-page">
-    <header class="review-masthead">
-      <h1 class="sr-only">AI 评课</h1>
-      <router-link class="review-button" :to="{path:'/ai-review',query:{demo:'gmq'}}">GMQ 试讲报告示例</router-link>
-    </header>
-    <p v-if="historyError" class="review-inline-alert" role="alert">{{ historyError }}</p>
-    <div v-if="error" class="review-inline-alert" role="alert">{{ error }}<button class="review-button" :disabled="loading || busy" @click="initialize">重新读取</button><router-link to="/">重新登录</router-link></div>
-    <section v-if="loading && !room" class="review-empty-state" role="status"><span class="review-loading-line" />正在读取课堂证据…</section>
-    <section v-else-if="!room && !error && !historyError" class="review-empty-state"><h2>你的第一份评课，等待一节真实课堂</h2><p>完成授课后，AI 结论与课堂证据会一起保存在这里。</p><router-link class="review-button primary" to="/classroom">进入模拟课堂<ArrowUpRight aria-hidden="true" /></router-link></section>
-    <template v-if="room">
-      <div class="review-session-meta"><span>课堂 #{{ room.session_id }} · {{ room.topic }}</span><span>{{ formatReportDate(room.created_at) }} · {{ formatReportTime(Number.isFinite(room.elapsed)?room.elapsed*1000:NaN) }}</span></div>
-      <section v-if="['active','paused'].includes(room.state)" class="review-empty-state"><h2>这节课堂还未结束</h2><p>课堂结束后再根据已保存的证据整理教练反馈。</p><router-link class="review-button" :to="classroomDestination(room)">返回课堂</router-link></section>
-      <ClassroomReport v-else :room="room" :busy="busy" @regenerate="regenerate" @plans-created="loadRoom(room.session_id)" @refresh="initialize" @print="printReport" />
+  <div class="classroom-review-page" :class="{'classroom-review-page--scene-only':archiveSceneOnly}">
+    <div ref="archiveSceneElement" class="archive-scene" :class="{'archive-scene--full':archiveSceneOnly}" :aria-hidden="archiveSceneOnly?undefined:'true'">
+      <img class="archive-scene-base" :class="{'is-hidden':archivePapersVisible}" :src="archiveSceneOnly?'/assets/archive-cover.png':'/assets/archive-reports-scene.png'" alt="" />
+      <img v-if="archiveSceneOnly" class="archive-scene-papers" :class="{'is-visible':archivePapersVisible}" src="/assets/growth-archive-desk.png" alt="" />
+      <ArchivePlantGlow v-if="archiveSceneOnly" :scene-element="archiveSceneElement" />
+      <ArchiveCoverBag v-if="archiveSceneOnly && !archiveBagDone" :scene-element="archiveSceneElement" @opened="archivePapersVisible=true" @finished="archiveBagDone=true" />
+    </div>
+    <template v-if="!archiveSceneOnly">
+      <header class="review-masthead">
+        <h1 class="sr-only">AI 评课</h1>
+        <router-link class="review-button" :to="{path:'/ai-review',query:{demo:'gmq'}}">GMQ 试讲报告示例</router-link>
+      </header>
+      <p v-if="historyError" class="review-inline-alert" role="alert">{{ historyError }}</p>
+      <div v-if="error" class="review-inline-alert" role="alert">{{ error }}<button class="review-button" :disabled="loading || busy" @click="initialize">重新读取</button><router-link to="/">重新登录</router-link></div>
+      <section v-if="loading && !room" class="review-empty-state" role="status"><span class="review-loading-line" />正在读取课堂证据…</section>
+      <template v-if="room">
+        <div class="review-session-meta"><span>课堂 #{{ room.session_id }} · {{ room.topic }}</span><span>{{ formatReportDate(room.created_at) }} · {{ formatReportTime(Number.isFinite(room.elapsed)?room.elapsed*1000:NaN) }}</span></div>
+        <section v-if="['active','paused'].includes(room.state)" class="review-empty-state"><h2>这节课堂还未结束</h2><p>课堂结束后再根据已保存的证据整理教练反馈。</p><router-link class="review-button" :to="classroomDestination(room)">返回课堂</router-link></section>
+        <ClassroomReport v-else :room="room" :busy="busy" @regenerate="regenerate" @plans-created="loadRoom(room.session_id)" @refresh="initialize" @print="printReport" />
+      </template>
     </template>
   </div>
 </template>

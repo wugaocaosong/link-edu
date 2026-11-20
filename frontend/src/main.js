@@ -9,7 +9,6 @@ const CoursesView = () => import('./views/CoursesView.vue')
 import { classroomEntry } from './services/classroomEntry.js'
 const ClassroomView = () => import('./views/ClassroomView.vue')
 const AiReviewView = () => import('./views/AiReviewHub.vue')
-const GrowthView = () => import('./views/GrowthView.vue')
 const ResourcesView = () => import('./views/ResourcesView.vue')
 const ProfileView = () => import('./views/ProfileView.vue')
 const RagKnowledgeView = () => import('./views/RagKnowledgeView.vue')
@@ -45,7 +44,8 @@ const router = createRouter({
         { path: 'training', redirect: classroomEntry },
         { path: 'classroom', component: ClassroomView, meta: { crumb: '教学训练  /  模拟课堂' } },
         { path: 'ai-review', component: AiReviewView, meta: { crumb: 'AI 评课  /  报告' } },
-        { path: 'growth', component: GrowthView, meta: { crumb: '成长档案  /  轨迹' } },
+        { path: 'growth', redirect: '/ai-review' },
+        { path: 'growth/archive', redirect: '/ai-review' },
         { path: 'resources', component: ResourcesView, meta: { crumb: '资源库  /  教案与素材' } },
         { path: 'knowledge', component: RagKnowledgeView, meta: { crumb: '知识库  /  检索与语料' } },
         { path: 'profile', component: ProfileView, meta: { crumb: '个人中心' } },

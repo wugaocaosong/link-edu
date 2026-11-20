@@ -1,0 +1,165 @@
+{
+  "video": "lkr.mp4",
+  "topic": "程序语句与程序结构：顺序、分支及代码规范",
+  "duration_s": 594.965,
+  "action": {
+    "event_rows": 149,
+    "counts": {
+      "Normal": 102,
+      "Writing": 47
+    },
+    "mean_confidence": {
+      "Normal": 0.5364,
+      "Writing": 0.5682
+    },
+    "source_model": "MM-TBA SlowFast ACRN",
+    "device": "CUDA RTX 5060"
+  },
+  "voice": {
+    "windows": 2975,
+    "median_rms_dbfs": -25.34,
+    "p10_rms_dbfs": -34.28,
+    "p90_rms_dbfs": -20.83,
+    "threshold_windows_above_minus45_dbfs": 2975,
+    "method": "local signal descriptors only; RMS level and zero-crossing rate; no ASR, speech-act classification, or emotion model was run",
+    "per_minute": [
+      {
+        "minute": 0,
+        "windows": 300,
+        "rms_median_dbfs": -24.75,
+        "rms_p10_dbfs": -33.26,
+        "rms_p90_dbfs": -20.71,
+        "windows_above_minus45_dbfs": 300,
+        "zcr_median": 0.1222
+      },
+      {
+        "minute": 1,
+        "windows": 300,
+        "rms_median_dbfs": -25.75,
+        "rms_p10_dbfs": -34.9,
+        "rms_p90_dbfs": -21.01,
+        "windows_above_minus45_dbfs": 300,
+        "zcr_median": 0.1075
+      },
+      {
+        "minute": 2,
+        "windows": 300,
+        "rms_median_dbfs": -26.27,
+        "rms_p10_dbfs": -34.22,
+        "rms_p90_dbfs": -21.46,
+        "windows_above_minus45_dbfs": 300,
+        "zcr_median": 0.11
+      },
+      {
+        "minute": 3,
+        "windows": 300,
+        "rms_median_dbfs": -25.07,
+        "rms_p10_dbfs": -34.15,
+        "rms_p90_dbfs": -20.45,
+        "windows_above_minus45_dbfs": 300,
+        "zcr_median": 0.1155
+      },
+      {
+        "minute": 4,
+        "windows": 300,
+        "rms_median_dbfs": -26.03,
+        "rms_p10_dbfs": -34.51,
+        "rms_p90_dbfs": -21.68,
+        "windows_above_minus45_dbfs": 300,
+        "zcr_median": 0.1003
+      },
+      {
+        "minute": 5,
+        "windows": 300,
+        "rms_median_dbfs": -25.18,
+        "rms_p10_dbfs": -34.1,
+        "rms_p90_dbfs": -20.71,
+        "windows_above_minus45_dbfs": 300,
+        "zcr_median": 0.112
+      },
+      {
+        "minute": 6,
+        "windows": 300,
+        "rms_median_dbfs": -24.1,
+        "rms_p10_dbfs": -33.17,
+        "rms_p90_dbfs": -19.95,
+        "windows_above_minus45_dbfs": 300,
+        "zcr_median": 0.1215
+      },
+      {
+        "minute": 7,
+        "windows": 300,
+        "rms_median_dbfs": -25.27,
+        "rms_p10_dbfs": -33.98,
+        "rms_p90_dbfs": -21.04,
+        "windows_above_minus45_dbfs": 300,
+        "zcr_median": 0.121
+      },
+      {
+        "minute": 8,
+        "windows": 300,
+        "rms_median_dbfs": -25.89,
+        "rms_p10_dbfs": -34.5,
+        "rms_p90_dbfs": -21.15,
+        "windows_above_minus45_dbfs": 300,
+        "zcr_median": 0.1117
+      },
+      {
+        "minute": 9,
+        "windows": 275,
+        "rms_median_dbfs": -24.78,
+        "rms_p10_dbfs": -33.87,
+        "rms_p90_dbfs": -20.76,
+        "windows_above_minus45_dbfs": 275,
+        "zcr_median": 0.1194
+      }
+    ]
+  },
+  "face": {
+    "samples_1fps": 595,
+    "yunet_detected": 595,
+    "yunet_coverage": 1.0,
+    "libreface_valid_frames": 238,
+    "libreface_frame_coverage": 0.4,
+    "top_expression_model_output_counts": {
+      "Neutral": 95,
+      "Happiness": 29,
+      "Surprise": 28,
+      "Anger": 3,
+      "Fear": 18,
+      "Sadness": 64,
+      "Disgust": 1
+    },
+    "mean_expression_raw_scores": {
+      "Anger": 0.0982,
+      "Contempt": 0.0887,
+      "Disgust": 0.0924,
+      "Fear": 0.1228,
+      "Happiness": 0.1136,
+      "Neutral": 0.1883,
+      "Sadness": 0.1647,
+      "Surprise": 0.1313
+    },
+    "mean_AU_intensity_raw": {
+      "1": 0.0328,
+      "2": 0.0282,
+      "4": 0.2091,
+      "5": 0.0273,
+      "6": 0.0163,
+      "9": 0.0328,
+      "12": 0.0196,
+      "15": 0.0822,
+      "17": 0.0634,
+      "20": 0.0475,
+      "25": 0.1093,
+      "26": 0.1818
+    },
+    "model": "LibreFace 1.2.0 CUDA"
+  },
+  "limits": [
+    "行为、表情与声学值都是模型/信号输出，需回放抽查；不可直接等同教学质量或真实情绪。",
+    "音量阈值不是经过验证的语音活动检测；本次未运行ASR、教学话语识别或中文SER。",
+    "表情类别和AU值未在这批视频上做人工校准；缺失帧不补值。",
+    "MM-TBA动作类别置信度偏低时须人工复核，Normal/Writing/Pointing均不应直接用于评分。"
+  ]
+}

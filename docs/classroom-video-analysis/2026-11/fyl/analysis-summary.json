@@ -1,0 +1,172 @@
+{
+  "video": "fyl.mp4",
+  "topic": "身边的算法：算法概念、描述与基本结构",
+  "duration_s": 606.993,
+  "action": {
+    "event_rows": 214,
+    "counts": {
+      "Normal": 179,
+      "Pointing": 35
+    },
+    "mean_confidence": {
+      "Normal": 0.5358,
+      "Pointing": 0.5415
+    },
+    "source_model": "MM-TBA SlowFast ACRN",
+    "device": "CUDA RTX 5060"
+  },
+  "voice": {
+    "windows": 3035,
+    "median_rms_dbfs": -34.13,
+    "p10_rms_dbfs": -43.68,
+    "p90_rms_dbfs": -26.89,
+    "threshold_windows_above_minus45_dbfs": 2889,
+    "method": "local signal descriptors only; RMS level and zero-crossing rate; no ASR, speech-act classification, or emotion model was run",
+    "per_minute": [
+      {
+        "minute": 0,
+        "windows": 300,
+        "rms_median_dbfs": -36.37,
+        "rms_p10_dbfs": -44.15,
+        "rms_p90_dbfs": -26.65,
+        "windows_above_minus45_dbfs": 286,
+        "zcr_median": 0.1043
+      },
+      {
+        "minute": 1,
+        "windows": 300,
+        "rms_median_dbfs": -33.11,
+        "rms_p10_dbfs": -42.5,
+        "rms_p90_dbfs": -26.36,
+        "windows_above_minus45_dbfs": 296,
+        "zcr_median": 0.1178
+      },
+      {
+        "minute": 2,
+        "windows": 300,
+        "rms_median_dbfs": -33.71,
+        "rms_p10_dbfs": -42.79,
+        "rms_p90_dbfs": -27.22,
+        "windows_above_minus45_dbfs": 294,
+        "zcr_median": 0.1091
+      },
+      {
+        "minute": 3,
+        "windows": 300,
+        "rms_median_dbfs": -32.72,
+        "rms_p10_dbfs": -42.66,
+        "rms_p90_dbfs": -26.28,
+        "windows_above_minus45_dbfs": 296,
+        "zcr_median": 0.1173
+      },
+      {
+        "minute": 4,
+        "windows": 300,
+        "rms_median_dbfs": -34.36,
+        "rms_p10_dbfs": -43.19,
+        "rms_p90_dbfs": -28.18,
+        "windows_above_minus45_dbfs": 290,
+        "zcr_median": 0.1086
+      },
+      {
+        "minute": 5,
+        "windows": 300,
+        "rms_median_dbfs": -34.59,
+        "rms_p10_dbfs": -43.63,
+        "rms_p90_dbfs": -27.09,
+        "windows_above_minus45_dbfs": 294,
+        "zcr_median": 0.1085
+      },
+      {
+        "minute": 6,
+        "windows": 300,
+        "rms_median_dbfs": -34.3,
+        "rms_p10_dbfs": -42.79,
+        "rms_p90_dbfs": -27.25,
+        "windows_above_minus45_dbfs": 296,
+        "zcr_median": 0.1067
+      },
+      {
+        "minute": 7,
+        "windows": 300,
+        "rms_median_dbfs": -34.22,
+        "rms_p10_dbfs": -43.5,
+        "rms_p90_dbfs": -26.7,
+        "windows_above_minus45_dbfs": 291,
+        "zcr_median": 0.1118
+      },
+      {
+        "minute": 8,
+        "windows": 300,
+        "rms_median_dbfs": -33.94,
+        "rms_p10_dbfs": -46.52,
+        "rms_p90_dbfs": -26.73,
+        "windows_above_minus45_dbfs": 263,
+        "zcr_median": 0.1173
+      },
+      {
+        "minute": 9,
+        "windows": 300,
+        "rms_median_dbfs": -34.34,
+        "rms_p10_dbfs": -46.91,
+        "rms_p90_dbfs": -26.83,
+        "windows_above_minus45_dbfs": 259,
+        "zcr_median": 0.1279
+      },
+      {
+        "minute": 10,
+        "windows": 35,
+        "rms_median_dbfs": -39.37,
+        "rms_p10_dbfs": -47.81,
+        "rms_p90_dbfs": -28.4,
+        "windows_above_minus45_dbfs": 24,
+        "zcr_median": 0.106
+      }
+    ]
+  },
+  "face": {
+    "samples_1fps": 607,
+    "yunet_detected": 607,
+    "yunet_coverage": 1.0,
+    "libreface_valid_frames": 515,
+    "libreface_frame_coverage": 0.8484,
+    "top_expression_model_output_counts": {
+      "Neutral": 240,
+      "Happiness": 109,
+      "Surprise": 95,
+      "Sadness": 64,
+      "Fear": 7
+    },
+    "mean_expression_raw_scores": {
+      "Anger": 0.0896,
+      "Contempt": 0.089,
+      "Disgust": 0.0891,
+      "Fear": 0.105,
+      "Happiness": 0.1399,
+      "Neutral": 0.201,
+      "Sadness": 0.1539,
+      "Surprise": 0.1325
+    },
+    "mean_AU_intensity_raw": {
+      "1": 0.0806,
+      "2": 0.0632,
+      "4": 0.1615,
+      "5": 0.05,
+      "6": 0.0347,
+      "9": 0.0505,
+      "12": 0.0517,
+      "15": 0.0888,
+      "17": 0.0939,
+      "20": 0.0604,
+      "25": 0.1759,
+      "26": 0.3939
+    },
+    "model": "LibreFace 1.2.0 CUDA"
+  },
+  "limits": [
+    "行为、表情与声学值都是模型/信号输出，需回放抽查；不可直接等同教学质量或真实情绪。",
+    "音量阈值不是经过验证的语音活动检测；本次未运行ASR、教学话语识别或中文SER。",
+    "表情类别和AU值未在这批视频上做人工校准；缺失帧不补值。",
+    "MM-TBA动作类别置信度偏低时须人工复核，Normal/Writing/Pointing均不应直接用于评分。"
+  ]
+}

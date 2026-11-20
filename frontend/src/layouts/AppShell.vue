@@ -1,5 +1,5 @@
 <template>
-  <main v-ambient-ui="!isAcademy && !isStudio" class="dashboard app-shell" :class="{ immersive: immersive, 'sidebar-folded': sidebarFolded, 'protected-shell': protectedShell, 'studio-ui': isStudio, 'desk-fullscreen': isStudio && ['/courses','/dashboard'].includes(route.path) }">
+  <main v-ambient-ui="!isAcademy && !isStudio" class="dashboard app-shell" :class="{ immersive: immersive, 'sidebar-folded': sidebarFolded, 'protected-shell': protectedShell, 'studio-ui': isStudio, 'desk-fullscreen': isStudio && (['/courses','/dashboard','/growth'].includes(route.path) || archiveCoverPage) }">
     <a class="skip-content" href="#workspace-content">跳到页面内容</a>
     <AmbientVideo
       v-if="!immersive && !protectedShell && !isAcademy && !isStudio"
@@ -154,6 +154,7 @@ const crumb = computed(() => {
 })
 const pageTitle = computed(() => nav.find(item => isActive(item.to))?.label || crumb.value)
 const immersive = computed(() => Boolean(route.meta.immersive))
+const archiveCoverPage = computed(() => route.path === '/ai-review' && !Object.keys(route.query).length)
 // Keep console shell chrome (sidebar / workspace) consistent on every authenticated page.
 const protectedShell = computed(() => false)
 const displayName = computed(() => auth.user?.name || '临客')
@@ -161,7 +162,7 @@ const roleLabel = computed(() => auth.user?.role_label || '师范生')
 const profileInitial = computed(() => displayName.value.slice(0, 1))
 
 function isActive(path) {
-  return route.path === path || (path === '/resources' && route.path === '/knowledge')
+  return route.path === path || route.path.startsWith(`${path}/`) || (path === '/resources' && route.path === '/knowledge')
 }
 
 function goSearch() {

@@ -1,0 +1,162 @@
+{
+  "video": "网络2-数据.mp4",
+  "topic": "走进数据分析：公交客流比较与可视化",
+  "duration_s": 569.12,
+  "action": {
+    "event_rows": 318,
+    "counts": {
+      "Normal": 259,
+      "Writing": 59
+    },
+    "mean_confidence": {
+      "Normal": 0.5293,
+      "Writing": 0.6048
+    },
+    "source_model": "MM-TBA SlowFast ACRN",
+    "device": "CUDA RTX 5060"
+  },
+  "voice": {
+    "windows": 2846,
+    "median_rms_dbfs": -49.3,
+    "p10_rms_dbfs": -69.56,
+    "p90_rms_dbfs": -41.95,
+    "threshold_windows_above_minus45_dbfs": 709,
+    "method": "local signal descriptors only; RMS level and zero-crossing rate; no ASR, speech-act classification, or emotion model was run",
+    "per_minute": [
+      {
+        "minute": 0,
+        "windows": 300,
+        "rms_median_dbfs": -51.37,
+        "rms_p10_dbfs": -71.2,
+        "rms_p90_dbfs": -41.96,
+        "windows_above_minus45_dbfs": 73,
+        "zcr_median": 0.1374
+      },
+      {
+        "minute": 1,
+        "windows": 300,
+        "rms_median_dbfs": -46.66,
+        "rms_p10_dbfs": -63.91,
+        "rms_p90_dbfs": -40.74,
+        "windows_above_minus45_dbfs": 121,
+        "zcr_median": 0.1658
+      },
+      {
+        "minute": 2,
+        "windows": 300,
+        "rms_median_dbfs": -49.41,
+        "rms_p10_dbfs": -69.98,
+        "rms_p90_dbfs": -41.09,
+        "windows_above_minus45_dbfs": 82,
+        "zcr_median": 0.1347
+      },
+      {
+        "minute": 3,
+        "windows": 300,
+        "rms_median_dbfs": -49.39,
+        "rms_p10_dbfs": -67.64,
+        "rms_p90_dbfs": -42.41,
+        "windows_above_minus45_dbfs": 69,
+        "zcr_median": 0.1386
+      },
+      {
+        "minute": 4,
+        "windows": 300,
+        "rms_median_dbfs": -49.34,
+        "rms_p10_dbfs": -68.25,
+        "rms_p90_dbfs": -42.27,
+        "windows_above_minus45_dbfs": 73,
+        "zcr_median": 0.1381
+      },
+      {
+        "minute": 5,
+        "windows": 300,
+        "rms_median_dbfs": -53.7,
+        "rms_p10_dbfs": -70.2,
+        "rms_p90_dbfs": -43.86,
+        "windows_above_minus45_dbfs": 44,
+        "zcr_median": 0.1233
+      },
+      {
+        "minute": 6,
+        "windows": 300,
+        "rms_median_dbfs": -48.62,
+        "rms_p10_dbfs": -70.06,
+        "rms_p90_dbfs": -42.54,
+        "windows_above_minus45_dbfs": 67,
+        "zcr_median": 0.1277
+      },
+      {
+        "minute": 7,
+        "windows": 300,
+        "rms_median_dbfs": -49.78,
+        "rms_p10_dbfs": -72.67,
+        "rms_p90_dbfs": -43.18,
+        "windows_above_minus45_dbfs": 57,
+        "zcr_median": 0.1427
+      },
+      {
+        "minute": 8,
+        "windows": 300,
+        "rms_median_dbfs": -48.36,
+        "rms_p10_dbfs": -70.52,
+        "rms_p90_dbfs": -42.15,
+        "windows_above_minus45_dbfs": 87,
+        "zcr_median": 0.1478
+      },
+      {
+        "minute": 9,
+        "windows": 146,
+        "rms_median_dbfs": -49.1,
+        "rms_p10_dbfs": -67.53,
+        "rms_p90_dbfs": -41.6,
+        "windows_above_minus45_dbfs": 36,
+        "zcr_median": 0.1572
+      }
+    ]
+  },
+  "face": {
+    "samples_1fps": 570,
+    "yunet_detected": 508,
+    "yunet_coverage": 0.8912,
+    "libreface_valid_frames": 474,
+    "libreface_frame_coverage": 0.8316,
+    "top_expression_model_output_counts": {
+      "Neutral": 455,
+      "Sadness": 3,
+      "Happiness": 12,
+      "Surprise": 4
+    },
+    "mean_expression_raw_scores": {
+      "Anger": 0.0983,
+      "Contempt": 0.0979,
+      "Disgust": 0.0981,
+      "Fear": 0.099,
+      "Happiness": 0.1143,
+      "Neutral": 0.2653,
+      "Sadness": 0.1258,
+      "Surprise": 0.1013
+    },
+    "mean_AU_intensity_raw": {
+      "1": 0.0453,
+      "2": 0.0225,
+      "4": 0.0948,
+      "5": 0.0166,
+      "6": 0.0085,
+      "9": 0.0261,
+      "12": 0.0073,
+      "15": 0.0453,
+      "17": 0.0547,
+      "20": 0.0397,
+      "25": 0.0897,
+      "26": 0.0489
+    },
+    "model": "LibreFace 1.2.0 CUDA"
+  },
+  "limits": [
+    "行为、表情与声学值都是模型/信号输出，需回放抽查；不可直接等同教学质量或真实情绪。",
+    "音量阈值不是经过验证的语音活动检测；本次未运行ASR、教学话语识别或中文SER。",
+    "表情类别和AU值未在这批视频上做人工校准；缺失帧不补值。",
+    "MM-TBA动作类别置信度偏低时须人工复核，Normal/Writing/Pointing均不应直接用于评分。"
+  ]
+}

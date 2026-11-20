@@ -1,0 +1,89 @@
+{
+  "videos": [
+    {
+      "video": "ckh.mp4",
+      "topic": "算法概念与特征：地铁换乘路线及流程图",
+      "duration_s": 794.958,
+      "action_rows": 693,
+      "face_coverage": 1.0,
+      "face_valid": 491,
+      "audio_windows": 3975,
+      "report": "E:\\codex\\link-edu-latest\\output\\classroom-analysis\\ckh\\analysis-report.md"
+    },
+    {
+      "video": "lkr.mp4",
+      "topic": "程序语句与程序结构：顺序、分支及代码规范",
+      "duration_s": 594.965,
+      "action_rows": 149,
+      "face_coverage": 1.0,
+      "face_valid": 238,
+      "audio_windows": 2975,
+      "report": "E:\\codex\\link-edu-latest\\output\\classroom-analysis\\lkr\\analysis-report.md"
+    },
+    {
+      "video": "cyt.mp4",
+      "topic": "数据图表与分析：图表选择与电子表格实践",
+      "duration_s": 716.543,
+      "action_rows": 49,
+      "face_coverage": 0.9554,
+      "face_valid": 480,
+      "audio_windows": 3583,
+      "report": "E:\\codex\\link-edu-latest\\output\\classroom-analysis\\cyt\\analysis-report.md"
+    },
+    {
+      "video": "fyl.mp4",
+      "topic": "身边的算法：算法概念、描述与基本结构",
+      "duration_s": 606.993,
+      "action_rows": 214,
+      "face_coverage": 1.0,
+      "face_valid": 515,
+      "audio_windows": 3035,
+      "report": "E:\\codex\\link-edu-latest\\output\\classroom-analysis\\fyl\\analysis-report.md"
+    },
+    {
+      "video": "lm.mp4",
+      "topic": "信息获取与辨识：检索策略和信息可信度",
+      "duration_s": 580.685,
+      "action_rows": 202,
+      "face_coverage": 0.9983,
+      "face_valid": 475,
+      "audio_windows": 2903,
+      "report": "E:\\codex\\link-edu-latest\\output\\classroom-analysis\\lm\\analysis-report.md"
+    },
+    {
+      "video": "xzr.mp4",
+      "topic": "算法的三要素（IPO）与三大结构",
+      "duration_s": 507.1,
+      "action_rows": 186,
+      "face_coverage": 1.0,
+      "face_valid": 389,
+      "audio_windows": 2536,
+      "report": "E:\\codex\\link-edu-latest\\output\\classroom-analysis\\xzr\\analysis-report.md"
+    },
+    {
+      "video": "网络1-信息.mp4",
+      "topic": "信息的基本特征",
+      "duration_s": 658.075,
+      "action_rows": 130,
+      "face_coverage": 0.9939,
+      "face_valid": 545,
+      "audio_windows": 3290,
+      "report": "E:\\codex\\link-edu-latest\\output\\classroom-analysis\\网络1-信息\\analysis-report.md"
+    },
+    {
+      "video": "网络2-数据.mp4",
+      "topic": "走进数据分析：公交客流比较与可视化",
+      "duration_s": 569.12,
+      "action_rows": 318,
+      "face_coverage": 0.8912,
+      "face_valid": 474,
+      "audio_windows": 2846,
+      "report": "E:\\codex\\link-edu-latest\\output\\classroom-analysis\\网络2-数据\\analysis-report.md"
+    }
+  ],
+  "important_limits": [
+    "本批未运行ASR和中文SER；声学文件只提供RMS与过零率。",
+    "模型输出不是经过教师行为标注验证的评分，不直接生成教师优劣或情绪结论。",
+    "建议结合时间戳回放与人工标注后，再用于LINK报告或模型评估。"
+  ]
+}
