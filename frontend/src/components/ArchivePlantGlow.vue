@@ -16,11 +16,15 @@ function placeOverlay() {
   // Keep the source-pixel SVG exactly aligned with the centered object-fit: cover image.
   const sourceWidth = background.naturalWidth || 1672;
   const sourceHeight = background.naturalHeight || 941;
-  const scale = Math.max(imageRect.width / sourceWidth, imageRect.height / sourceHeight);
-  overlay.value.style.left = `${imageRect.left - sceneRect.left + (imageRect.width - sourceWidth * scale) / 2}px`;
-  overlay.value.style.top = `${imageRect.top - sceneRect.top + (imageRect.height - sourceHeight * scale) / 2}px`;
-  overlay.value.style.width = `${sourceWidth * scale}px`;
-  overlay.value.style.height = `${sourceHeight * scale}px`;
+  const designWidth = 1672;
+  const designHeight = 941;
+  const pixelRatio = sourceWidth / designWidth;
+  const imageScale = Math.max(imageRect.width / sourceWidth, imageRect.height / sourceHeight);
+  const scale = imageScale * pixelRatio;
+  overlay.value.style.left = `${imageRect.left - sceneRect.left + (imageRect.width - designWidth * scale) / 2}px`;
+  overlay.value.style.top = `${imageRect.top - sceneRect.top + (imageRect.height - designHeight * scale) / 2}px`;
+  overlay.value.style.width = `${designWidth * scale}px`;
+  overlay.value.style.height = `${designHeight * scale}px`;
 }
 
 onMounted(() => {
@@ -45,9 +49,16 @@ onBeforeUnmount(() => resizeObserver?.disconnect());
         <feGaussianBlur stdDeviation="4" />
       </filter>
     </defs>
-    <path class="archive-plant-halo" filter="url(#archive-plant-glow-blur)" d="M 0,0 L 38,0 Q 44,18 63,27 Q 82,11 99,15 Q 115,2 137,17 Q 157,5 174,21 Q 198,8 216,23 Q 239,11 258,28 Q 283,14 302,32 Q 328,17 344,37 Q 374,24 390,49 Q 416,35 434,64 Q 450,88 432,111 Q 452,136 429,160 Q 445,180 428,201 Q 442,226 424,244 Q 435,263 414,277 Q 397,293 373,278 Q 355,298 334,282 L 311,305 Q 306,327 304,347 Q 301,368 282,376 Q 254,386 223,383 L 132,380 Q 106,378 91,361 Q 82,349 79,330 Q 63,314 50,298 Q 37,278 27,256 Q 16,229 0,214 Z" />
-    <path class="archive-plant-edge" d="M 0,0 L 38,0 Q 44,18 63,27 Q 82,11 99,15 Q 115,2 137,17 Q 157,5 174,21 Q 198,8 216,23 Q 239,11 258,28 Q 283,14 302,32 Q 328,17 344,37 Q 374,24 390,49 Q 416,35 434,64 Q 450,88 432,111 Q 452,136 429,160 Q 445,180 428,201 Q 442,226 424,244 Q 435,263 414,277 Q 397,293 373,278 Q 355,298 334,282 L 311,305 Q 306,327 304,347 Q 301,368 282,376 Q 254,386 223,383 L 132,380 Q 106,378 91,361 Q 82,349 79,330 Q 63,314 50,298 Q 37,278 27,256 Q 16,229 0,214 Z" />
-    <path class="archive-plant-hit" tabindex="0" role="img" aria-label="盆栽" d="M 0,0 L 38,0 Q 44,18 63,27 Q 82,11 99,15 Q 115,2 137,17 Q 157,5 174,21 Q 198,8 216,23 Q 239,11 258,28 Q 283,14 302,32 Q 328,17 344,37 Q 374,24 390,49 Q 416,35 434,64 Q 450,88 432,111 Q 452,136 429,160 Q 445,180 428,201 Q 442,226 424,244 Q 435,263 414,277 Q 397,293 373,278 Q 355,298 334,282 L 311,305 Q 306,327 304,347 Q 301,368 282,376 Q 254,386 223,383 L 132,380 Q 106,378 91,361 Q 82,349 79,330 Q 63,314 50,298 Q 37,278 27,256 Q 16,229 0,214 Z" />
+    <!-- Trace only the visible outside edge: foliage, pot silhouette, and the saucer's exposed rim. -->
+    <g class="archive-plant-contour">
+      <path class="archive-plant-halo" filter="url(#archive-plant-glow-blur)" d="M 42,0 C 48,14 57,21 69,25 C 77,12 89,9 101,15 C 112,4 127,7 137,19 C 150,8 164,11 176,24 C 189,13 204,14 216,26 C 231,15 246,19 259,32 C 273,20 289,23 302,38 C 317,27 332,30 344,45 C 360,35 376,41 389,57 C 404,48 418,54 429,70 C 441,86 435,100 424,111 C 438,127 435,141 423,152 C 435,167 432,181 420,191 C 432,206 427,219 415,230 C 401,226 385,208 373,192 C 367,210 353,221 340,218 C 326,215 315,198 307,184 C 300,204 286,217 272,218 C 256,216 245,196 237,181 C 230,199 217,212 204,211 C 190,210 178,193 169,177 C 162,196 151,207 138,208 C 123,207 113,191 106,176 C 98,195 87,207 76,207 C 63,203 56,188 52,177 C 43,198 39,220 39,240 C 36,267 44,295 57,316 C 43,311 29,297 20,281 C 12,266 12,249 5,237 C -3,226 -1,212 9,201 C 0,192 1,180 9,169 C 0,158 1,146 11,136 C 2,126 3,112 13,102 C 4,91 6,78 18,68 C 9,58 12,46 23,39 C 16,30 18,18 31,13 C 25,6 31,0 42,0" />
+      <path class="archive-plant-edge" d="M 42,0 C 48,14 57,21 69,25 C 77,12 89,9 101,15 C 112,4 127,7 137,19 C 150,8 164,11 176,24 C 189,13 204,14 216,26 C 231,15 246,19 259,32 C 273,20 289,23 302,38 C 317,27 332,30 344,45 C 360,35 376,41 389,57 C 404,48 418,54 429,70 C 441,86 435,100 424,111 C 438,127 435,141 423,152 C 435,167 432,181 420,191 C 432,206 427,219 415,230 C 401,226 385,208 373,192 C 367,210 353,221 340,218 C 326,215 315,198 307,184 C 300,204 286,217 272,218 C 256,216 245,196 237,181 C 230,199 217,212 204,211 C 190,210 178,193 169,177 C 162,196 151,207 138,208 C 123,207 113,191 106,176 C 98,195 87,207 76,207 C 63,203 56,188 52,177 C 43,198 39,220 39,240 C 36,267 44,295 57,316 C 43,311 29,297 20,281 C 12,266 12,249 5,237 C -3,226 -1,212 9,201 C 0,192 1,180 9,169 C 0,158 1,146 11,136 C 2,126 3,112 13,102 C 4,91 6,78 18,68 C 9,58 12,46 23,39 C 16,30 18,18 31,13 C 25,6 31,0 42,0" />
+      <path class="archive-plant-halo" filter="url(#archive-plant-glow-blur)" d="M 109,207 C 128,211 151,213 174,213 C 220,213 265,209 310,205 M 109,207 C 99,214 93,225 94,240 C 97,270 101,303 107,332 C 111,350 120,359 140,364 C 174,372 241,371 272,364 C 288,360 297,350 301,332 C 307,301 310,270 311,238 C 312,224 307,213 300,206" />
+      <path class="archive-plant-edge" d="M 109,207 C 128,211 151,213 174,213 C 220,213 265,209 310,205 M 109,207 C 99,214 93,225 94,240 C 97,270 101,303 107,332 C 111,350 120,359 140,364 C 174,372 241,371 272,364 C 288,360 297,350 301,332 C 307,301 310,270 311,238 C 312,224 307,213 300,206" />
+      <path class="archive-plant-halo" filter="url(#archive-plant-glow-blur)" d="M 111,318 C 100,326 84,332 72,342 C 63,350 67,360 80,369 C 105,385 156,389 211,388 C 267,387 318,377 340,361 C 353,352 353,344 341,338 C 331,332 319,328 312,319" />
+      <path class="archive-plant-edge" d="M 111,318 C 100,326 84,332 72,342 C 63,350 67,360 80,369 C 105,385 156,389 211,388 C 267,387 318,377 340,361 C 353,352 353,344 341,338 C 331,332 319,328 312,319" />
+      <path class="archive-plant-hit" d="M 42,0 C 47,15 56,23 69,25 C 77,13 89,10 101,15 C 112,4 126,7 137,19 C 149,8 164,11 176,24 C 188,13 203,14 216,26 C 230,15 245,18 259,32 C 272,20 288,23 302,38 C 315,27 331,30 344,45 C 359,35 375,40 389,57 C 403,48 418,54 429,69 C 441,85 435,99 424,111 C 438,126 435,140 423,152 C 435,166 432,180 420,191 C 431,205 427,219 415,230 C 402,226 387,210 373,192 C 366,210 353,220 340,218 C 326,215 315,199 307,184 C 299,204 286,217 272,218 C 256,216 245,196 237,181 C 230,199 217,212 204,211 C 190,210 178,193 169,177 C 162,196 151,207 138,208 C 123,207 113,191 106,176 C 98,195 87,207 76,207 C 64,204 57,190 52,177 C 43,198 39,220 39,240 C 36,269 45,298 57,316 C 42,311 29,297 20,281 C 12,266 13,248 5,237 C -3,226 -1,212 9,201 C 0,192 1,180 9,169 C 0,158 1,146 11,136 C 2,126 3,112 13,102 C 4,91 6,78 18,68 C 9,58 12,46 23,39 C 16,30 18,18 31,13 C 25,6 31,0 42,0 Z M 109,207 C 128,211 151,213 174,213 C 220,213 265,209 310,205 C 318,237 313,296 301,332 C 297,350 288,360 272,364 C 241,371 174,372 140,364 C 120,359 111,350 107,332 C 101,303 97,270 94,240 C 93,225 99,214 109,207 Z M 111,318 C 100,326 84,332 72,342 C 63,350 67,360 80,369 C 105,385 156,389 211,388 C 267,387 318,377 340,361 C 353,352 353,344 341,338 C 331,332 319,328 312,319 C 305,322 296,326 282,330 C 249,340 188,344 145,335 C 130,332 119,327 111,318 Z" />
+    </g>
   </svg>
 </template>
 
@@ -64,27 +75,26 @@ onBeforeUnmount(() => resizeObserver?.disconnect());
   fill: none;
   stroke: #ffd18a;
   stroke-linejoin: round;
+  stroke-linecap: round;
   opacity: 0;
   transition: opacity 220ms ease;
   pointer-events: none;
 }
 
-.archive-plant-halo { stroke-width: 8; }
-.archive-plant-edge { stroke-width: 2; }
+.archive-plant-halo { stroke-width: 5; }
+.archive-plant-edge { stroke-width: 1.5; }
 
-.archive-plant-glow:hover .archive-plant-halo,
-.archive-plant-glow:focus-within .archive-plant-halo { opacity: .68; }
-.archive-plant-glow:hover .archive-plant-edge,
-.archive-plant-glow:focus-within .archive-plant-edge { opacity: .95; }
+.archive-plant-contour:hover .archive-plant-halo,
+.archive-plant-contour:focus-within .archive-plant-halo { opacity: .58; }
+.archive-plant-contour:hover .archive-plant-edge,
+.archive-plant-contour:focus-within .archive-plant-edge { opacity: .9; }
 
 .archive-plant-hit {
   fill: transparent;
   stroke: transparent;
   pointer-events: visibleFill;
-  cursor: pointer;
+  cursor: default;
 }
-
-.archive-plant-hit:focus { outline: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .archive-plant-halo,
