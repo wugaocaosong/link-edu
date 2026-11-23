@@ -110,9 +110,11 @@ def init_db():
     with app.app_context():
         from alembic import command
         from alembic.config import Config as AlembicConfig
-        from sqlalchemy import inspect
+        from services.local_mysql import inspect_startup_tables
         migration_config = AlembicConfig(str(__import__('pathlib').Path(__file__).with_name('alembic.ini')))
-        existing_tables = set(inspect(db.engine).get_table_names())
+        existing_tables = inspect_startup_tables(
+            db.engine, public_deployment=app.config.get('PUBLIC_DEPLOYMENT', False)
+        )
         if not existing_tables:
             # A clean install creates the complete current metadata, then records the baseline revision.
             db.create_all()

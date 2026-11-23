@@ -1,23 +1,28 @@
 param(
-  [string]$HostName = "127.0.0.1",
-  [int]$Port = 3306,
-  [string]$User = "root",
-  [string]$Password = "root",
-  [string]$Database = "link"
+    [string]$HostName = '127.0.0.1',
+    [int]$Port = 3306,
+    [string]$User = 'root',
+    [string]$Password = 'root',
+    [string]$Database = 'link',
+    [string]$PythonPath
 )
 
-$mysql = "C:\Program Files\MySQL\MySQL Server 8.4\bin\mysql.exe"
-if (-not (Test-Path $mysql)) {
-  Write-Host "未找到 MySQL 客户端，请确认已安装 MySQL Server。"
-  exit 1
+$ErrorActionPreference = 'Stop'
+if (-not $PythonPath) {
+    $venv = Join-Path $PSScriptRoot '.venv/Scripts/python.exe'
+    $PythonPath = if (Test-Path -LiteralPath $venv) { $venv } else { (Get-Command python.exe).Source }
 }
-
-$sqlFile = Join-Path $PSScriptRoot "sql\00_create_database.sql"
-& $mysql -h $HostName -P $Port -u $User "-p$Password" < $sqlFile
-if ($LASTEXITCODE -ne 0) {
-  Write-Host "连接 MySQL 失败。请先在「服务」中启动 MySQL，或修改账号密码。"
-  exit $LASTEXITCODE
+$originalUrl = $env:DATABASE_URL
+try {
+    # With no connection overrides, use exactly the same configuration as Flask.
+    if (@('HostName', 'Port', 'User', 'Password', 'Database') | Where-Object { $PSBoundParameters.ContainsKey($_) }) {
+        $serverHost = if ($HostName.Contains(':') -and -not $HostName.StartsWith('[')) { "[$HostName]" } else { $HostName }
+        $env:DATABASE_URL = 'mysql+pymysql://{0}:{1}@{2}:{3}/{4}?charset=utf8mb4' -f (
+            [Uri]::EscapeDataString($User), [Uri]::EscapeDataString($Password), $serverHost, $Port, $Database
+        )
+    }
+    & $PythonPath (Join-Path $PSScriptRoot 'init_db.py') --require-mysql
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+} finally {
+    $env:DATABASE_URL = $originalUrl
 }
-
-Set-Location $PSScriptRoot
-.\.venv\Scripts\python init_db.py
