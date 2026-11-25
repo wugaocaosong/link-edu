@@ -82,7 +82,7 @@
                 <span>专项 {{ modeStats.special }} · 综合 {{ modeStats.full }}</span>
               </div>
               <ul class="review-stat__history" aria-label="近期历史记录">
-                <li v-for="item in recentHistoryPreview" :key="item.id">
+                <li v-for="item in recentHistoryPreview" :key="item.id" data-assistant-detail="training">
                   <em>{{ shortHistoryTitle(item) }}</em>
                   <b>{{ scoreLabel(item) }}</b>
                 </li>
@@ -213,7 +213,7 @@
                 <span>{{ formatDateTime(current.created_at) }}</span>
               </div>
 
-              <div class="review-detail__grid" v-if="!insufficientEvidence">
+              <div class="review-detail__grid" v-if="!insufficientEvidence" data-assistant-detail="report-full">
                 <VChart class="review-detail__radar" :option="radarOption" autoresize />
                 <ul class="review-detail__dims">
                   <li v-for="item in dimensions" :key="item.key">
@@ -224,7 +224,7 @@
               </div>
 
               <blockquote v-if="report.next_action || current.suggestion">
-                {{ report.next_action || current.suggestion }}
+                <span data-assistant-detail="report-advice">{{ report.next_action || current.suggestion }}</span>
               </blockquote>
 
               <section class="review-replay" aria-label="本次训练回放">
@@ -247,14 +247,14 @@
                 <p v-else class="dock-hint">{{ replayHint }}</p>
               </section>
 
-              <div class="review-detail__briefs">
+              <div class="review-detail__briefs" data-assistant-detail="report-full">
                 <article v-if="report.summary">
                   <h4>观察</h4>
-                  <p>{{ report.summary }}</p>
+                  <p data-assistant-detail="report-summary">{{ report.summary }}</p>
                 </article>
                 <article v-if="report.problems?.length">
                   <h4>主要问题</h4>
-                  <p>{{ report.problems.join('；') }}</p>
+                  <p data-assistant-detail="report-problems">{{ report.problems.join('；') }}</p>
                 </article>
                 <article v-if="report.fixes?.length">
                   <h4>改进建议</h4>
@@ -269,18 +269,18 @@
                 <router-link class="ghost-link" to="/classroom">真实课堂证据报告 →</router-link>
               </div>
 
-              <div class="review-report" v-if="current">
+              <div class="review-report" v-if="current" data-assistant-detail="report-full">
                 <article v-for="section in report.sections || []" :key="section.title">
                   <h3>{{ section.title }}</h3>
                   <p>{{ section.body }}</p>
                 </article>
                 <article v-if="report.summary && !(report.sections || []).some((section) => section.title === '综合判断')">
                   <h3>本次总结</h3>
-                  <p>{{ report.summary }}</p>
+                  <p data-assistant-detail="report-summary">{{ report.summary }}</p>
                 </article>
                 <article v-if="report.problems?.length && !(report.sections || []).some((section) => section.title === '主要问题')">
                   <h3>主要问题</h3>
-                  <p>{{ report.problems.join('；') }}</p>
+                  <p data-assistant-detail="report-problems">{{ report.problems.join('；') }}</p>
                 </article>
                 <div v-if="showFullReport" class="review-lists">
                   <div>

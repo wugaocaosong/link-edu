@@ -32,7 +32,7 @@ def status():
     return result
 
 
-def reserve(service, amount, session_id=None):
+def reserve(service, amount, session_id=None, assistant_user_id=None):
     if os.getenv('AI_PRICING_CONFIRMED', '').lower() != 'true':
         raise ValueError('请先核对云服务单价并配置 AI_PRICING_CONFIRMED=true')
     with lock, budget_file_lock():
@@ -44,8 +44,11 @@ def reserve(service, amount, session_id=None):
                 raise ValueError('调用预算已到停止阈值，本次未发起云请求')
             from services.delivery_budget import check
             check(connection, amount)
+            if assistant_user_id is not None:
+                from services.assistant_quota import check as check_quota
+                check_quota(connection, assistant_user_id, amount)
             result = connection.execute(ApiUsage.__table__.insert().values(
-                service=service, session_id=session_id, reserved_cny=amount))
+                service=service, session_id=session_id, assistant_user_id=assistant_user_id, reserved_cny=amount))
             return result.inserted_primary_key[0]
 
 
