@@ -67,3 +67,97 @@
 .help-dock .help-chat__log {padding:18px 16px;gap:14px}
 .help-chat__log article {align-self:flex-start;max-width:92%}
 .help-chat__form {flex:none}
+
+.help-dock .interview-practice { padding:10px 14px; border-bottom:1px solid #ffffff16; }
+.help-dock .interview-practice__title { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:13px; }
+.help-dock .interview-practice__modules { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; margin-top:7px; }
+.help-dock .interview-practice button { padding:5px 7px; border:1px solid #b49ac652; border-radius:8px; background:#342740; color:#f5eafa; cursor:pointer; }
+.help-dock .interview-practice button[aria-pressed="true"] { border-color:#ead0ff; background:#634771; }
+.help-dock .interview-practice p { margin:6px 0 0; font-size:11px; color:#e0cce8; }
+.help-dock .help-chat__log p { white-space:pre-wrap; }
+.help-dock .help-chat__form textarea { flex:1; min-width:0; resize:vertical; max-height:120px; padding:8px 10px; border:1px solid #b49ac652; border-radius:8px; background:#160f1e; color:#f5eafa; font:inherit; }
+.assistant-header-character { flex:0 0 48px; height:48px; }
+.assistant-role {
+  display:flex; justify-content:space-between; align-items:center; gap:8px; min-height:62px;
+  margin:6px 14px 0; padding:4px 10px; border-radius:8px; color:#fff4de;
+  background:#452e51; border:1px solid #bc9ad055; font-size:12px;
+}
+.assistant-role--student { background:#22483f; border:2px solid #a67c55; }
+.assistant-role__visitor { display:flex; align-items:center; gap:5px; }
+.assistant-role__visitor .assistant-character { width:55px; height:55px; }
+.assistant-role--student .assistant-role__visitor { animation:assistant-arrive .8s ease-out both; }
+@keyframes assistant-arrive {
+  from { opacity:0; transform:translateX(30px); }
+  48% { opacity:1; transform:translate(13px,-4px); }
+  70% { transform:translate(7px,0); }
+}
+
+.help-sources a { color:#f0d6ff; text-decoration:underline; text-underline-offset:3px; justify-self:start; }
+
+.interview-controls, .interview-history header { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:8px; }
+.interview-controls select { background:#291d34; color:inherit; border:1px solid #9a7baa; border-radius:6px; padding:4px; }
+.interview-recording { max-height:min(27dvh,190px); overflow:auto; margin-top:7px; font-size:12px; }
+.interview-recording summary,.interview-history summary { cursor:pointer; }
+.interview-recording label,.interview-recording audio,.interview-recording textarea { display:block; margin:6px 0; width:100%; }
+.interview-recording textarea { color:inherit; background:#21162b; border:1px solid #957caa; border-radius:5px; padding:6px; }
+.interview-radar { display:flex; align-items:center; gap:7px; }
+.interview-radar svg { flex:0 0 46%; max-width:155px; overflow:visible; }
+.interview-radar ul { padding-left:15px; margin:6px 0; }
+.interview-history { min-height:0; flex:1; overflow:auto; padding:12px 15px; font-size:12px; line-height:1.55; }
+.interview-history details { padding:8px 0; border-bottom:1px solid #a88ab544; }
+.interview-history details p { white-space:pre-wrap; }
+
+@media (min-width:601px) {
+  .help-dock:not(.in-lesson) .help-fab.digital-human-fab {
+    top:max(12px, calc(50% - 76px)); bottom:auto;
+  }
+  .help-dock:not(.in-lesson) .help-chat {
+    top:max(12px, calc((100dvh - var(--help-height,560px)) / 2)); bottom:auto;
+  }
+  .help-dock:not(.in-lesson) .assistant-header-character { display:none; }
+}
+@media (max-width:600px) {
+  .help-dock.assistant-open .digital-human-fab { visibility:hidden; }
+}
+.help-dock.in-lesson.assistant-open .digital-human-fab { visibility:hidden; }
+
+.help-dock .interview-skill-card {
+  min-height:48px; padding:0; perspective:440px; border-color:#a489bf75;
+  background:linear-gradient(145deg,#4a3659,#30263e);
+}
+.interview-skill-card__inner { position:relative; display:grid; min-height:46px; transform-style:preserve-3d; transition:transform .38s ease; }
+.interview-skill-card[aria-pressed="true"] .interview-skill-card__inner { transform:rotateY(180deg); }
+.interview-skill-card__front,.interview-skill-card__back { grid-area:1/1; display:flex; justify-content:center; align-items:center; gap:7px; padding:5px; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+.interview-skill-card__front span { color:#edd3a8; font-size:17px; }
+.interview-skill-card__back { transform:rotateY(180deg); color:#fff0d5; font-size:12px; }
+.assistant-composer-tools,.assistant-attachment-draft { display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding:5px 12px; }
+.assistant-composer-tools button,.assistant-attachment-draft button { color:inherit; background:#493555; border:1px solid #ba9ac467; border-radius:7px; padding:4px 7px; cursor:pointer; font-size:12px; }
+.assistant-camera-preview { flex-basis:100%; display:flex; align-items:center; gap:8px; }
+.assistant-camera-preview video { width:110px; max-height:75px; object-fit:contain; border-radius:5px; }
+.assistant-attachment-draft { font-size:12px; }
+.assistant-attachment-draft span { overflow-wrap:anywhere; }
+.assistant-attachment-draft img { width:38px; height:32px; object-fit:contain; }
+.assistant-attachment { display:grid; gap:4px; color:inherit; overflow-wrap:anywhere; }
+.assistant-attachment img { max-width:min(190px,100%); max-height:145px; object-fit:contain; }
+@media(prefers-reduced-motion:reduce) {
+  .interview-skill-card__inner { transition:none; }
+}
+
+.help-dock .help-chat {
+  width:min(var(--help-width,390px),calc(100vw - 24px));
+  height:min(var(--help-height,560px),calc(100dvh - 24px));
+  max-height:calc(100dvh - 24px);
+  box-sizing:border-box;
+}
+.help-dock .help-chat__resize {
+  position:absolute; bottom:0; left:0; width:25px; height:25px; padding:0;
+  border:0; border-radius:0 8px 0 0; background:#392b46; color:#efcfed;
+  cursor:nesw-resize; touch-action:none; line-height:1; z-index:2;
+}
+.help-dock .help-chat__resize:focus-visible { outline-offset:-3px; }
+.help-dock .help-chat__form { padding-left:30px; }
+.help-dock .interview-practice { flex:0 1 auto; min-height:0; overflow:auto; }
+@media(max-width:600px) {
+  .help-dock .help-chat { width:auto; }
+  .help-dock .help-chat__resize { cursor:ns-resize; }
+}

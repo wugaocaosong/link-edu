@@ -41,6 +41,7 @@ class ApiUsage(db.Model):
     __tablename__ = 'classroom_api_usage'
     id = db.Column(db.Integer, primary_key=True)
     tenant_id = db.Column(db.Integer, db.ForeignKey('tenants.id'), nullable=True, index=True)
+    assistant_user_id = db.Column(db.Integer, nullable=True, index=True)
     session_id = db.Column(db.Integer, index=True)
     service = db.Column(db.String(20), nullable=False)
     reserved_cny = db.Column(db.Float, nullable=False)
@@ -58,6 +59,7 @@ class CreditUsage(db.Model):
     account = db.Column(db.String(16), nullable=False, index=True)
     service = db.Column(db.String(16), nullable=False)
     model = db.Column(db.String(80), nullable=False)
+    assistant_user_id = db.Column(db.Integer, nullable=True, index=True)
     session_id = db.Column(db.Integer, index=True)
     reserved_usd = db.Column(db.Float, nullable=False)
     charged_usd = db.Column(db.Float)

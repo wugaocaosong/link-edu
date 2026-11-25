@@ -62,9 +62,9 @@ def model(service):
                       'asr': 'qwen3-asr-flash-realtime', 'tts': 'qwen3-tts-flash-realtime'}[service])
 
 
-def chat(system, payload, session_id=None, image=None, max_tokens=600, *, test=False):
+def chat(system, payload, session_id=None, image=None, max_tokens=600, *, test=False, user_id=None):
     if llm_provider() == 'openai_next':
-        return next_chat(system, payload, session_id, image, max_tokens, test=test)
+        return next_chat(system, payload, session_id, image, max_tokens, test=test, **({'user_id': user_id} if user_id is not None else {}))
     credential = deepseek_credential('vision' if image else 'dialogue', test=test)
     token = key(credential)
     endpoint = os.getenv('DEEPSEEK_BASE_URL', 'https://api.deepseek.com').rstrip('/')
@@ -76,7 +76,8 @@ def chat(system, payload, session_id=None, image=None, max_tokens=600, *, test=F
     # UTF-8 byte count conservatively bounds text tokens. Image allowance is separate.
     upper_input = len((system + content).encode('utf-8')) + (4096 if image else 0) + 1024
     usage_id = reserve('vision' if image else 'dialogue',
-                       (upper_input * input_price + max_tokens * output_price) / 1e6, session_id)
+                       (upper_input * input_price + max_tokens * output_price) / 1e6, session_id,
+                       *((user_id,) if user_id is not None else ()))
     if image:
         content = [{'type': 'text', 'text': content},
                    {'type': 'image_url', 'image_url': {'url': image}}]
@@ -105,7 +106,7 @@ def chat(system, payload, session_id=None, image=None, max_tokens=600, *, test=F
         raise ProviderError('DeepSeek 返回JSON结构无效，请重试') from None
 
 
-def next_chat(system, payload, session_id, image, max_tokens, *, test=False):
+def next_chat(system, payload, session_id, image, max_tokens, *, test=False, user_id=None):
     from services import classroom_credits as credits
     service = 'vision' if image else 'dialogue'
     account = 'test' if test or current_app.config.get('CLASSROOM_API_PROFILE') == 'test' else service
@@ -123,7 +124,8 @@ def next_chat(system, payload, session_id, image, max_tokens, *, test=False):
     content = json.dumps(payload, ensure_ascii=False)
     upper_input = len((system + content).encode('utf-8')) + (4096 if image else 0) + 1024
     usage_id = credits.reserve(account, service, selected_model,
-        (upper_input * input_price + max_tokens * output_price) / 1e6, session_id)
+        (upper_input * input_price + max_tokens * output_price) / 1e6, session_id,
+                       *((user_id,) if user_id is not None else ()))
     if image:
         content = [{'type': 'text', 'text': content}, {'type': 'image_url', 'image_url': {'url': image}}]
     try:
