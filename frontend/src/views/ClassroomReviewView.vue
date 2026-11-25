@@ -36,7 +36,7 @@ const archiveHistoryPlacements=[
   {polygon:'743,216 940,205 902,281 748,297',transform:'rotate(-4 840 251)',x:770,y:244},
 ];
 // Perspective of the top report sheet, mapped to the 1200×675 background image.
-const archiveReportPaperTransform='matrix(1.12 0.07 -0.12 1.26 525 224)';
+const archiveReportPaperTransform='matrix(0.97 0.08 -0.13 0.94 520 246)';
 const selectedId=computed(()=>String(room.value?.session_id||route.query.classroom||''));
 const archiveSceneOnly=computed(()=>!route.query.classroom&&!route.query.sessionId&&!route.query.feedbackId&&!route.query.demo);
 watch(archiveSceneOnly, isSceneOnly=>{
@@ -188,6 +188,7 @@ onBeforeUnmount(()=>{disposed=true;requestId++;controller?.abort();clearTimeout(
         <img src="/assets/desk/wood-arrow.webp" alt="" />
       </SceneLink>
       <video v-if="archiveSceneOnly && archiveVideoStarted" ref="archiveOpeningVideo" class="archive-opening-video" :class="{'is-visible':archiveVideoVisible}" src="/assets/archive-opening.mp4" playsinline preload="auto" @ended="finishArchiveOpening" @error="resetArchiveOpening" />
+      <button v-if="archiveSceneOnly && archiveVideoVisible" type="button" class="archive-video-skip" @click.stop="finishArchiveOpening">跳过视频</button>
     </div>
     <template v-if="!archiveSceneOnly">
       <header class="review-masthead">
