@@ -48,6 +48,9 @@ def test_public_privacy_quota_origin_and_paid_entrypoints(app):
     assert client.post('/api/classroom/probe', headers=headers(1), json={'service': 'tts'}).status_code == 403
     assert client.post('/api/feedbacks/1/ask', headers=headers(1), json={'question': 'test'}).status_code == 403
     assert client.get('/api/classroom/capabilities', headers={**headers(1), 'Origin': 'https://bad.example'}).status_code == 403
+    assert client.post('/api/auth/login', json={}, headers={'Origin': 'http://localhost'}).status_code == 400
+    assert client.post('/api/auth/login', json={}, headers={'Origin': 'https://link.wuyeni.cn', 'Host': 'link.wuyeni.cn'}).status_code == 400
+    assert client.post('/api/auth/login', json={}, headers={'Origin': 'https://link.wuyeni.cn'}).status_code == 403
     for _ in range(2):
         response = create_room(client, 1)
         assert response.status_code == 201

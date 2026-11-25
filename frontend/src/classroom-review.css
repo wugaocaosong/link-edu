@@ -183,15 +183,50 @@
 @media(max-width:800px){.review-masthead{align-items:flex-start;flex-direction:column;gap:14px;}.report-profile-grid{grid-template-columns:1fr;}.review-panel{padding:20px;}.report-section-title{align-items:flex-start;}.report-section-title>span{max-width:150px;text-align:right;}.reflection-grid{gap:16px;}.reflection-grid article+article{padding-left:16px;}.report-session-meta{flex-wrap:wrap;}}
 @media(max-width:560px){.classroom-review-page{padding-top:10px;}.review-masthead h1{font-size:32px;}.review-session-switch{flex-wrap:wrap;gap:6px;}.review-session-switch label{flex:1;}.review-session-switch select{order:3;flex-basis:100%;}.review-panel{padding:16px;border-radius:12px;}.report-overview{grid-template-columns:1fr;gap:20px;}.report-intro{padding-top:6px;}.report-intro h2{font-size:24px;}.report-method-tag{margin-top:16px;}.report-score-ring{width:154px;height:154px;}.report-overview-note{grid-column:auto;}.report-metrics{grid-template-columns:1fr 1fr;}.report-metrics>div{padding:12px 16px;flex-direction:row;align-items:center;}.report-metrics>div:nth-child(3){border-left:0;}.report-metrics>div:nth-child(n+3){border-top:1px solid var(--review-line);}.report-metrics strong{font-size:23px;}.report-section-title{flex-direction:column;}.report-section-title>span{max-width:none;text-align:left;}.classroom-review-page h2{font-size:18px;}.dimension-insight{padding:16px;}.dimension-insight h3{font-size:21px;}.evidence-lane{grid-template-columns:64px 1fr 20px;gap:8px;font-size:11px!important;}.evidence-time-axis{margin-left:78px;margin-right:30px;}.modality-grid{grid-template-columns:1fr;gap:18px;}.reflection-grid{grid-template-columns:1fr;gap:0;}.reflection-grid article+article{border-left:0;border-top:1px solid var(--review-line);padding:16px 0;}.reflection-number{font-size:24px;}.report-footer{flex-direction:column;}.review-session-meta{flex-direction:column;gap:2px;}.classroom-review-entry{flex-direction:column;align-items:flex-start;}}
 @media(prefers-reduced-motion:reduce){.classroom-review-page *{animation:none!important;transition:none!important;scroll-behavior:auto!important;}}
+@page classroom-report {
+  size: A4 portrait;
+  margin: 15mm 16mm 18mm;
+  @bottom-right { content: counter(page) " / " counter(pages); font: 9pt sans-serif; color: #566269; }
+}
+
 @media print {
-  .app-shell:has(.classroom-review-page){display:block!important;background:#fff!important;}
-  .app-shell:has(.classroom-review-page) :is(.sidebar,.topbar,.help-fab,.help-chat,.no-print,dialog,.aurora){display:none!important;}
-  .app-shell:has(.classroom-review-page) .workspace{margin:0!important;width:100%!important;padding:0!important;}
-  .app-shell:has(.classroom-review-page) :is(.page-slot,.page-frame){transform:none!important;filter:none!important;overflow:visible!important;}
-  .classroom-review-page{--review-bg:#fff;--review-raised:#f4f5f6;--review-ink:#171b20;--review-muted:#46515c;--review-line:#ccd1d5;--review-accent:#984000;--review-teal:#236358;color-scheme:light;padding:0;}
-  .classroom-review-page *{animation:none!important;box-shadow:none!important;}
-  .classroom-review-page :is(.report-score-ring,.lane-track,.modality-track){print-color-adjust:exact;-webkit-print-color-adjust:exact;}
-  .classroom-review-page .review-panel{break-inside:avoid;background:#fff;}
-  .report-overview{grid-template-columns:1fr 180px;}.report-overview-note{grid-column:1/-1;}.report-profile-grid{display:none;}.report-print-dimensions{display:block;}.report-print-dimensions section{margin:20px 0;break-inside:avoid;}.report-print-dimensions p{font-size:12px;}.report-print-dimensions small{font-size:10px;color:var(--review-muted);}
-  .report-correction,.report-section-title>span{display:none;}.report-footer{font-size:9px;}.review-masthead h1{font-size:28px;}
+  /* Release the nested viewport and scroll containers for paper pagination. */
+  :is(html, body, body *):has(.classroom-review-page .evidence-report),
+  .classroom-review-page:has(.evidence-report),
+  .evidence-report :is(.report-workspace,.report-main-column,.report-detail-column,.behavior-list),
+  .classroom-review-page .evidence-report {
+    display: block !important; position: static !important; inset: auto !important;
+    height: auto !important; min-height: 0 !important; max-height: none !important;
+    width: auto !important; max-width: none !important; overflow: visible !important;
+    padding: 0 !important; margin: 0 !important; transform: none !important;
+    filter: none !important; contain: none !important; background: white !important;
+  }
+  body:has(.evidence-report) { page: classroom-report; }
+  body:has(.evidence-report) :has(.evidence-report) > :not(:has(.evidence-report),.evidence-report,.review-session-meta),
+  .classroom-review-page :is(.no-print,.report-video-panel,.review-button,.review-eyebrow,.report-footer) {
+    display: none !important;
+  }
+  .classroom-review-page:has(.evidence-report) {
+    --review-ink: #17252d; --review-muted: #404d53; --review-bg: white;
+    --review-raised: #f6f8f8; --review-line: #ced7d7; --review-accent: #854114; --review-teal: #225e59;
+    color: var(--review-ink); color-scheme: light; font: 10pt/1.55 "Microsoft YaHei", sans-serif;
+  }
+  .classroom-review-page *, body :has(.evidence-report) { animation: none !important; transition: none !important; box-shadow: none !important; }
+  .classroom-review-page .review-panel { opacity: 1 !important; transform: none !important; }
+  .classroom-review-page .review-session-meta { display: flex; justify-content: space-between; gap: 1em; font-size: 10pt; border-bottom: 1pt solid #325c58; padding-bottom: 2mm; }
+  .classroom-review-page .report-status-line { display: flex; margin: 2mm 0; }
+  .classroom-review-page .review-panel { margin: 3mm 0; padding: 2mm 0; border: 0; border-radius: 0; background: white; break-inside: auto; }
+  .classroom-review-page .report-overview { display: block; min-height: 0; overflow: visible; }
+  .report-overview::before { display: none; }
+  .report-overview .coach-summary { display: flex; flex-direction: row; gap: 2mm; justify-content: flex-start; min-height: 0; padding: 2mm 0; border: 0; }
+  .report-overview .coach-summary strong { font-size: 14pt; }
+  .report-overview .report-method-tag { margin-top: 0; }
+  .classroom-review-page .report-section-title { display: block; margin: 0 0 2mm; }
+  .classroom-review-page :is(h2,h3,summary,.report-section-title) { break-after: avoid; }
+  .classroom-review-page :is(.coach-focus-card,.behavior-list li,.reflection-grid article,.report-fold article,.evidence-map,.modality-grid) { break-inside: avoid; }
+  .classroom-review-page :is(.coach-focus-card,.review-inline-alert,.behavior-list li) { background: white; }
+  .behavior-list li { display: block; margin: 1.5mm 0; padding: 2mm 3mm; }
+  .behavior-list time { margin-right: 2mm; }
+  .classroom-review-page :is(.report-fold,.dimension-sources) { overflow-wrap: anywhere; }
+  .classroom-review-page :is(.evidence-map,.modality-track) { print-color-adjust: exact; }
 }

@@ -39,12 +39,22 @@ export function saveClassroomRecording(origin, userId, sessionId, blob, meta) {
   const metadata = {filename:String(meta.filename || `LINK-课堂-${sessionId}.webm`),
     durationMs:Number(meta.durationMs)||0,segments:(meta.segments || []).map(s=>({
       wallStart:Number(s.wallStart),wallEnd:Number(s.wallEnd),videoStart:Number(s.videoStart)}))};
+  if (Array.isArray(meta.marks)) metadata.marks = Array.from(meta.marks);
   return transact('readwrite', (store, done, fail) => {
     const req = store.getAll();
     req.onsuccess = () => {
       if (!canStore(req.result, key, blob.size)) return fail('本机录像容量不足，请下载或手动删除旧录像；未删除任何记录。');
       const row = {...metadata, key, origin, userId:Number(userId), sessionId:Number(sessionId),
         blob, byteLength:blob.size, savedAt:Date.now(), mimeType:blob.type};
+      if (meta.partId) {
+        const previous = req.result.find(r => r.key === key);
+        const parts = previous?.parts || [];
+        if (parts.some(part => part.id === meta.partId)) {done(previous); return;}
+        row.parts = [...parts, {id:meta.partId,blob,segments:metadata.segments,durationMs:metadata.durationMs}];
+        row.byteLength = (previous?.byteLength || 0) + blob.size;
+        if (req.result.filter(r=>r.key!==key).reduce((n,r)=>n+r.byteLength,row.byteLength)>MAX_TOTAL_BYTES)
+          return fail('浏览器容量不足，请下载当前录像片段。');
+      }
       try {store.put(row); done(row);} catch {fail('录像保存失败，可下载视频；未修改已有录像。');}
     };
   });

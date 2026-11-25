@@ -51,6 +51,10 @@ def create_app(config_class=Config):
         from adaptive_routes import adaptive_bp
         app.register_blueprint(adaptive_bp)
     app.register_blueprint(tenants_bp)
+    from study_routes import bp as study_bp
+    from study_cli import study
+    app.register_blueprint(study_bp)
+    app.cli.add_command(study)
     from classroom_routes import register_classroom
     register_classroom(app)
     from assistant_routes import register_assistant

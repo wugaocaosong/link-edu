@@ -5,7 +5,7 @@ import re
 
 FRACTIONS = {
     'id': 'primary-math-fractions',
-    'version': 1,
+    'version': 2,
     'topic': '分数的初步认识',
     'grade': '小学三年级',
     'objective': '解释平均分、几分之一和同一整体，并回应学生的典型误解。',
@@ -15,9 +15,9 @@ FRACTIONS = {
         'same_whole': {'label': '同一整体', 'misconception': '不同整体的分数份量可以直接比较'},
     },
     'students': {
-        'ming': {'focus': '追问为什么，但不提前知道未讲内容', 'initial_misconceptions': []},
-        'yu': {'focus': '容易把不等分误认为二分之一', 'initial_misconceptions': ['equal_parts']},
-        'lin': {'focus': '较少主动发言，仅点名后回应', 'initial_misconceptions': []},
+        'ming': {'focus': '建构求证：理解较稳，老师引导比较后才迁移追问，并试着把大家的想法连起来', 'initial_misconceptions': []},
+        'yu': {'focus': '主动质疑：认为不等分也可以表示二分之一，会反问；开放追问、等待或比较后才说出数份的理由', 'initial_misconceptions': ['equal_parts']},
+        'lin': {'focus': '结论先行：先说很短的答案，被追问、等待或引导后才补充理由，不主动举手', 'initial_misconceptions': []},
     },
 }
 

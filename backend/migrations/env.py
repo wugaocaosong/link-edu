@@ -1,7 +1,6 @@
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import engine_from_config, pool
 
 from app import app
 from extensions import db
@@ -25,10 +24,9 @@ def run_migrations_offline():
 
 
 def run_migrations_online():
-    configuration = config.get_section(config.config_ini_section, {})
-    configuration['sqlalchemy.url'] = app.config['SQLALCHEMY_DATABASE_URI']
-    connectable = engine_from_config(configuration, prefix='sqlalchemy.', poolclass=pool.NullPool)
-    with connectable.connect() as connection:
+    # Flask resolves relative SQLite paths under instance_path. Use the same
+    # engine as the application, including during a standalone Alembic run.
+    with app.app_context(), db.engine.connect() as connection:
         context.configure(connection=connection, target_metadata=target_metadata,
                           compare_type=True, render_as_batch=connection.dialect.name == 'sqlite')
         with context.begin_transaction():

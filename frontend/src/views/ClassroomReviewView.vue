@@ -18,7 +18,6 @@ const archiveSceneElement=ref(null);
 const archivePaperOverlay=ref(null);
 const archivePapersVisible=ref(false);
 const archiveBagDone=ref(false);
-const archiveBagResetKey=ref(0);
 const archiveVideoStarted=ref(false), archiveVideoVisible=ref(false), archiveOpeningVideo=ref(null);
 let archiveVideoEndTimer=null;
 let archiveOverlayResizeObserver=null;
@@ -51,16 +50,10 @@ async function playArchiveOpening(){
   archiveVideoStarted.value=true;archiveVideoVisible.value=true;
   await nextTick();
   try { await archiveOpeningVideo.value?.play(); }
-  catch { resetArchiveOpening(); }
-}
-function resetArchiveOpening(){
-  if(!archiveVideoStarted.value)return;
-  clearTimeout(archiveVideoEndTimer);archiveOpeningVideo.value?.pause();
-  archiveVideoStarted.value=false;archiveVideoVisible.value=false;archivePapersVisible.value=false;archiveBagDone.value=false;
-  archiveBagResetKey.value++;
+  catch { finishArchiveOpening(); }
 }
 function finishArchiveOpening(){
-  if(!archiveVideoStarted.value)return;
+  if(!archiveVideoStarted.value || archiveBagDone.value || disposed)return;
   archivePapersVisible.value=true;archiveBagDone.value=true;archiveVideoVisible.value=false;
   archiveOpeningVideo.value?.pause();
   clearTimeout(archiveVideoEndTimer);
@@ -139,7 +132,7 @@ async function regenerate(objection){
 function printReport(){window.print();}
 let printFolds=[];
 function preparePrint(){
-  printFolds=[...document.querySelectorAll('.classroom-review-page .report-fold:not([open])')];
+  printFolds=[...document.querySelectorAll('.evidence-report :is(.report-fold,.dimension-sources):not([open])')];
   printFolds.forEach(fold=>{fold.open=true;});
 }
 function restorePrint(){printFolds.forEach(fold=>{fold.open=false;});printFolds=[];}
@@ -153,7 +146,7 @@ onBeforeUnmount(()=>{disposed=true;requestId++;controller?.abort();clearTimeout(
       <img class="archive-scene-base" :class="{'is-hidden':archivePapersVisible}" :src="archiveSceneOnly?'/assets/archive-cover.png':'/assets/archive-reports-scene.png'" alt="" />
       <img v-if="archiveSceneOnly" class="archive-scene-papers" :class="{'is-visible':archivePapersVisible}" src="/assets/growth-archive-desk.png" alt="" @load="placeArchivePaperOverlay" />
       <ArchivePlantGlow v-if="archiveSceneOnly" :scene-element="archiveSceneElement" />
-      <ArchiveCoverBag v-if="archiveSceneOnly && !archiveBagDone" :key="archiveBagResetKey" :scene-element="archiveSceneElement" @play-video="playArchiveOpening" />
+      <ArchiveCoverBag v-if="archiveSceneOnly && !archiveBagDone" :scene-element="archiveSceneElement" @play-video="playArchiveOpening" />
       <svg v-if="archiveSceneOnly" ref="archivePaperOverlay" class="archive-paper-report-overlay" :class="{'is-visible':archivePapersVisible}" viewBox="0 0 1200 675" preserveAspectRatio="none" role="group" aria-label="白纸上的最近和历史评课报告">
         <g v-for="(item,historyIndex) in (archivePapersVisible?archiveReports.slice(1,5):[])" :key="item.session_id" class="archive-paper-history" :transform="archiveHistoryPlacements[historyIndex]?.transform" role="link" tabindex="0" :aria-label="`历史报告，${shortArchiveDate(item.created_at)}，点击查看`" @click="openArchiveReport(item)" @keydown="archiveReportKeydown($event,item)">
           <title>{{ `历史评课报告 · ${formatReportDate(item.created_at)}` }}</title>
@@ -187,7 +180,7 @@ onBeforeUnmount(()=>{disposed=true;requestId++;controller?.abort();clearTimeout(
       <SceneLink direction="right" v-if="archiveSceneOnly" class="archive-desk-return" to="/courses" aria-label="返回办公桌">
         <img src="/assets/desk/wood-arrow.webp" alt="" />
       </SceneLink>
-      <video v-if="archiveSceneOnly && archiveVideoStarted" ref="archiveOpeningVideo" class="archive-opening-video" :class="{'is-visible':archiveVideoVisible}" src="/assets/archive-opening.mp4" playsinline preload="auto" @ended="finishArchiveOpening" @error="resetArchiveOpening" />
+      <video v-if="archiveSceneOnly && archiveVideoStarted" ref="archiveOpeningVideo" class="archive-opening-video" :class="{'is-visible':archiveVideoVisible}" src="/assets/archive-opening.mp4" playsinline preload="auto" @ended="finishArchiveOpening" @error="finishArchiveOpening" />
       <button v-if="archiveSceneOnly && archiveVideoVisible" type="button" class="archive-video-skip" @click.stop="finishArchiveOpening">跳过视频</button>
     </div>
     <template v-if="!archiveSceneOnly">

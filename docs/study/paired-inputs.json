@@ -1,0 +1,115 @@
+{
+  "transcript": {
+    "transcript": [
+      {
+        "turn": 1,
+        "speaker": "教师",
+        "text": "小林，你觉得涂色的是多少？"
+      },
+      {
+        "turn": 2,
+        "speaker": "小林",
+        "text": "我觉得是一半。"
+      },
+      {
+        "turn": 3,
+        "speaker": "教师",
+        "text": "你是怎样判断的？"
+      }
+    ]
+  },
+  "multimodal": {
+    "transcript": [
+      {
+        "turn": 1,
+        "speaker": "教师",
+        "text": "小林，你觉得涂色的是多少？"
+      },
+      {
+        "turn": 2,
+        "speaker": "小林",
+        "text": "我觉得是一半。"
+      },
+      {
+        "turn": 3,
+        "speaker": "教师",
+        "text": "你是怎样判断的？"
+      }
+    ],
+    "playback": [
+      {
+        "reply_id": "demo-1",
+        "event_id": 2,
+        "start_ms": 14500,
+        "end_ms": 15700,
+        "status": "completed",
+        "turn": 2
+      },
+      {
+        "reply_id": "demo-2",
+        "event_id": 6,
+        "start_ms": 22300,
+        "end_ms": 22400,
+        "status": "interrupted_or_failed",
+        "turn": null
+      }
+    ],
+    "teacher_motion": {
+      "version": "motion-rubric-2",
+      "status": "insufficient",
+      "sample_count": 0,
+      "observed_samples": 0,
+      "modalities": {
+        "body": {
+          "observed_samples": 0,
+          "total_samples": 0,
+          "status_counts": {
+            "disabled": 0,
+            "failed": 0,
+            "loading": 0,
+            "low_confidence": 0,
+            "multiple": 0,
+            "no_detection": 0,
+            "observed": 0
+          },
+          "event_ids": []
+        },
+        "hands": {
+          "observed_samples": 0,
+          "total_samples": 0,
+          "status_counts": {
+            "disabled": 0,
+            "failed": 0,
+            "loading": 0,
+            "low_confidence": 0,
+            "multiple": 0,
+            "no_detection": 0,
+            "observed": 0
+          },
+          "event_ids": []
+        },
+        "face": {
+          "observed_samples": 0,
+          "total_samples": 0,
+          "status_counts": {
+            "disabled": 0,
+            "failed": 0,
+            "loading": 0,
+            "low_confidence": 0,
+            "multiple": 0,
+            "no_detection": 0,
+            "observed": 0
+          },
+          "event_ids": []
+        }
+      },
+      "observations": [],
+      "eligible_event_ids": [],
+      "limitations": [
+        "约2秒抽样一次；样本比例不是整堂课时长占比，不能保证捕获瞬时动作。",
+        "仅为单人摄像头几何线索，无法确认目光对象、手势意图或心理状态。",
+        "坐姿、个体活动方式及板书情境均应结合上下文，不要求固定站姿或微笑。"
+      ]
+    }
+  }
+}

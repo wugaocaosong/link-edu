@@ -219,6 +219,9 @@ def report_stage(room, stage):
 
 
 def request_report(app, session_id, retry=False):
+    from study_models import StudyAttempt
+    if StudyAttempt.query.filter_by(session_id=session_id).first():
+        return
     with locks:
         room = db.session.get(Classroom, session_id)
         finish_retest_plans(room)

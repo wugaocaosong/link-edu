@@ -62,7 +62,8 @@ export function useClassroom() {
   const seen = new Set();
   let motionTimeout,
     lastMotionSent = -Infinity,
-    cameraPending = false;
+    cameraPending = false,
+    researchRecording = false;
   const send = (type, payload = {}) => {
     if (ws?.readyState === WebSocket.OPEN && ws.bufferedAmount < 200000) {
       ws.send(
@@ -252,7 +253,7 @@ export function useClassroom() {
     if (!cameraEnabled.value) await toggleCamera();
     if (!cameraEnabled.value) throw new Error(error.value || '摄像头不可用，无法开始课堂');
   }
-  async function begin(mode, consent, cameraConsent, practicePlanId = null) {
+  async function begin(mode, consent, cameraConsent, practicePlanId = null, studyAttempt = null) {
     if (busy.value) return;
     if (!consentReady(consent, cameraConsent)) return;
     busy.value = true;
@@ -268,6 +269,7 @@ export function useClassroom() {
         camera_consent: cameraConsent,
         cloud_vision: cloudVision.value,
         ...(practicePlanId ? { practice_plan_id: practicePlanId } : {}),
+        ...(studyAttempt ? { study_attempt: studyAttempt } : {}),
       });
       await load(data.session_id);
       await connect();
@@ -348,7 +350,7 @@ export function useClassroom() {
           stopCamera();
           ws?.close();
         }
-        if (["completed", "failed", "insufficient"].includes(room.value.report_state))
+        if ((room.value.study_attempt && room.value.state === 'ended') || ["completed", "failed", "insufficient"].includes(room.value.report_state))
           clearInterval(pollTimer);
       } catch {
         error.value = "报告状态读取失败，可稍后从历史课堂继续查看";
@@ -530,7 +532,9 @@ export function useClassroom() {
       return;
     }
     try {
-      error.value = "正在等待摄像头授权；若浏览器未弹窗，请在地址栏检查权限。";
+      error.value = researchRecording
+        ? "正在准备本机授课录像。请在浏览器提示中允许，画面不会显示在课堂里。"
+        : "正在等待摄像头授权；若浏览器未弹窗，请在地址栏检查权限。";
       cameraPending = true;
       let timedOut = false,
         timer;
@@ -564,6 +568,7 @@ export function useClassroom() {
         track.onended = () => pauseCapture('摄像头已断开，采集已停止。检查设备后可重新连接。');
       });
       describeCamera();
+      if (researchRecording) return;
       initializeMotion();
       frameTimer = setInterval(async () => {
         if (!poseReady || frameBusy || !camera.value?.videoWidth) return;
@@ -682,6 +687,7 @@ export function useClassroom() {
     mouth,
     pose,
     camera,
+    setResearchRecording(value) { researchRecording = value === true; },
     elapsed,
     cloudVision,
     busy,

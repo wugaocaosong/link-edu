@@ -9,18 +9,32 @@ export function useClassroomRecording({state, room, getUserId, snapshot, wallMs,
   let recorder, starting=false, owner, disposed=false;
   function releaseUrl(){if(url.value)URL.revokeObjectURL(url.value);url.value='';}
   watch(state, async value=>{
-    if (['paused','disconnected','connecting'].includes(value)) recorder?.pause();
+    if (['paused','disconnected','connecting'].includes(value)) {
+      if(room.value?.study_attempt && recorder){recorder.stop();recorder=null;}
+      else recorder?.pause();
+    }
     if (['finishing','ended'].includes(value)) recorder?.stop();
     if (!['listening','speaking'].includes(value) || !enabled.value || starting || disposed) return;
     if (recorder) {
       try {await recorder.resume();} catch {error.value='录像恢复失败，课堂可继续。';recorder.stop();}
       return;
     }
-    starting=true; error.value='';
+    starting=true; error.value=''; saved.value=false;
     owner={origin:location.origin,userId:getUserId(),sessionId:room.value.session_id};
+    const studyOwner = room.value.study_attempt ? {...owner,partId:crypto.randomUUID()} : null;
     const current=recorder=new ClassroomRecorder({paint:createClassroomPainter(snapshot),getWallMs:wallMs,
       getAudioStream:audioStream,onState:value=>{phase.value=value;},onError:value=>{error.value=value;},
-      onResult:value=>{if(disposed)return;result.value=value;releaseUrl();url.value=URL.createObjectURL(value.blob);previewOpen.value=true;}});
+      onResult:value=>{
+        if (studyOwner) {
+          value.partId=studyOwner.partId;
+          saveClassroomRecording(studyOwner.origin,studyOwner.userId,studyOwner.sessionId,value.blob,value)
+            .then(()=>{if(!disposed && result.value?.partId===value.partId)saved.value=true;})
+            .catch(e=>{if(!disposed)error.value=e.message;});
+        }
+        if(disposed)return;
+        result.value=value;releaseUrl();url.value=URL.createObjectURL(value.blob);
+        if(!studyOwner) previewOpen.value=true;
+      }});
     try {
       await current.start();
       if(disposed)current.dispose();

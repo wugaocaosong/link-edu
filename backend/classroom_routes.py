@@ -10,6 +10,8 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_sock import Sock
 from sqlalchemy import update
 from extensions import db
+from study_routes import active_attempt, study_session
+from services.fraction_study import ROUNDS
 from models import Course, TrainingSession, User
 from classroom_models import Classroom, ClassroomEvent, ClassroomTicket, PracticePlan
 from services import classroom_budget as budget
@@ -51,6 +53,10 @@ def owned(sid):
     row = Classroom.query.filter_by(session_id=sid, user_id=int(get_jwt_identity())).first()
     if not row:
         abort(404)
+    attempt = study_session(sid)
+    if attempt:
+        from study_routes import owned_attempt
+        owned_attempt(attempt.id)
     return row
 
 
@@ -64,6 +70,13 @@ def serialize(room, include_events=False):
             'scenario': scenario_brief()}
     data.update(clock)
     data['elapsed'] = clock['active_elapsed']
+    attempt = study_session(room.session_id)
+    if attempt:
+        data['study_attempt'] = attempt.id
+        data['study_stage'] = attempt.stage
+        from study_models import StudyParticipant
+        participant = db.session.get(StudyParticipant, attempt.participant_id)
+        data['study_arm'] = participant.arm if participant else None
     phase = ClassroomEvent.query.filter_by(session_id=room.session_id, kind='report_stage').order_by(ClassroomEvent.id.desc()).first()
     data['report_stage'] = room.report_state if room.report_state in ('completed','failed','insufficient') else phase.payload.get('stage') if phase else room.report_state
     if include_events:
@@ -169,8 +182,21 @@ def create():
                 source.report_version != plan.source_report_version):
             return jsonify(message='这项复练任务已开始或来源报告已更新，请重新选择'), 409
     with active_lock:
+        study_id = data.get('study_attempt')
+        attempt = None
+        if study_id is not None:
+            if type(study_id) is not int or plan:
+                abort(400)
+            attempt = active_attempt(study_id)
+            if attempt.stage not in ROUNDS:
+                abort(409)
+            if attempt.session_id:
+                return jsonify(serialize(owned(attempt.session_id)))
+            mode_value = 'full'
         active = Classroom.query.filter_by(user_id=uid).filter(Classroom.state.in_(['active', 'paused'])).first()
         if active:
+            if attempt or study_session(active.session_id):
+                return jsonify(message='请从对应场次继续已有课堂'), 409
             if plan:
                 return jsonify(message='请先完成当前课堂，再开始复练任务'), 409
             return jsonify(serialize(active)), 200
@@ -187,7 +213,11 @@ def create():
             db.session.add(course)
             db.session.flush()
         from tenancy import tenant_id_for_request
-        tenant_id = tenant_id_for_request(db.session.get(User, uid))
+        if attempt:
+            from study_models import StudyParticipant
+            tenant_id = db.session.get(StudyParticipant, attempt.participant_id).tenant_id
+        else:
+            tenant_id = tenant_id_for_request(db.session.get(User, uid))
         session = TrainingSession(user_id=uid, tenant_id=tenant_id, course_id=course.id, status='in_progress',
             progress_percent=0, duration_minutes=0, started_at=datetime.utcnow(), last_trained_at=datetime.utcnow())
         db.session.add(session)
@@ -195,6 +225,11 @@ def create():
         room = Classroom(session_id=session.id, user_id=uid, tenant_id=tenant_id, mode=mode_value,
                          cloud_vision=data.get('cloud_vision') is True)
         db.session.add(room)
+        if attempt:
+            room.cloud_vision = False
+            room.topic = '认识几分之一'
+            db.session.flush()
+            attempt.session_id = session.id
         if plan:
             plan.retest_session_id = session.id
             plan.status = 'active'
@@ -331,6 +366,8 @@ def finish(sid):
 @jwt_required()
 def report(sid):
     room = owned(sid)
+    if study_session(sid):
+        return jsonify(message='请在实验场次提交独立自评并领取本组报告'), 409
     if room.state != 'ended':
         return jsonify(message='请先结束课堂'), 409
     data = request.get_json(silent=True) or {}
