@@ -23,6 +23,7 @@ export const validScore=value=>typeof value==='number' && Number.isFinite(value)
 const timed=e=>typeof e.at_ms==='number' && Number.isFinite(e.at_ms) && e.at_ms>=0;
 const byTime=(a,b)=>(timed(a)?a.at_ms:Infinity)-(timed(b)?b.at_ms:Infinity) || a.id-b.id;
 export function classroomDestination(room) {
+  if (room.study_attempt) return {path:'/study'};
   return ['active','paused'].includes(room.state) ? {path:'/classroom',query:{session:room.session_id}} :
     {path:'/ai-review',query:{classroom:String(room.session_id)}};
 }

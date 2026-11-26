@@ -24,7 +24,10 @@ import { History, PlayerPlay, PlayerStop, PlayerPause, Video, VideoOff, Micropho
 import "../classroom.css";
 
 const route=useRoute(), router=useRouter(), live=useClassroom();
-const showTablet = ref(!route.query.session && !route.query.practice)
+const showTablet = ref(!route.query.session && !route.query.practice && !route.query.study)
+const studyId = computed(() => Number(route.query.study) || room.value?.study_attempt)
+const studyArm = ref('')
+const concealCamera = computed(() => studyArm.value === 'transcript' || room.value?.study_arm === 'transcript')
 const classroomSurface = ref(null)
 async function enterClassroom() {
   showTablet.value = false
@@ -54,7 +57,7 @@ const {room, capabilities, events, messages, error, state, partial, students, ac
   pose, reply, playbackStudent, landmarks, motionStatus, handStatus, faceStatus, cameraEnabled,
   retryMotion, camera, elapsed, cloudVision, busy, send, refreshCapabilities, begin, reconnect,
   finish, load, regenerate, setVision, volume, setVolume, cameraResolution, cameraAdjusting,
-  cameraNote, setCameraResolution, previewCamera, pauseCapture, capabilitiesLoading, capabilitiesError} = live;
+  cameraNote, setCameraResolution, previewCamera, pauseCapture, setResearchRecording, capabilitiesLoading, capabilitiesError} = live;
 const mode=ref(route.query.mode === 'fragment' ? 'fragment' : 'full'), consent=ref(false), cameraConsent=ref(false), history=ref([]), probing=ref("");
 const practicePlan=ref(null);
 const practiceLoading=ref(false);
@@ -122,7 +125,14 @@ const stateLabel=computed(()=>({
 const latestTeacher=computed(()=>events.value.filter(e=>e.type==="transcript").at(-1)?.data.text);
 function openSettings(){cameraRef.value?.openSettings();}
 async function preparationSettings(){preparationOpen.value=false;await nextTick();openSettings();}
+watch(concealCamera, value => { setResearchRecording(value); if (value) cameraConsent.value = true; }, {immediate:true});
+async function loadStudyArm(){
+  if(!studyId.value) return;
+  try { studyArm.value = (await api.get('/study', {timeout:10000, skipBusy:true})).data.arm || ''; }
+  catch { studyArm.value = room.value?.study_arm || ''; }
+}
 async function requestPreview(){
+  if(concealCamera.value) return;
   if(!cameraConsent.value){preparationOpen.value=true;return;}
   preparationOpen.value=false;
   if(!cameraEnabled.value)await previewCamera(cameraConsent.value);
@@ -153,12 +163,15 @@ async function start(){
     error.value='复练任务不可用或来源报告已更新，请从评课报告重新选择。';return;
   }
   window.dispatchEvent(new Event("link:classroom-capture"));
-  await begin(mode.value,consent.value,cameraConsent.value,practiceId.value,lessonTopic.value,lessonSubject.value);
-  if(room.value) router.replace({query:{session:room.value.session_id}});
+  if(studyId.value){ if(!studyArm.value) await loadStudyArm(); recordEnabled.value=true; }
+  await begin(studyId.value ? 'full' : mode.value,consent.value,cameraConsent.value,practiceId.value,studyId.value,lessonTopic.value,lessonSubject.value);
+  if(room.value) router.replace({query:{session:room.value.session_id,
+    ...(room.value.study_attempt ? {study:room.value.study_attempt} : {})}});
 }
 async function resume(){
   if(startBlockers.value.length) return;
   window.dispatchEvent(new Event("link:classroom-capture"));
+  if(studyId.value){ if(!studyArm.value) await loadStudyArm(); recordEnabled.value=true; }
   await reconnect(consent.value,cameraConsent.value);
 }
 function selectStudent(id){
@@ -192,7 +205,7 @@ watch(()=>route.query.session,sid=>{
 watch(()=>route.query.practice,()=>loadPracticePlan());
 watch(state,s=>{if(s==="ended"){refreshHistory();refreshCapabilities();}});
 onMounted(async()=>{
-  await refreshCapabilities();await refreshHistory();await loadPracticePlan();
+  await refreshCapabilities();await refreshHistory();await loadPracticePlan();await loadStudyArm();
   if(route.query.session) await openSession(route.query.session);
 });
 onBeforeRouteLeave(()=>{
@@ -221,10 +234,10 @@ onBeforeRouteLeave(()=>{
       <ClassroomCamera ref="cameraRef" :enabled="cameraEnabled" :disabled="state==='ended'" :landmarks="landmarks"
         :camera-consent="cameraConsent" :camera-busy="busy" :preview-allowed="!active"
         :motion="pose" :face-status="faceStatus" :motion-status="motionStatus" :hand-status="handStatus"
-        :teacher-text="partial || latestTeacher" :reply="reply" :messages="messages" :volume="volume" :resolution="cameraResolution"
+        :teacher-text="partial || latestTeacher" :reply="reply" :messages="messages" :volume="volume" :resolution="cameraResolution" :conceal="concealCamera"
         :resolution-busy="cameraAdjusting || busy" :camera-note="cameraNote" :progress="progress" :time-label="timeLabel"
         @volume="setVolume" @resolution="setCameraResolution" @video="camera=$event" @retry="retryMotion" @toggle="requestPreview" @prepare="preparationOpen=true" @fullscreen-target="helpTarget=$event">
-        <template #heading><span class="connection-label" :class="state"><i aria-hidden="true" />{{ stateLabel }}</span><p class="scene-topic">{{ room?.topic || lessonTopic }}</p></template>
+        <template #heading><span class="connection-label" :class="state"><i aria-hidden="true" />{{ stateLabel }}</span><p class="scene-topic">{{ room?.topic || (studyId?'认识几分之一':lessonTopic) }}</p></template>
         <template #timer><ClassroomCountdown :seconds="remaining" /></template>
         <template #students="{ presentation }">
           <PixelStudentStage ref="studentRef" :presentation="presentation" :students="students.length ? students : defaultStudents"
@@ -238,6 +251,7 @@ onBeforeRouteLeave(()=>{
               <button v-if="['paused','disconnected'].includes(state)" class="class-btn player-start" :disabled="busy" :title="startHint" aria-describedby="class-start-hint" @click="launchLesson"><PlayerPlay aria-hidden="true" />继续授课</button>
               <button class="class-btn player-start" aria-label="结束并评课" :disabled="busy || state==='finishing' || finishWait>0" :title="finishWait ? '还需授课 '+finishWait+' 秒才能评课' : '结束课堂，检查证据并评课'" @click="finishLesson"><PlayerStop aria-hidden="true" />{{ state==='finishing' ? '处理中…' : finishWait>0 ? '结束（'+finishWait+'s）' : '结束并评课' }}</button>
             </template>
+            <router-link v-else-if="studyId" class="class-btn player-start" to="/study">填写独立自评</router-link>
             <button v-else class="class-btn player-start" @click="router.push('/classroom').then(()=>router.go(0))"><PlayerPlay aria-hidden="true" />下一节课</button>
           </div>
         </template>
@@ -252,14 +266,14 @@ onBeforeRouteLeave(()=>{
           <ClassroomIconButton label="课堂记录" aria-haspopup="dialog" :aria-expanded="timelineOpen" @click="timelineOpen=true"><Messages /></ClassroomIconButton>
         </template>
         <template #settings>
-          <div class="vision-option">
+          <div v-if="!studyId" class="vision-option">
             <label><input type="checkbox" v-model="cloudVision" :disabled="state==='ended' || busy" @change="setVision" />边录边分析可见行为（云端画面）</label>
             <p class="subtle-note">默认关闭。开启后最多每15秒上传1张截图、每课最多40张并消耗视觉额度；截图私有保存，可在报告中回看书写、指向和面部外观线索。线索只代表采样瞬间，不等于持续时长或教学评分；不判表情正常/异常。整段录像仍只保存在本机。</p>
           </div>
           <ClassroomSettings :capabilities="capabilities" :probing="probing" :active="active" @probe="probe" @refresh="refreshCapabilities" />
         </template>
         <template #windows>
-          <ClassroomPreparation v-model="preparationOpen" v-model:consent="consent" v-model:camera-consent="cameraConsent"
+          <ClassroomPreparation v-model="preparationOpen" :study="!!studyId" :conceal-camera="concealCamera" v-model:consent="consent" v-model:camera-consent="cameraConsent"
             v-model:record-enabled="recordEnabled" v-model:mode="mode" v-model:topic="lessonTopic" v-model:subject="lessonSubject" :capabilities="capabilities" :practice-plan="practicePlan"
             :room="room" :state="state" :busy="busy" :active="active" :camera-enabled="cameraEnabled" :pose="pose"
             :blockers="startBlockers" :hint="conciseHint" :loading="capabilitiesLoading" :needs-settings="needsSettings"
@@ -275,23 +289,24 @@ onBeforeRouteLeave(()=>{
       <p v-if="recordError" role="alert">{{ recordError }}</p>
     </ClassroomDialog>
     <div class="classroom-services" aria-label="课堂连接状态">
+      <router-link v-if="!active" class="text-action" to="/study">实验场次</router-link>
       <span v-if="!room || ['paused','disconnected'].includes(state)" id="class-start-hint" class="classroom-ready-hint" role="status" aria-live="polite">{{ conciseHint }}</span>
       <button class="text-action classroom-history" :disabled="active || busy" aria-haspopup="dialog" :aria-expanded="showHistory" @click="showHistory=true;refreshHistory()"><History aria-hidden="true" />历史课堂</button>
-      <span v-if="recordEnabled" role="status">录像 · {{ {idle:'开课后录制',recording:'录制中',paused:'已暂停',preview:'可预览',failed:'不可用'}[recordPhase] }} <button v-if="recordResult" class="text-action" @click="recordPreview=true">预览录像</button></span>
-      <ClassroomIconButton align="start" :label="cameraEnabled ? '摄像头已开启（设置）' : '摄像头已关闭（设置）'" :active="cameraEnabled" @click="openSettings"><Video v-if="cameraEnabled" /><VideoOff v-else /></ClassroomIconButton>
+      <span v-if="recordEnabled" role="status">录像 · {{ {idle:'开课后录制',recording:'录制中',paused:'已暂停',preview:'已录制',failed:'不可用'}[recordPhase] }} <button v-if="recordResult && !studyId" class="text-action" @click="recordPreview=true">预览录像</button><button v-if="studyId && recordResult && !recordSaved" class="text-action" @click="recording.save">保存录像</button></span>
+      <ClassroomIconButton v-if="!concealCamera" align="start" :label="cameraEnabled ? '摄像头已开启（设置）' : '摄像头已关闭（设置）'" :active="cameraEnabled" @click="openSettings"><Video v-if="cameraEnabled" /><VideoOff v-else /></ClassroomIconButton>
       <ClassroomIconButton align="start" :label="['listening','speaking'].includes(state) ? '麦克风采集中（设置）' : '麦克风未采集（设置）'" :active="['listening','speaking'].includes(state)" @click="openSettings"><Microphone /></ClassroomIconButton>
       <ClassroomIconButton :label="'连接：'+stateLabel+'（设置）'" @click="openSettings"><Wifi /></ClassroomIconButton>
       <span v-for="group in statusGroups" :key="group.key" class="status-item" :class="group.tone"><i aria-hidden="true" />{{ group.title }} <b>{{ group.label }}</b></span>
       <span v-if="!reply.studentId && reply.phase==='thinking'" role="status">学生正在思考…</span>
     </div>
-    <section v-if="room?.state==='ended'" class="class-panel classroom-review-entry">
+    <section v-if="room?.state==='ended' && !studyId" class="class-panel classroom-review-entry">
       <div><h2>课堂已保存</h2><p>{{ {running:'AI 正在评课，可前往报告页查看进度。',completed:'AI 评课已就绪，查看维度分析与课堂证据。',insufficient:'课堂数据不足，查看具体缺项与补充建议。',failed:'评课未完成，前往报告页查看原因并重试。'}[room.report_state] || '前往 AI 评课页面查看本节课堂。' }}</p></div>
       <router-link class="class-btn" :to="classroomDestination(room)">查看 AI 评课 ↗</router-link>
     </section>
     <ClassroomDialog v-model="showHistory" title="历史课堂">
       <div class="history-panel">
         <p v-if="!history.length" class="empty-state">暂无课堂记录</p>
-        <router-link v-for="item in history" :key="item.session_id" :to="classroomDestination(item)" @click="item.state==='active' && openSession(item.session_id)">
+        <router-link v-for="item in history" :key="item.session_id" :to="item.study_attempt ? '/study' : classroomDestination(item)" @click="!item.study_attempt && item.state==='active' && openSession(item.session_id)">
           <span>{{ item.topic }}<small>{{ formatReportDate(item.created_at) }}</small></span>
           <b>{{ ['active','paused'].includes(item.state) ? "可继续" : {completed:"查看报告",failed:"待重试",running:"评课中",idle:"待评课",insufficient:"数据不足"}[item.report_state] }}</b>
         </router-link>

@@ -37,6 +37,7 @@ const props = defineProps({
   resolution: {type:Number, default:720},
   resolutionBusy: Boolean,
   cameraNote: String,
+  conceal: Boolean,
   progress: Number,
   timeLabel: String,
   messages: { type: Array, default: () => [] },
@@ -290,7 +291,7 @@ onUnmounted(() => {
   <div
     ref="container"
     class="classroom-camera"
-    :class="{ expanded, fallback, 'dialogue-layout': dialogue }"
+    :class="{ expanded, fallback, 'dialogue-layout': dialogue, 'camera-concealed': conceal }"
     :role="fallback ? 'dialog' : undefined"
     :aria-modal="fallback ? 'true' : undefined"
     aria-label="老师镜头"
@@ -300,7 +301,7 @@ onUnmounted(() => {
     <div ref="workspace" class="classroom-workspace">
     <ClassroomConversation v-show="dialogue" :visible="dialogue" :messages="messages" />
     <div ref="frame" class="motion-frame" :style="dialogue ? { left: `${cameraPosition.x}px`, top: `${cameraPosition.y}px` } : undefined">
-      <div v-if="dialogue" class="camera-window-heading">
+      <div v-if="dialogue && !conceal" class="camera-window-heading">
         <button type="button" class="camera-window-handle" aria-label="拖动教师小窗，方向键移动，Home 复位"
           @pointerdown="cameraWindow.down" @pointermove="cameraWindow.pointer" @pointerup="cameraWindow.end" @pointercancel="cameraWindow.end" @lostpointercapture="cameraWindow.end" @keydown="cameraWindow.keys">⠿ <span>我的画面</span></button>
         <button type="button" aria-label="复位教师小窗位置" title="位置复位" @click="cameraWindow.reset">↺</button>
@@ -311,11 +312,15 @@ onUnmounted(() => {
         autoplay
         muted
         playsinline
-        :class="{ mirrored: mirror }"
+        :class="{ mirrored: mirror && !conceal }"
+        :aria-hidden="conceal || undefined"
         @loadedmetadata="draw"
       />
       <canvas ref="canvas" aria-hidden="true" />
-      <div v-if="!enabled" class="camera-placeholder" :class="{ 'ready-stage': previewAllowed && !disabled && !dialogue }" @pointermove="moveLight">
+      <div v-if="conceal" class="camera-placeholder" aria-hidden="true">
+        <strong>{{ disabled ? '本次课堂已结束' : enabled ? '课堂进行中' : '你的课堂，即将开始' }}</strong>
+      </div>
+      <div v-else-if="!enabled" class="camera-placeholder" :class="{ 'ready-stage': previewAllowed && !disabled && !dialogue }" @pointermove="moveLight">
         <div v-if="previewAllowed && !disabled && !dialogue" class="stage-dust" aria-hidden="true">
           <i v-for="n in 26" :key="n" :style="{left: (n * 37 % 100) + '%', top: (n * 61 % 100) + '%', animationDelay: -n * .8 + 's'}" />
         </div>
@@ -357,8 +362,8 @@ onUnmounted(() => {
     <ClassroomDialog v-model="settingsOpen" title="课堂设置">
     <h3>画面与声音</h3>
     <div class="camera-tools">
-      <label><input type="checkbox" v-model="skeleton" />骨架</label
-      ><label><input type="checkbox" v-model="mirror" />镜像</label>
+      <label v-if="!conceal"><input type="checkbox" v-model="skeleton" />骨架</label
+      ><label v-if="!conceal"><input type="checkbox" v-model="mirror" />镜像</label>
       <label><input type="checkbox" v-model="captions" />字幕</label>
       <template v-if="captions"
         ><select v-model="captionSource" aria-label="字幕内容">
@@ -378,14 +383,15 @@ onUnmounted(() => {
       </select></label>
       <label class="volume-control">音量<input type="range" aria-label="设置上课音量" min="0" max="1" step="0.05" :value="volume" @input="emit('volume', $event.target.value)" /><output>{{ Math.round(volume * 100) }}%</output></label>
     </div>
-    <p class="pose-caption">
+    <p v-if="!conceal" class="pose-caption">
       {{ status
       }}<span v-if="enabled && handStatus === 'failed'"> · 手部检测不可用</span>
       <span> · 面部{{ faceState }}</span>
     </p>
-    <p class="motion-observations">{{ observations.join(' · ') || '暂无清晰动作线索' }}</p>
-    <p class="camera-resolution-note" :title="cameraNote">{{ cameraNote }}</p>
-    <p class="camera-privacy pose-caption">开启镜头将在本机检测身体、手势和面部；仅动作摘要用于教态评课，不做人脸识别或情绪判断。云截图需另行开启。</p>
+    <p v-if="!conceal" class="motion-observations">{{ observations.join(' · ') || '暂无清晰动作线索' }}</p>
+    <p v-if="!conceal" class="camera-resolution-note" :title="cameraNote">{{ cameraNote }}</p>
+    <p v-if="!conceal" class="camera-privacy pose-caption">开启镜头将在本机检测身体、手势和面部；仅动作摘要用于教态评课，不做人脸识别或情绪判断。云截图需另行开启。</p>
+    <p v-else class="camera-privacy pose-caption">本场不显示摄像头画面，也不把画面送入反馈报告。授课录像只保存在这台电脑，课后可以导出。</p>
     <div class="motion-recovery">
     <button
       v-if="enabled && (motionStatus === 'failed' || handStatus === 'failed' || faceStatus === 'failed')"
@@ -445,6 +451,9 @@ onUnmounted(() => {
 .motion-frame { position:relative; height:clamp(240px, calc(100dvh - 500px), 680px); overflow:hidden; border-radius:12px 12px 0 0; background:#090a0e; }
 .motion-frame:has(.camera-placeholder)::before { content:""; position:absolute; inset:0; opacity:.45; background:radial-gradient(ellipse at 50% 60%, #ff7a180c, transparent 65%), radial-gradient(#ffffff19 .6px, transparent .6px); background-size:100% 100%, 24px 24px; mask-image:linear-gradient(transparent, #000 35%, #000 75%, transparent); }
 .motion-frame video, .motion-frame canvas { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
+.camera-concealed .motion-frame video,
+.camera-concealed .motion-frame canvas { opacity:0; }
+.camera-concealed .camera-placeholder { z-index:1; }
 .motion-frame canvas { pointer-events:none; }
 .mirrored { transform:scaleX(-1); }
 .motion-frame .camera-placeholder { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; padding:64px 16px 16px; text-align:center; gap:12px; }
@@ -459,7 +468,7 @@ onUnmounted(() => {
 .camera-lens svg { width:28px; height:28px; }
 .camera-lens::after { content:""; position:absolute; inset:-8px; border:1px solid #ff7a181a; border-radius:28px; animation:lens-pulse 4s ease-in-out infinite; }
 .camera-open-button svg { width:18px; height:18px; }
-.camera-captions { position:absolute; display:flex; flex-direction:column; max-height:calc(100% - 16px); bottom:16px; left:50%; transform:translateX(-50%); width:min(var(--caption-width,80%),calc(100% - 24px)); padding:8px 12px; background:#090a0edc; border:1px solid #ffffff10; border-radius:8px; color:#fff; font-size:var(--subtitle-size); line-height:1.5; overflow-wrap:anywhere; }
+.camera-captions { position:absolute; z-index:2; display:flex; flex-direction:column; max-height:calc(100% - 16px); bottom:16px; left:50%; transform:translateX(-50%); width:min(var(--caption-width,80%),calc(100% - 24px)); padding:8px 12px; background:#090a0edc; border:1px solid #ffffff10; border-radius:8px; color:#fff; font-size:var(--subtitle-size); line-height:1.5; overflow-wrap:anywhere; }
 .caption-speaker { display:block; flex-shrink:0; font-size:11px; color:var(--class-orange-text); margin-bottom:4px; text-align:center; }
 .caption-lines { height:3em; min-height:0; text-align:center; overflow:auto; overscroll-behavior:contain; scrollbar-width:thin; }
 .camera-captions p { margin:0; font-size:inherit; line-height:inherit; color:inherit; }

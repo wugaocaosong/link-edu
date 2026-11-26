@@ -23,6 +23,14 @@ def live(app):
     obj.worker = lambda fn: None  # Never invoke paid providers in unit tests.
     return obj
 
+def test_transcript_arm_drops_camera_pose_and_image(app):
+    obj = live(app)
+    obj.conceal_camera = True
+    obj.incoming({'type': 'pose', 'event_id': 'pose-1', 'data': {'present': True}})
+    obj.incoming({'type': 'image', 'event_id': 'image-1', 'image': 'data:image/jpeg;base64,eA=='})
+    assert ClassroomEvent.query.filter(ClassroomEvent.kind.in_(['pose', 'vision', 'vision_request'])).count() == 0
+
+
 def test_only_final_transcript_and_dedup(app):
     obj = live(app)
     obj.handle_asr({'type':'conversation.item.input_audio_transcription.text','text':'平均','stash':'分'})

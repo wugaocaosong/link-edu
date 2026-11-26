@@ -34,6 +34,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', component: LandingView },
+    { path: '/study', component: () => import('./views/FractionStudy.vue'), meta: { auth: true } },
     {
       path: '/',
       component: AppShell,

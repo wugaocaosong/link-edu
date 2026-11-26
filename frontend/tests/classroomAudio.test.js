@@ -61,6 +61,15 @@ test('failed synthesis without audio reports failure once', t => {
   assert.deepEqual(f.messages.map(m=>m.type),['playback_failed']);
 });
 
+test('a muted reply cannot confirm that the teacher heard the sentence', t => {
+  const f=fixture(t);
+  f.audio.chunk('muted',f.pcm(100),16000);
+  f.audio.setVolume(0); f.audio.setVolume(1);
+  f.audio.end('muted'); f.flush();
+  assert.ok(f.messages.some(m=>m.type==='playback_failed'));
+  assert.ok(!f.messages.some(m=>m.type==='playback_done'));
+});
+
 test('completed reply cannot play again or finish twice', t => {
   const f=fixture(t); f.audio.chunk('one',f.pcm(100),16000); f.audio.end('one'); f.flush();
   f.audio.chunk('one',f.pcm(100),16000); f.audio.end('one'); f.flush();
