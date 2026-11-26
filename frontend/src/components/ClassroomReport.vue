@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, onBeforeUnmount, watch } from 'vue';
+import { computed, ref, onBeforeUnmount, onMounted, watch } from 'vue';
 import { ArrowUpRight, Focus2, ListDetails, ShieldCheck, Bulb, Photo, Refresh, Printer } from '@vicons/tabler';
 import { api } from '../services/api';
 import { buildReview, formatReportTime as time, formatReportDate } from '../services/classroomReview.js';
@@ -11,8 +11,7 @@ import ClassroomDialog from './ClassroomDialog.vue';
 import ClassroomReplay from './ClassroomReplay.vue';
 const props=defineProps({room:Object,busy:Boolean});
 const auth=useAuthStore();
-const emit=defineEmits(['regenerate','plans-created','refresh']);
-const exportLocked=ref(false);
+const emit=defineEmits(['regenerate','plans-created','refresh','print']);
 const view=computed(()=>buildReview(props.room));
 const linkedCoachCount=computed(()=>view.value.coachingFocuses.filter(item=>item.evidence.length).length);
 const status=computed(()=>({idle:'待评课',running:'评课进行中',completed:'已完成',failed:'生成失败',insufficient:'证据不足 · 未生成'}[props.room.report_state]||'待评课'));
@@ -28,9 +27,20 @@ const motion=computed(()=>props.room.report?.motion_evidence);
 const sources=computed(()=>props.room.report?.sources||[]);
 const behaviorLabels={teacher_question:'教师提问',student_response:'学生完整回应',question_response:'提问与回应',teacher_followup:'教师追问',teacher_feedback:'教师反馈',teacher_summary:'课堂小结',post_question_silence:'提问后的静默间隔',board_observation:'可见板书',board_speech_context:'板书与授课发言',motion_speech_context:'动作与授课发言',teacher_writing_observation:'书写动作线索',teacher_pointing_observation:'指向动作线索',facial_appearance_observation:'面部外观描述'};
 const behaviors=computed(()=>props.room.behavior_analysis?.segments||[]);
-const mmEvents=computed(()=>(props.room.events||[]).filter(event=>event.type==='mm_tba_action'));
+const projectMmEvents=ref([]),projectMmSummary=ref(null);
+onMounted(async()=>{try{const r=await fetch('/assets/mm-tba/image-digitization-2026-11-25.json');if(r.ok){const d=await r.json();projectMmSummary.value=d;projectMmEvents.value=d.events||[];}}catch{}});
+const mmEvents=computed(()=>[...(props.room.events||[]).filter(event=>event.type==='mm_tba_action'),...projectMmEvents.value]);
 const mmStatus=computed(()=>(props.room.events||[]).filter(event=>event.type==='mm_tba_status').at(-1)?.data);
-const mmCounts=computed(()=>mmEvents.value.reduce((counts,event)=>{const label=event.data.label;counts[label]=(counts[label]||0)+1;return counts;},{Normal:0,Writing:0,Pointing:0}));
+const mmCounts=computed(()=>projectMmSummary.value?.counts||mmEvents.value.reduce((counts,event)=>{const label=event.data.label;counts[label]=(counts[label]||0)+1;return counts;},{Normal:0,Writing:0,Pointing:0}));
+const mmActionStats=computed(()=>{
+  const total=['Normal','Writing','Pointing'].reduce((sum,label)=>sum+(Number(mmCounts.value[label])||0),0);
+  return [
+    {key:'Normal',label:'正常状态',color:'normal',count:Number(mmCounts.value.Normal)||0},
+    {key:'Writing',label:'书写动作',color:'writing',count:Number(mmCounts.value.Writing)||0},
+    {key:'Pointing',label:'指向动作',color:'pointing',count:Number(mmCounts.value.Pointing)||0},
+  ].map(item=>({...item,percent:total?Math.round(item.count/total*100):0}));
+});
+const mmActionTotal=computed(()=>mmActionStats.value.reduce((sum,item)=>sum+item.count,0));
 const mmFilter=ref('Writing');
 const mmShown=computed(()=>mmEvents.value.filter(event=>mmFilter.value==='all'||event.data.label===mmFilter.value));
 const mmBusy=ref(false),mmMessage=ref('');
@@ -135,7 +145,7 @@ function regenerate(){
       <div class="report-main-column">
       <p v-if="room.report_state!=='completed'" class="review-inline-alert">以下保留的是上一版报告，本次尚未生成成功。</p>
       <section class="review-panel report-video-panel" aria-labelledby="report-video-heading">
-        <ClassroomReplay :room="room" :event="null" />
+        <ClassroomReplay :room="room" :event="null" recording-title="本节课堂录像" />
       </section>
       <section class="report-overview review-panel" aria-labelledby="report-heading">
         <div class="report-intro"><p class="review-eyebrow">01 / CLASSROOM COACH</p><h2 id="report-heading">本节课堂教练反馈</h2><p>从可回看的课堂事实出发，整理观察与下一步练习。</p><span class="report-method-tag"><ShieldCheck aria-hidden="true" />CLASS-Secondary 相关观察主题 · LINK 辅助复盘</span></div>
@@ -152,7 +162,7 @@ function regenerate(){
       <div class="report-actions-panel no-print">
         <router-link class="review-button" to="/classroom">模拟课堂<ArrowUpRight aria-hidden="true" /></router-link>
         <button class="review-button" :disabled="busy" @click="emit('refresh')"><Refresh aria-hidden="true" />刷新</button>
-        <button v-if="room?.report && room.report_state!=='insufficient'" type="button" class="review-button" @click="exportLocked=true"><Printer aria-hidden="true" />PDF 导出 · 未开放</button>
+        <button v-if="room?.report && room.report_state!=='insufficient'" class="review-button" @click="emit('print')"><Printer aria-hidden="true" />打印 / PDF</button>
       </div>
       <section class="review-panel report-profile" aria-labelledby="profile-heading">
         <div class="report-section-title"><div><p class="review-eyebrow">02 / OBSERVATION THEMES</p><h2 id="profile-heading"><Focus2 aria-hidden="true" />课堂观察与练习建议</h2></div><span>有证据才形成观察</span></div>
@@ -226,6 +236,17 @@ function regenerate(){
     <section v-if="view.hasReport && motion?.sample_count" class="review-panel report-motion">
       <div class="report-section-title"><div><p class="review-eyebrow">04 / OBSERVABILITY</p><h2><Focus2 aria-hidden="true" />先看证据质量，再谈教态</h2></div><span>动作摘要 · {{ motion.observed_samples }} 个可观察样本</span></div>
       <div class="modality-grid"><div v-for="(m,key) in motion.modalities" :key="key"><header><span>{{ modalityLabels[key] || key }}</span><b>{{ m.observed_samples }} / {{ m.total_samples }}</b></header><div class="modality-track" :aria-label="(modalityLabels[key]||key)+'可观察样本 '+m.observed_samples+' / '+m.total_samples"><i :key="ratio(m)" :style="{width:ratio(m)+'%'}" /></div><small>可观察样本 / 采样总数</small></div></div>
+      <div class="mm-inline-summary">
+        <div class="mm-summary-heading"><strong>MM‑TBA 动作分类</strong><span>样本数与占比 · 共 {{mmActionTotal}} 个分类样本</span></div>
+        <div class="mm-action-chart" role="img" aria-label="MM-TBA 动作类别样本数量与比例">
+          <div v-for="item in mmActionStats" :key="item.key" class="mm-action-row" :class="`is-${item.color}`">
+            <div class="mm-action-label"><span>{{item.label}}</span><b>{{item.count}}</b><small>{{item.percent}}%</small></div>
+            <div class="mm-action-track"><i :style="{width:item.percent+'%'}" /></div>
+          </div>
+        </div>
+        <button v-if="mmEvents.length" type="button" class="review-button no-print" @click="showEvidence(mmEvents,'MM‑TBA 动作分类 · 录像时间点')">查看 {{mmEvents.length}} 个动作时间点</button>
+        <span v-else class="review-caption">尚无分类结果；在下方“录像动作分析”运行 MM‑TBA 后，这里会显示三个类别及可回看的时间点。</span>
+      </div>
       <p class="review-caption">采样可观察率不是教态得分，也不是整课时长占比。面部几何不用于推断情绪、性格或自信程度。</p>
       <details class="report-fold"><summary>查看动作线索与检测边界</summary>
         <p v-if="motion.status!=='observed'">动作证据不足，本节不形成非语言行为观察。</p>
@@ -277,10 +298,6 @@ function regenerate(){
       </div>
     </div>
     <footer class="report-footer">LINK · 每一份判断，都应回到课堂本身。<span>教师自主复核 · AI 辅助成长</span></footer>
-    <ClassroomDialog v-model="exportLocked" title="PDF 导出尚未开放">
-      <p>报告 PDF 导出是规划中的个人进阶权益。你仍可免费查看当前报告和基础证据。</p>
-      <RouterLink to="/membership" @click="exportLocked=false">查看会员权益</RouterLink>
-    </ClassroomDialog>
     <ClassroomDialog v-model="drawerOpen" :title="drawerTitle">
       <ClassroomReplay v-if="drawerOpen" :room="room" :event="playbackEvent" />
       <div class="report-evidence-drawer"><p class="review-caption">本节课堂原始记录 · {{ evidence.length }} 条</p><label class="evidence-search">查找证据<input v-model="filter" type="search" placeholder="关键词、事件编号或时间" /></label>

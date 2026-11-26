@@ -2,7 +2,7 @@
 import SceneLink from '../components/SceneLink.vue';
 import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Refresh, History } from '@vicons/tabler';
+import { Refresh, Printer, History } from '@vicons/tabler';
 import { api } from '../services/api';
 import { classroomDestination, formatReportDate, formatReportTime } from '../services/classroomReview.js';
 import ClassroomReport from '../components/ClassroomReport.vue';
@@ -134,6 +134,7 @@ async function regenerate(objection){
   } catch(e){if(!disposed)error.value=e.response?.data?.message||'评课请求未确认，请刷新状态后再决定是否重试。';}
   finally {if(!disposed)busy.value=false;}
 }
+function printReport(){window.print();}
 let printFolds=[];
 function preparePrint(){
   printFolds=[...document.querySelectorAll('.evidence-report :is(.report-fold,.dimension-sources):not([open])')];
@@ -190,7 +191,7 @@ onBeforeUnmount(()=>{disposed=true;requestId++;controller?.abort();clearTimeout(
     <template v-if="!archiveSceneOnly">
       <header class="review-masthead">
         <h1 class="sr-only">AI 评课</h1>
-        <router-link class="review-button" :to="{path:'/ai-review',query:{demo:'gmq'}}">GMQ 试讲报告示例</router-link>
+        <router-link v-if="/GMQ/i.test(String(room?.topic||''))" class="review-button" :to="{path:'/ai-review',query:{demo:'gmq'}}">GMQ 试讲报告示例</router-link>
       </header>
       <p v-if="historyError" class="review-inline-alert" role="alert">{{ historyError }}</p>
       <div v-if="error" class="review-inline-alert" role="alert">{{ error }}<button class="review-button" :disabled="loading || busy" @click="initialize">重新读取</button><router-link to="/">重新登录</router-link></div>
@@ -198,7 +199,7 @@ onBeforeUnmount(()=>{disposed=true;requestId++;controller?.abort();clearTimeout(
       <template v-if="room">
         <div class="review-session-meta"><span>课堂 #{{ room.session_id }} · {{ room.topic }}</span><span>{{ formatReportDate(room.created_at) }} · {{ formatReportTime(Number.isFinite(room.elapsed)?room.elapsed*1000:NaN) }}</span></div>
         <section v-if="['active','paused'].includes(room.state)" class="review-empty-state"><h2>这节课堂还未结束</h2><p>课堂结束后再根据已保存的证据整理教练反馈。</p><router-link class="review-button" :to="classroomDestination(room)">返回课堂</router-link></section>
-        <ClassroomReport v-else :room="room" :busy="busy" @regenerate="regenerate" @plans-created="loadRoom(room.session_id)" @refresh="loadRoom(room.session_id)" />
+        <ClassroomReport v-else :room="room" :busy="busy" @regenerate="regenerate" @plans-created="loadRoom(room.session_id)" @refresh="loadRoom(room.session_id)" @print="printReport" />
       </template>
     </template>
   </div>

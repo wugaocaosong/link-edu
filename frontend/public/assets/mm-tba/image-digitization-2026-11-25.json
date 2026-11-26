@@ -1,0 +1,3181 @@
+{
+  "counts": {
+    "Writing": 1,
+    "Pointing": 34,
+    "Normal": 253
+  },
+  "analysis_duration_ms": 599008,
+  "model": "MM-TBA SlowFast ACRN",
+  "title": "图像数字化课堂录像",
+  "events": [
+    {
+      "id": 1,
+      "type": "mm_tba_action",
+      "at_ms": 6650,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.512,
+        "label": "Pointing",
+        "video_ms": 6650
+      }
+    },
+    {
+      "id": 2,
+      "type": "mm_tba_action",
+      "at_ms": 7633,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.501,
+        "label": "Pointing",
+        "video_ms": 7633
+      }
+    },
+    {
+      "id": 3,
+      "type": "mm_tba_action",
+      "at_ms": 11565,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.503,
+        "label": "Pointing",
+        "video_ms": 11565
+      }
+    },
+    {
+      "id": 4,
+      "type": "mm_tba_action",
+      "at_ms": 12548,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.534,
+        "label": "Pointing",
+        "video_ms": 12548
+      }
+    },
+    {
+      "id": 5,
+      "type": "mm_tba_action",
+      "at_ms": 13531,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.523,
+        "label": "Pointing",
+        "video_ms": 13531
+      }
+    },
+    {
+      "id": 6,
+      "type": "mm_tba_action",
+      "at_ms": 14514,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.546,
+        "label": "Pointing",
+        "video_ms": 14514
+      }
+    },
+    {
+      "id": 7,
+      "type": "mm_tba_action",
+      "at_ms": 15497,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.548,
+        "label": "Pointing",
+        "video_ms": 15497
+      }
+    },
+    {
+      "id": 8,
+      "type": "mm_tba_action",
+      "at_ms": 16480,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.554,
+        "label": "Pointing",
+        "video_ms": 16480
+      }
+    },
+    {
+      "id": 9,
+      "type": "mm_tba_action",
+      "at_ms": 17462,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.547,
+        "label": "Pointing",
+        "video_ms": 17462
+      }
+    },
+    {
+      "id": 10,
+      "type": "mm_tba_action",
+      "at_ms": 18445,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.539,
+        "label": "Pointing",
+        "video_ms": 18445
+      }
+    },
+    {
+      "id": 11,
+      "type": "mm_tba_action",
+      "at_ms": 19428,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.53,
+        "label": "Pointing",
+        "video_ms": 19428
+      }
+    },
+    {
+      "id": 12,
+      "type": "mm_tba_action",
+      "at_ms": 20253,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.52,
+        "label": "Pointing",
+        "video_ms": 20253
+      }
+    },
+    {
+      "id": 13,
+      "type": "mm_tba_action",
+      "at_ms": 21235,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.513,
+        "label": "Pointing",
+        "video_ms": 21235
+      }
+    },
+    {
+      "id": 14,
+      "type": "mm_tba_action",
+      "at_ms": 22218,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.521,
+        "label": "Pointing",
+        "video_ms": 22218
+      }
+    },
+    {
+      "id": 15,
+      "type": "mm_tba_action",
+      "at_ms": 23201,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.524,
+        "label": "Pointing",
+        "video_ms": 23201
+      }
+    },
+    {
+      "id": 16,
+      "type": "mm_tba_action",
+      "at_ms": 24184,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.524,
+        "label": "Pointing",
+        "video_ms": 24184
+      }
+    },
+    {
+      "id": 17,
+      "type": "mm_tba_action",
+      "at_ms": 25167,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.521,
+        "label": "Pointing",
+        "video_ms": 25167
+      }
+    },
+    {
+      "id": 18,
+      "type": "mm_tba_action",
+      "at_ms": 26150,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.512,
+        "label": "Pointing",
+        "video_ms": 26150
+      }
+    },
+    {
+      "id": 19,
+      "type": "mm_tba_action",
+      "at_ms": 27133,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.523,
+        "label": "Pointing",
+        "video_ms": 27133
+      }
+    },
+    {
+      "id": 20,
+      "type": "mm_tba_action",
+      "at_ms": 28116,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.514,
+        "label": "Pointing",
+        "video_ms": 28116
+      }
+    },
+    {
+      "id": 21,
+      "type": "mm_tba_action",
+      "at_ms": 29099,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.514,
+        "label": "Pointing",
+        "video_ms": 29099
+      }
+    },
+    {
+      "id": 22,
+      "type": "mm_tba_action",
+      "at_ms": 30082,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.523,
+        "label": "Pointing",
+        "video_ms": 30082
+      }
+    },
+    {
+      "id": 23,
+      "type": "mm_tba_action",
+      "at_ms": 31065,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.524,
+        "label": "Pointing",
+        "video_ms": 31065
+      }
+    },
+    {
+      "id": 24,
+      "type": "mm_tba_action",
+      "at_ms": 32048,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.512,
+        "label": "Pointing",
+        "video_ms": 32048
+      }
+    },
+    {
+      "id": 25,
+      "type": "mm_tba_action",
+      "at_ms": 33031,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.522,
+        "label": "Pointing",
+        "video_ms": 33031
+      }
+    },
+    {
+      "id": 26,
+      "type": "mm_tba_action",
+      "at_ms": 34014,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.525,
+        "label": "Pointing",
+        "video_ms": 34014
+      }
+    },
+    {
+      "id": 27,
+      "type": "mm_tba_action",
+      "at_ms": 34997,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.526,
+        "label": "Pointing",
+        "video_ms": 34997
+      }
+    },
+    {
+      "id": 28,
+      "type": "mm_tba_action",
+      "at_ms": 35980,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.507,
+        "label": "Pointing",
+        "video_ms": 35980
+      }
+    },
+    {
+      "id": 29,
+      "type": "mm_tba_action",
+      "at_ms": 37945,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.512,
+        "label": "Pointing",
+        "video_ms": 37945
+      }
+    },
+    {
+      "id": 30,
+      "type": "mm_tba_action",
+      "at_ms": 38928,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.594,
+        "label": "Writing",
+        "video_ms": 38928
+      }
+    },
+    {
+      "id": 31,
+      "type": "mm_tba_action",
+      "at_ms": 40253,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.512,
+        "label": "Pointing",
+        "video_ms": 40253
+      }
+    },
+    {
+      "id": 32,
+      "type": "mm_tba_action",
+      "at_ms": 41235,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.537,
+        "label": "Pointing",
+        "video_ms": 41235
+      }
+    },
+    {
+      "id": 33,
+      "type": "mm_tba_action",
+      "at_ms": 42218,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.51,
+        "label": "Pointing",
+        "video_ms": 42218
+      }
+    },
+    {
+      "id": 34,
+      "type": "mm_tba_action",
+      "at_ms": 44184,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.507,
+        "label": "Pointing",
+        "video_ms": 44184
+      }
+    },
+    {
+      "id": 35,
+      "type": "mm_tba_action",
+      "at_ms": 50082,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.5,
+        "label": "Pointing",
+        "video_ms": 50082
+      }
+    },
+    {
+      "id": 36,
+      "type": "mm_tba_action",
+      "at_ms": 93031,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.558,
+        "label": "Normal",
+        "video_ms": 93031
+      }
+    },
+    {
+      "id": 37,
+      "type": "mm_tba_action",
+      "at_ms": 159911,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.609,
+        "label": "Normal",
+        "video_ms": 159911
+      }
+    },
+    {
+      "id": 38,
+      "type": "mm_tba_action",
+      "at_ms": 161235,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.54,
+        "label": "Normal",
+        "video_ms": 161235
+      }
+    },
+    {
+      "id": 39,
+      "type": "mm_tba_action",
+      "at_ms": 164184,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.511,
+        "label": "Normal",
+        "video_ms": 164184
+      }
+    },
+    {
+      "id": 40,
+      "type": "mm_tba_action",
+      "at_ms": 166150,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.541,
+        "label": "Normal",
+        "video_ms": 166150
+      }
+    },
+    {
+      "id": 41,
+      "type": "mm_tba_action",
+      "at_ms": 167133,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.508,
+        "label": "Normal",
+        "video_ms": 167133
+      }
+    },
+    {
+      "id": 42,
+      "type": "mm_tba_action",
+      "at_ms": 167133,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.592,
+        "label": "Normal",
+        "video_ms": 167133
+      }
+    },
+    {
+      "id": 43,
+      "type": "mm_tba_action",
+      "at_ms": 168116,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.582,
+        "label": "Normal",
+        "video_ms": 168116
+      }
+    },
+    {
+      "id": 44,
+      "type": "mm_tba_action",
+      "at_ms": 169099,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.646,
+        "label": "Normal",
+        "video_ms": 169099
+      }
+    },
+    {
+      "id": 45,
+      "type": "mm_tba_action",
+      "at_ms": 175980,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.611,
+        "label": "Normal",
+        "video_ms": 175980
+      }
+    },
+    {
+      "id": 46,
+      "type": "mm_tba_action",
+      "at_ms": 177945,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.502,
+        "label": "Normal",
+        "video_ms": 177945
+      }
+    },
+    {
+      "id": 47,
+      "type": "mm_tba_action",
+      "at_ms": 180253,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.509,
+        "label": "Normal",
+        "video_ms": 180253
+      }
+    },
+    {
+      "id": 48,
+      "type": "mm_tba_action",
+      "at_ms": 181235,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.513,
+        "label": "Normal",
+        "video_ms": 181235
+      }
+    },
+    {
+      "id": 49,
+      "type": "mm_tba_action",
+      "at_ms": 182218,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.508,
+        "label": "Normal",
+        "video_ms": 182218
+      }
+    },
+    {
+      "id": 50,
+      "type": "mm_tba_action",
+      "at_ms": 191065,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.522,
+        "label": "Normal",
+        "video_ms": 191065
+      }
+    },
+    {
+      "id": 51,
+      "type": "mm_tba_action",
+      "at_ms": 205167,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.504,
+        "label": "Normal",
+        "video_ms": 205167
+      }
+    },
+    {
+      "id": 52,
+      "type": "mm_tba_action",
+      "at_ms": 214997,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.52,
+        "label": "Normal",
+        "video_ms": 214997
+      }
+    },
+    {
+      "id": 53,
+      "type": "mm_tba_action",
+      "at_ms": 215980,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.529,
+        "label": "Normal",
+        "video_ms": 215980
+      }
+    },
+    {
+      "id": 54,
+      "type": "mm_tba_action",
+      "at_ms": 218928,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.504,
+        "label": "Normal",
+        "video_ms": 218928
+      }
+    },
+    {
+      "id": 55,
+      "type": "mm_tba_action",
+      "at_ms": 220253,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.526,
+        "label": "Normal",
+        "video_ms": 220253
+      }
+    },
+    {
+      "id": 56,
+      "type": "mm_tba_action",
+      "at_ms": 222218,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.52,
+        "label": "Normal",
+        "video_ms": 222218
+      }
+    },
+    {
+      "id": 57,
+      "type": "mm_tba_action",
+      "at_ms": 223201,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.537,
+        "label": "Normal",
+        "video_ms": 223201
+      }
+    },
+    {
+      "id": 58,
+      "type": "mm_tba_action",
+      "at_ms": 224184,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.524,
+        "label": "Normal",
+        "video_ms": 224184
+      }
+    },
+    {
+      "id": 59,
+      "type": "mm_tba_action",
+      "at_ms": 225167,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.521,
+        "label": "Normal",
+        "video_ms": 225167
+      }
+    },
+    {
+      "id": 60,
+      "type": "mm_tba_action",
+      "at_ms": 226150,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.534,
+        "label": "Normal",
+        "video_ms": 226150
+      }
+    },
+    {
+      "id": 61,
+      "type": "mm_tba_action",
+      "at_ms": 228116,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.532,
+        "label": "Normal",
+        "video_ms": 228116
+      }
+    },
+    {
+      "id": 62,
+      "type": "mm_tba_action",
+      "at_ms": 229099,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.508,
+        "label": "Normal",
+        "video_ms": 229099
+      }
+    },
+    {
+      "id": 63,
+      "type": "mm_tba_action",
+      "at_ms": 231065,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.56,
+        "label": "Normal",
+        "video_ms": 231065
+      }
+    },
+    {
+      "id": 64,
+      "type": "mm_tba_action",
+      "at_ms": 232048,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.512,
+        "label": "Normal",
+        "video_ms": 232048
+      }
+    },
+    {
+      "id": 65,
+      "type": "mm_tba_action",
+      "at_ms": 233031,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.556,
+        "label": "Normal",
+        "video_ms": 233031
+      }
+    },
+    {
+      "id": 66,
+      "type": "mm_tba_action",
+      "at_ms": 249099,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.518,
+        "label": "Normal",
+        "video_ms": 249099
+      }
+    },
+    {
+      "id": 67,
+      "type": "mm_tba_action",
+      "at_ms": 250082,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.516,
+        "label": "Normal",
+        "video_ms": 250082
+      }
+    },
+    {
+      "id": 68,
+      "type": "mm_tba_action",
+      "at_ms": 251065,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.503,
+        "label": "Normal",
+        "video_ms": 251065
+      }
+    },
+    {
+      "id": 69,
+      "type": "mm_tba_action",
+      "at_ms": 252048,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.529,
+        "label": "Normal",
+        "video_ms": 252048
+      }
+    },
+    {
+      "id": 70,
+      "type": "mm_tba_action",
+      "at_ms": 254997,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.51,
+        "label": "Normal",
+        "video_ms": 254997
+      }
+    },
+    {
+      "id": 71,
+      "type": "mm_tba_action",
+      "at_ms": 285167,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.512,
+        "label": "Normal",
+        "video_ms": 285167
+      }
+    },
+    {
+      "id": 72,
+      "type": "mm_tba_action",
+      "at_ms": 287133,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.511,
+        "label": "Normal",
+        "video_ms": 287133
+      }
+    },
+    {
+      "id": 73,
+      "type": "mm_tba_action",
+      "at_ms": 291065,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.515,
+        "label": "Normal",
+        "video_ms": 291065
+      }
+    },
+    {
+      "id": 74,
+      "type": "mm_tba_action",
+      "at_ms": 292048,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.508,
+        "label": "Normal",
+        "video_ms": 292048
+      }
+    },
+    {
+      "id": 75,
+      "type": "mm_tba_action",
+      "at_ms": 293031,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.532,
+        "label": "Normal",
+        "video_ms": 293031
+      }
+    },
+    {
+      "id": 76,
+      "type": "mm_tba_action",
+      "at_ms": 294014,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.575,
+        "label": "Normal",
+        "video_ms": 294014
+      }
+    },
+    {
+      "id": 77,
+      "type": "mm_tba_action",
+      "at_ms": 294997,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.568,
+        "label": "Normal",
+        "video_ms": 294997
+      }
+    },
+    {
+      "id": 78,
+      "type": "mm_tba_action",
+      "at_ms": 295980,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.544,
+        "label": "Normal",
+        "video_ms": 295980
+      }
+    },
+    {
+      "id": 79,
+      "type": "mm_tba_action",
+      "at_ms": 296962,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.564,
+        "label": "Normal",
+        "video_ms": 296962
+      }
+    },
+    {
+      "id": 80,
+      "type": "mm_tba_action",
+      "at_ms": 297945,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.541,
+        "label": "Normal",
+        "video_ms": 297945
+      }
+    },
+    {
+      "id": 81,
+      "type": "mm_tba_action",
+      "at_ms": 299911,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.518,
+        "label": "Normal",
+        "video_ms": 299911
+      }
+    },
+    {
+      "id": 82,
+      "type": "mm_tba_action",
+      "at_ms": 300253,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.513,
+        "label": "Normal",
+        "video_ms": 300253
+      }
+    },
+    {
+      "id": 83,
+      "type": "mm_tba_action",
+      "at_ms": 303201,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.522,
+        "label": "Normal",
+        "video_ms": 303201
+      }
+    },
+    {
+      "id": 84,
+      "type": "mm_tba_action",
+      "at_ms": 307133,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.544,
+        "label": "Normal",
+        "video_ms": 307133
+      }
+    },
+    {
+      "id": 85,
+      "type": "mm_tba_action",
+      "at_ms": 308116,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.534,
+        "label": "Normal",
+        "video_ms": 308116
+      }
+    },
+    {
+      "id": 86,
+      "type": "mm_tba_action",
+      "at_ms": 309099,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.548,
+        "label": "Normal",
+        "video_ms": 309099
+      }
+    },
+    {
+      "id": 87,
+      "type": "mm_tba_action",
+      "at_ms": 310082,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.551,
+        "label": "Normal",
+        "video_ms": 310082
+      }
+    },
+    {
+      "id": 88,
+      "type": "mm_tba_action",
+      "at_ms": 311065,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.558,
+        "label": "Normal",
+        "video_ms": 311065
+      }
+    },
+    {
+      "id": 89,
+      "type": "mm_tba_action",
+      "at_ms": 312048,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.525,
+        "label": "Normal",
+        "video_ms": 312048
+      }
+    },
+    {
+      "id": 90,
+      "type": "mm_tba_action",
+      "at_ms": 313031,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.541,
+        "label": "Normal",
+        "video_ms": 313031
+      }
+    },
+    {
+      "id": 91,
+      "type": "mm_tba_action",
+      "at_ms": 314014,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.539,
+        "label": "Normal",
+        "video_ms": 314014
+      }
+    },
+    {
+      "id": 92,
+      "type": "mm_tba_action",
+      "at_ms": 314997,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.531,
+        "label": "Normal",
+        "video_ms": 314997
+      }
+    },
+    {
+      "id": 93,
+      "type": "mm_tba_action",
+      "at_ms": 315980,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.506,
+        "label": "Normal",
+        "video_ms": 315980
+      }
+    },
+    {
+      "id": 94,
+      "type": "mm_tba_action",
+      "at_ms": 317945,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.502,
+        "label": "Normal",
+        "video_ms": 317945
+      }
+    },
+    {
+      "id": 95,
+      "type": "mm_tba_action",
+      "at_ms": 318928,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.507,
+        "label": "Normal",
+        "video_ms": 318928
+      }
+    },
+    {
+      "id": 96,
+      "type": "mm_tba_action",
+      "at_ms": 321235,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.521,
+        "label": "Normal",
+        "video_ms": 321235
+      }
+    },
+    {
+      "id": 97,
+      "type": "mm_tba_action",
+      "at_ms": 324184,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.55,
+        "label": "Normal",
+        "video_ms": 324184
+      }
+    },
+    {
+      "id": 98,
+      "type": "mm_tba_action",
+      "at_ms": 325167,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.501,
+        "label": "Normal",
+        "video_ms": 325167
+      }
+    },
+    {
+      "id": 99,
+      "type": "mm_tba_action",
+      "at_ms": 326150,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.512,
+        "label": "Normal",
+        "video_ms": 326150
+      }
+    },
+    {
+      "id": 100,
+      "type": "mm_tba_action",
+      "at_ms": 327133,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.511,
+        "label": "Normal",
+        "video_ms": 327133
+      }
+    },
+    {
+      "id": 101,
+      "type": "mm_tba_action",
+      "at_ms": 328116,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.528,
+        "label": "Normal",
+        "video_ms": 328116
+      }
+    },
+    {
+      "id": 102,
+      "type": "mm_tba_action",
+      "at_ms": 329099,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.535,
+        "label": "Normal",
+        "video_ms": 329099
+      }
+    },
+    {
+      "id": 103,
+      "type": "mm_tba_action",
+      "at_ms": 330082,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.528,
+        "label": "Normal",
+        "video_ms": 330082
+      }
+    },
+    {
+      "id": 104,
+      "type": "mm_tba_action",
+      "at_ms": 331065,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.544,
+        "label": "Normal",
+        "video_ms": 331065
+      }
+    },
+    {
+      "id": 105,
+      "type": "mm_tba_action",
+      "at_ms": 333031,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.502,
+        "label": "Normal",
+        "video_ms": 333031
+      }
+    },
+    {
+      "id": 106,
+      "type": "mm_tba_action",
+      "at_ms": 334014,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.525,
+        "label": "Normal",
+        "video_ms": 334014
+      }
+    },
+    {
+      "id": 107,
+      "type": "mm_tba_action",
+      "at_ms": 338928,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.504,
+        "label": "Normal",
+        "video_ms": 338928
+      }
+    },
+    {
+      "id": 108,
+      "type": "mm_tba_action",
+      "at_ms": 339911,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.526,
+        "label": "Normal",
+        "video_ms": 339911
+      }
+    },
+    {
+      "id": 109,
+      "type": "mm_tba_action",
+      "at_ms": 340253,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.57,
+        "label": "Normal",
+        "video_ms": 340253
+      }
+    },
+    {
+      "id": 110,
+      "type": "mm_tba_action",
+      "at_ms": 342218,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.548,
+        "label": "Normal",
+        "video_ms": 342218
+      }
+    },
+    {
+      "id": 111,
+      "type": "mm_tba_action",
+      "at_ms": 343201,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.572,
+        "label": "Normal",
+        "video_ms": 343201
+      }
+    },
+    {
+      "id": 112,
+      "type": "mm_tba_action",
+      "at_ms": 344184,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.528,
+        "label": "Normal",
+        "video_ms": 344184
+      }
+    },
+    {
+      "id": 113,
+      "type": "mm_tba_action",
+      "at_ms": 345167,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.506,
+        "label": "Normal",
+        "video_ms": 345167
+      }
+    },
+    {
+      "id": 114,
+      "type": "mm_tba_action",
+      "at_ms": 346150,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.524,
+        "label": "Normal",
+        "video_ms": 346150
+      }
+    },
+    {
+      "id": 115,
+      "type": "mm_tba_action",
+      "at_ms": 348116,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.506,
+        "label": "Normal",
+        "video_ms": 348116
+      }
+    },
+    {
+      "id": 116,
+      "type": "mm_tba_action",
+      "at_ms": 351065,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.516,
+        "label": "Normal",
+        "video_ms": 351065
+      }
+    },
+    {
+      "id": 117,
+      "type": "mm_tba_action",
+      "at_ms": 352048,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.541,
+        "label": "Normal",
+        "video_ms": 352048
+      }
+    },
+    {
+      "id": 118,
+      "type": "mm_tba_action",
+      "at_ms": 353031,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.508,
+        "label": "Normal",
+        "video_ms": 353031
+      }
+    },
+    {
+      "id": 119,
+      "type": "mm_tba_action",
+      "at_ms": 354014,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.566,
+        "label": "Normal",
+        "video_ms": 354014
+      }
+    },
+    {
+      "id": 120,
+      "type": "mm_tba_action",
+      "at_ms": 354997,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.585,
+        "label": "Normal",
+        "video_ms": 354997
+      }
+    },
+    {
+      "id": 121,
+      "type": "mm_tba_action",
+      "at_ms": 355980,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.577,
+        "label": "Normal",
+        "video_ms": 355980
+      }
+    },
+    {
+      "id": 122,
+      "type": "mm_tba_action",
+      "at_ms": 356962,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.57,
+        "label": "Normal",
+        "video_ms": 356962
+      }
+    },
+    {
+      "id": 123,
+      "type": "mm_tba_action",
+      "at_ms": 357945,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.549,
+        "label": "Normal",
+        "video_ms": 357945
+      }
+    },
+    {
+      "id": 124,
+      "type": "mm_tba_action",
+      "at_ms": 358928,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.566,
+        "label": "Normal",
+        "video_ms": 358928
+      }
+    },
+    {
+      "id": 125,
+      "type": "mm_tba_action",
+      "at_ms": 359911,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.545,
+        "label": "Normal",
+        "video_ms": 359911
+      }
+    },
+    {
+      "id": 126,
+      "type": "mm_tba_action",
+      "at_ms": 360253,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.531,
+        "label": "Normal",
+        "video_ms": 360253
+      }
+    },
+    {
+      "id": 127,
+      "type": "mm_tba_action",
+      "at_ms": 361235,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.52,
+        "label": "Normal",
+        "video_ms": 361235
+      }
+    },
+    {
+      "id": 128,
+      "type": "mm_tba_action",
+      "at_ms": 362218,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.529,
+        "label": "Normal",
+        "video_ms": 362218
+      }
+    },
+    {
+      "id": 129,
+      "type": "mm_tba_action",
+      "at_ms": 363201,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.516,
+        "label": "Normal",
+        "video_ms": 363201
+      }
+    },
+    {
+      "id": 130,
+      "type": "mm_tba_action",
+      "at_ms": 365167,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.51,
+        "label": "Normal",
+        "video_ms": 365167
+      }
+    },
+    {
+      "id": 131,
+      "type": "mm_tba_action",
+      "at_ms": 366150,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.526,
+        "label": "Normal",
+        "video_ms": 366150
+      }
+    },
+    {
+      "id": 132,
+      "type": "mm_tba_action",
+      "at_ms": 367133,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.519,
+        "label": "Normal",
+        "video_ms": 367133
+      }
+    },
+    {
+      "id": 133,
+      "type": "mm_tba_action",
+      "at_ms": 368116,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.514,
+        "label": "Normal",
+        "video_ms": 368116
+      }
+    },
+    {
+      "id": 134,
+      "type": "mm_tba_action",
+      "at_ms": 369099,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.523,
+        "label": "Normal",
+        "video_ms": 369099
+      }
+    },
+    {
+      "id": 135,
+      "type": "mm_tba_action",
+      "at_ms": 370082,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.519,
+        "label": "Normal",
+        "video_ms": 370082
+      }
+    },
+    {
+      "id": 136,
+      "type": "mm_tba_action",
+      "at_ms": 371065,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.527,
+        "label": "Normal",
+        "video_ms": 371065
+      }
+    },
+    {
+      "id": 137,
+      "type": "mm_tba_action",
+      "at_ms": 372048,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.523,
+        "label": "Normal",
+        "video_ms": 372048
+      }
+    },
+    {
+      "id": 138,
+      "type": "mm_tba_action",
+      "at_ms": 373031,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.524,
+        "label": "Normal",
+        "video_ms": 373031
+      }
+    },
+    {
+      "id": 139,
+      "type": "mm_tba_action",
+      "at_ms": 374014,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.544,
+        "label": "Normal",
+        "video_ms": 374014
+      }
+    },
+    {
+      "id": 140,
+      "type": "mm_tba_action",
+      "at_ms": 374997,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.522,
+        "label": "Normal",
+        "video_ms": 374997
+      }
+    },
+    {
+      "id": 141,
+      "type": "mm_tba_action",
+      "at_ms": 375980,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.523,
+        "label": "Normal",
+        "video_ms": 375980
+      }
+    },
+    {
+      "id": 142,
+      "type": "mm_tba_action",
+      "at_ms": 377945,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.513,
+        "label": "Normal",
+        "video_ms": 377945
+      }
+    },
+    {
+      "id": 143,
+      "type": "mm_tba_action",
+      "at_ms": 381235,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.501,
+        "label": "Normal",
+        "video_ms": 381235
+      }
+    },
+    {
+      "id": 144,
+      "type": "mm_tba_action",
+      "at_ms": 382218,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.51,
+        "label": "Normal",
+        "video_ms": 382218
+      }
+    },
+    {
+      "id": 145,
+      "type": "mm_tba_action",
+      "at_ms": 384184,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.51,
+        "label": "Normal",
+        "video_ms": 384184
+      }
+    },
+    {
+      "id": 146,
+      "type": "mm_tba_action",
+      "at_ms": 395980,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.511,
+        "label": "Normal",
+        "video_ms": 395980
+      }
+    },
+    {
+      "id": 147,
+      "type": "mm_tba_action",
+      "at_ms": 396962,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.513,
+        "label": "Normal",
+        "video_ms": 396962
+      }
+    },
+    {
+      "id": 148,
+      "type": "mm_tba_action",
+      "at_ms": 397945,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.53,
+        "label": "Normal",
+        "video_ms": 397945
+      }
+    },
+    {
+      "id": 149,
+      "type": "mm_tba_action",
+      "at_ms": 398928,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.538,
+        "label": "Normal",
+        "video_ms": 398928
+      }
+    },
+    {
+      "id": 150,
+      "type": "mm_tba_action",
+      "at_ms": 399911,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.552,
+        "label": "Normal",
+        "video_ms": 399911
+      }
+    },
+    {
+      "id": 151,
+      "type": "mm_tba_action",
+      "at_ms": 401235,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.516,
+        "label": "Normal",
+        "video_ms": 401235
+      }
+    },
+    {
+      "id": 152,
+      "type": "mm_tba_action",
+      "at_ms": 402218,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.51,
+        "label": "Normal",
+        "video_ms": 402218
+      }
+    },
+    {
+      "id": 153,
+      "type": "mm_tba_action",
+      "at_ms": 407133,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.522,
+        "label": "Normal",
+        "video_ms": 407133
+      }
+    },
+    {
+      "id": 154,
+      "type": "mm_tba_action",
+      "at_ms": 408116,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.514,
+        "label": "Normal",
+        "video_ms": 408116
+      }
+    },
+    {
+      "id": 155,
+      "type": "mm_tba_action",
+      "at_ms": 409099,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.507,
+        "label": "Normal",
+        "video_ms": 409099
+      }
+    },
+    {
+      "id": 156,
+      "type": "mm_tba_action",
+      "at_ms": 410082,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.501,
+        "label": "Normal",
+        "video_ms": 410082
+      }
+    },
+    {
+      "id": 157,
+      "type": "mm_tba_action",
+      "at_ms": 412048,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.515,
+        "label": "Normal",
+        "video_ms": 412048
+      }
+    },
+    {
+      "id": 158,
+      "type": "mm_tba_action",
+      "at_ms": 416962,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.509,
+        "label": "Normal",
+        "video_ms": 416962
+      }
+    },
+    {
+      "id": 159,
+      "type": "mm_tba_action",
+      "at_ms": 418928,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.51,
+        "label": "Normal",
+        "video_ms": 418928
+      }
+    },
+    {
+      "id": 160,
+      "type": "mm_tba_action",
+      "at_ms": 419911,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.593,
+        "label": "Normal",
+        "video_ms": 419911
+      }
+    },
+    {
+      "id": 161,
+      "type": "mm_tba_action",
+      "at_ms": 420253,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.599,
+        "label": "Normal",
+        "video_ms": 420253
+      }
+    },
+    {
+      "id": 162,
+      "type": "mm_tba_action",
+      "at_ms": 421235,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.552,
+        "label": "Normal",
+        "video_ms": 421235
+      }
+    },
+    {
+      "id": 163,
+      "type": "mm_tba_action",
+      "at_ms": 422218,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.588,
+        "label": "Normal",
+        "video_ms": 422218
+      }
+    },
+    {
+      "id": 164,
+      "type": "mm_tba_action",
+      "at_ms": 423201,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.52,
+        "label": "Normal",
+        "video_ms": 423201
+      }
+    },
+    {
+      "id": 165,
+      "type": "mm_tba_action",
+      "at_ms": 424184,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.52,
+        "label": "Normal",
+        "video_ms": 424184
+      }
+    },
+    {
+      "id": 166,
+      "type": "mm_tba_action",
+      "at_ms": 425167,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.53,
+        "label": "Normal",
+        "video_ms": 425167
+      }
+    },
+    {
+      "id": 167,
+      "type": "mm_tba_action",
+      "at_ms": 426150,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.526,
+        "label": "Normal",
+        "video_ms": 426150
+      }
+    },
+    {
+      "id": 168,
+      "type": "mm_tba_action",
+      "at_ms": 427133,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.533,
+        "label": "Normal",
+        "video_ms": 427133
+      }
+    },
+    {
+      "id": 169,
+      "type": "mm_tba_action",
+      "at_ms": 428116,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.506,
+        "label": "Normal",
+        "video_ms": 428116
+      }
+    },
+    {
+      "id": 170,
+      "type": "mm_tba_action",
+      "at_ms": 429099,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.526,
+        "label": "Normal",
+        "video_ms": 429099
+      }
+    },
+    {
+      "id": 171,
+      "type": "mm_tba_action",
+      "at_ms": 431065,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.511,
+        "label": "Normal",
+        "video_ms": 431065
+      }
+    },
+    {
+      "id": 172,
+      "type": "mm_tba_action",
+      "at_ms": 433031,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.522,
+        "label": "Normal",
+        "video_ms": 433031
+      }
+    },
+    {
+      "id": 173,
+      "type": "mm_tba_action",
+      "at_ms": 434997,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.507,
+        "label": "Normal",
+        "video_ms": 434997
+      }
+    },
+    {
+      "id": 174,
+      "type": "mm_tba_action",
+      "at_ms": 435980,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.566,
+        "label": "Normal",
+        "video_ms": 435980
+      }
+    },
+    {
+      "id": 175,
+      "type": "mm_tba_action",
+      "at_ms": 436962,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.548,
+        "label": "Normal",
+        "video_ms": 436962
+      }
+    },
+    {
+      "id": 176,
+      "type": "mm_tba_action",
+      "at_ms": 437945,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.553,
+        "label": "Normal",
+        "video_ms": 437945
+      }
+    },
+    {
+      "id": 177,
+      "type": "mm_tba_action",
+      "at_ms": 438928,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.553,
+        "label": "Normal",
+        "video_ms": 438928
+      }
+    },
+    {
+      "id": 178,
+      "type": "mm_tba_action",
+      "at_ms": 439911,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.559,
+        "label": "Normal",
+        "video_ms": 439911
+      }
+    },
+    {
+      "id": 179,
+      "type": "mm_tba_action",
+      "at_ms": 440253,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.565,
+        "label": "Normal",
+        "video_ms": 440253
+      }
+    },
+    {
+      "id": 180,
+      "type": "mm_tba_action",
+      "at_ms": 441235,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.517,
+        "label": "Normal",
+        "video_ms": 441235
+      }
+    },
+    {
+      "id": 181,
+      "type": "mm_tba_action",
+      "at_ms": 442218,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.514,
+        "label": "Normal",
+        "video_ms": 442218
+      }
+    },
+    {
+      "id": 182,
+      "type": "mm_tba_action",
+      "at_ms": 443201,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.584,
+        "label": "Normal",
+        "video_ms": 443201
+      }
+    },
+    {
+      "id": 183,
+      "type": "mm_tba_action",
+      "at_ms": 444184,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.606,
+        "label": "Normal",
+        "video_ms": 444184
+      }
+    },
+    {
+      "id": 184,
+      "type": "mm_tba_action",
+      "at_ms": 445167,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.587,
+        "label": "Normal",
+        "video_ms": 445167
+      }
+    },
+    {
+      "id": 185,
+      "type": "mm_tba_action",
+      "at_ms": 446150,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.6,
+        "label": "Normal",
+        "video_ms": 446150
+      }
+    },
+    {
+      "id": 186,
+      "type": "mm_tba_action",
+      "at_ms": 447133,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.57,
+        "label": "Normal",
+        "video_ms": 447133
+      }
+    },
+    {
+      "id": 187,
+      "type": "mm_tba_action",
+      "at_ms": 448116,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.563,
+        "label": "Normal",
+        "video_ms": 448116
+      }
+    },
+    {
+      "id": 188,
+      "type": "mm_tba_action",
+      "at_ms": 449099,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.575,
+        "label": "Normal",
+        "video_ms": 449099
+      }
+    },
+    {
+      "id": 189,
+      "type": "mm_tba_action",
+      "at_ms": 450082,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.555,
+        "label": "Normal",
+        "video_ms": 450082
+      }
+    },
+    {
+      "id": 190,
+      "type": "mm_tba_action",
+      "at_ms": 453031,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.501,
+        "label": "Normal",
+        "video_ms": 453031
+      }
+    },
+    {
+      "id": 191,
+      "type": "mm_tba_action",
+      "at_ms": 454014,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.511,
+        "label": "Normal",
+        "video_ms": 454014
+      }
+    },
+    {
+      "id": 192,
+      "type": "mm_tba_action",
+      "at_ms": 456962,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.531,
+        "label": "Normal",
+        "video_ms": 456962
+      }
+    },
+    {
+      "id": 193,
+      "type": "mm_tba_action",
+      "at_ms": 457945,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.527,
+        "label": "Normal",
+        "video_ms": 457945
+      }
+    },
+    {
+      "id": 194,
+      "type": "mm_tba_action",
+      "at_ms": 458928,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.513,
+        "label": "Normal",
+        "video_ms": 458928
+      }
+    },
+    {
+      "id": 195,
+      "type": "mm_tba_action",
+      "at_ms": 459911,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.559,
+        "label": "Normal",
+        "video_ms": 459911
+      }
+    },
+    {
+      "id": 196,
+      "type": "mm_tba_action",
+      "at_ms": 460253,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.534,
+        "label": "Normal",
+        "video_ms": 460253
+      }
+    },
+    {
+      "id": 197,
+      "type": "mm_tba_action",
+      "at_ms": 462218,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.522,
+        "label": "Normal",
+        "video_ms": 462218
+      }
+    },
+    {
+      "id": 198,
+      "type": "mm_tba_action",
+      "at_ms": 463201,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.557,
+        "label": "Normal",
+        "video_ms": 463201
+      }
+    },
+    {
+      "id": 199,
+      "type": "mm_tba_action",
+      "at_ms": 464184,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.568,
+        "label": "Normal",
+        "video_ms": 464184
+      }
+    },
+    {
+      "id": 200,
+      "type": "mm_tba_action",
+      "at_ms": 465167,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.596,
+        "label": "Normal",
+        "video_ms": 465167
+      }
+    },
+    {
+      "id": 201,
+      "type": "mm_tba_action",
+      "at_ms": 466150,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.592,
+        "label": "Normal",
+        "video_ms": 466150
+      }
+    },
+    {
+      "id": 202,
+      "type": "mm_tba_action",
+      "at_ms": 467133,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.559,
+        "label": "Normal",
+        "video_ms": 467133
+      }
+    },
+    {
+      "id": 203,
+      "type": "mm_tba_action",
+      "at_ms": 468116,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.566,
+        "label": "Normal",
+        "video_ms": 468116
+      }
+    },
+    {
+      "id": 204,
+      "type": "mm_tba_action",
+      "at_ms": 469099,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.512,
+        "label": "Normal",
+        "video_ms": 469099
+      }
+    },
+    {
+      "id": 205,
+      "type": "mm_tba_action",
+      "at_ms": 470082,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.527,
+        "label": "Normal",
+        "video_ms": 470082
+      }
+    },
+    {
+      "id": 206,
+      "type": "mm_tba_action",
+      "at_ms": 471065,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.531,
+        "label": "Normal",
+        "video_ms": 471065
+      }
+    },
+    {
+      "id": 207,
+      "type": "mm_tba_action",
+      "at_ms": 472048,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.508,
+        "label": "Normal",
+        "video_ms": 472048
+      }
+    },
+    {
+      "id": 208,
+      "type": "mm_tba_action",
+      "at_ms": 473031,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.502,
+        "label": "Normal",
+        "video_ms": 473031
+      }
+    },
+    {
+      "id": 209,
+      "type": "mm_tba_action",
+      "at_ms": 474014,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.511,
+        "label": "Normal",
+        "video_ms": 474014
+      }
+    },
+    {
+      "id": 210,
+      "type": "mm_tba_action",
+      "at_ms": 476962,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.507,
+        "label": "Normal",
+        "video_ms": 476962
+      }
+    },
+    {
+      "id": 211,
+      "type": "mm_tba_action",
+      "at_ms": 480253,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.505,
+        "label": "Normal",
+        "video_ms": 480253
+      }
+    },
+    {
+      "id": 212,
+      "type": "mm_tba_action",
+      "at_ms": 486150,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.542,
+        "label": "Normal",
+        "video_ms": 486150
+      }
+    },
+    {
+      "id": 213,
+      "type": "mm_tba_action",
+      "at_ms": 487133,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.53,
+        "label": "Normal",
+        "video_ms": 487133
+      }
+    },
+    {
+      "id": 214,
+      "type": "mm_tba_action",
+      "at_ms": 489099,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.507,
+        "label": "Normal",
+        "video_ms": 489099
+      }
+    },
+    {
+      "id": 215,
+      "type": "mm_tba_action",
+      "at_ms": 490082,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.569,
+        "label": "Normal",
+        "video_ms": 490082
+      }
+    },
+    {
+      "id": 216,
+      "type": "mm_tba_action",
+      "at_ms": 491065,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.539,
+        "label": "Normal",
+        "video_ms": 491065
+      }
+    },
+    {
+      "id": 217,
+      "type": "mm_tba_action",
+      "at_ms": 492048,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.566,
+        "label": "Normal",
+        "video_ms": 492048
+      }
+    },
+    {
+      "id": 218,
+      "type": "mm_tba_action",
+      "at_ms": 493031,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.546,
+        "label": "Normal",
+        "video_ms": 493031
+      }
+    },
+    {
+      "id": 219,
+      "type": "mm_tba_action",
+      "at_ms": 494014,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.547,
+        "label": "Normal",
+        "video_ms": 494014
+      }
+    },
+    {
+      "id": 220,
+      "type": "mm_tba_action",
+      "at_ms": 494997,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.524,
+        "label": "Normal",
+        "video_ms": 494997
+      }
+    },
+    {
+      "id": 221,
+      "type": "mm_tba_action",
+      "at_ms": 495980,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.504,
+        "label": "Normal",
+        "video_ms": 495980
+      }
+    },
+    {
+      "id": 222,
+      "type": "mm_tba_action",
+      "at_ms": 497945,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.554,
+        "label": "Normal",
+        "video_ms": 497945
+      }
+    },
+    {
+      "id": 223,
+      "type": "mm_tba_action",
+      "at_ms": 498928,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.535,
+        "label": "Normal",
+        "video_ms": 498928
+      }
+    },
+    {
+      "id": 224,
+      "type": "mm_tba_action",
+      "at_ms": 499911,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.528,
+        "label": "Normal",
+        "video_ms": 499911
+      }
+    },
+    {
+      "id": 225,
+      "type": "mm_tba_action",
+      "at_ms": 500253,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.504,
+        "label": "Normal",
+        "video_ms": 500253
+      }
+    },
+    {
+      "id": 226,
+      "type": "mm_tba_action",
+      "at_ms": 501235,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.521,
+        "label": "Normal",
+        "video_ms": 501235
+      }
+    },
+    {
+      "id": 227,
+      "type": "mm_tba_action",
+      "at_ms": 502218,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.516,
+        "label": "Normal",
+        "video_ms": 502218
+      }
+    },
+    {
+      "id": 228,
+      "type": "mm_tba_action",
+      "at_ms": 503201,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.51,
+        "label": "Normal",
+        "video_ms": 503201
+      }
+    },
+    {
+      "id": 229,
+      "type": "mm_tba_action",
+      "at_ms": 504184,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.521,
+        "label": "Normal",
+        "video_ms": 504184
+      }
+    },
+    {
+      "id": 230,
+      "type": "mm_tba_action",
+      "at_ms": 505167,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.515,
+        "label": "Normal",
+        "video_ms": 505167
+      }
+    },
+    {
+      "id": 231,
+      "type": "mm_tba_action",
+      "at_ms": 506150,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.519,
+        "label": "Normal",
+        "video_ms": 506150
+      }
+    },
+    {
+      "id": 232,
+      "type": "mm_tba_action",
+      "at_ms": 507133,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.521,
+        "label": "Normal",
+        "video_ms": 507133
+      }
+    },
+    {
+      "id": 233,
+      "type": "mm_tba_action",
+      "at_ms": 508116,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.525,
+        "label": "Normal",
+        "video_ms": 508116
+      }
+    },
+    {
+      "id": 234,
+      "type": "mm_tba_action",
+      "at_ms": 509099,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.51,
+        "label": "Normal",
+        "video_ms": 509099
+      }
+    },
+    {
+      "id": 235,
+      "type": "mm_tba_action",
+      "at_ms": 510082,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.517,
+        "label": "Normal",
+        "video_ms": 510082
+      }
+    },
+    {
+      "id": 236,
+      "type": "mm_tba_action",
+      "at_ms": 512048,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.517,
+        "label": "Normal",
+        "video_ms": 512048
+      }
+    },
+    {
+      "id": 237,
+      "type": "mm_tba_action",
+      "at_ms": 513031,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.515,
+        "label": "Normal",
+        "video_ms": 513031
+      }
+    },
+    {
+      "id": 238,
+      "type": "mm_tba_action",
+      "at_ms": 514014,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.518,
+        "label": "Normal",
+        "video_ms": 514014
+      }
+    },
+    {
+      "id": 239,
+      "type": "mm_tba_action",
+      "at_ms": 514997,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.513,
+        "label": "Normal",
+        "video_ms": 514997
+      }
+    },
+    {
+      "id": 240,
+      "type": "mm_tba_action",
+      "at_ms": 515980,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.514,
+        "label": "Normal",
+        "video_ms": 515980
+      }
+    },
+    {
+      "id": 241,
+      "type": "mm_tba_action",
+      "at_ms": 516962,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.507,
+        "label": "Normal",
+        "video_ms": 516962
+      }
+    },
+    {
+      "id": 242,
+      "type": "mm_tba_action",
+      "at_ms": 517945,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.519,
+        "label": "Normal",
+        "video_ms": 517945
+      }
+    },
+    {
+      "id": 243,
+      "type": "mm_tba_action",
+      "at_ms": 518928,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.511,
+        "label": "Normal",
+        "video_ms": 518928
+      }
+    },
+    {
+      "id": 244,
+      "type": "mm_tba_action",
+      "at_ms": 519911,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.503,
+        "label": "Normal",
+        "video_ms": 519911
+      }
+    },
+    {
+      "id": 245,
+      "type": "mm_tba_action",
+      "at_ms": 520253,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.504,
+        "label": "Normal",
+        "video_ms": 520253
+      }
+    },
+    {
+      "id": 246,
+      "type": "mm_tba_action",
+      "at_ms": 522218,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.521,
+        "label": "Normal",
+        "video_ms": 522218
+      }
+    },
+    {
+      "id": 247,
+      "type": "mm_tba_action",
+      "at_ms": 524184,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.546,
+        "label": "Normal",
+        "video_ms": 524184
+      }
+    },
+    {
+      "id": 248,
+      "type": "mm_tba_action",
+      "at_ms": 525167,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.53,
+        "label": "Normal",
+        "video_ms": 525167
+      }
+    },
+    {
+      "id": 249,
+      "type": "mm_tba_action",
+      "at_ms": 526150,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.548,
+        "label": "Normal",
+        "video_ms": 526150
+      }
+    },
+    {
+      "id": 250,
+      "type": "mm_tba_action",
+      "at_ms": 527133,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.503,
+        "label": "Normal",
+        "video_ms": 527133
+      }
+    },
+    {
+      "id": 251,
+      "type": "mm_tba_action",
+      "at_ms": 528116,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.513,
+        "label": "Normal",
+        "video_ms": 528116
+      }
+    },
+    {
+      "id": 252,
+      "type": "mm_tba_action",
+      "at_ms": 529099,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.53,
+        "label": "Normal",
+        "video_ms": 529099
+      }
+    },
+    {
+      "id": 253,
+      "type": "mm_tba_action",
+      "at_ms": 530082,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.523,
+        "label": "Normal",
+        "video_ms": 530082
+      }
+    },
+    {
+      "id": 254,
+      "type": "mm_tba_action",
+      "at_ms": 531065,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.535,
+        "label": "Normal",
+        "video_ms": 531065
+      }
+    },
+    {
+      "id": 255,
+      "type": "mm_tba_action",
+      "at_ms": 532048,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.526,
+        "label": "Normal",
+        "video_ms": 532048
+      }
+    },
+    {
+      "id": 256,
+      "type": "mm_tba_action",
+      "at_ms": 533031,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.509,
+        "label": "Normal",
+        "video_ms": 533031
+      }
+    },
+    {
+      "id": 257,
+      "type": "mm_tba_action",
+      "at_ms": 534014,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.527,
+        "label": "Normal",
+        "video_ms": 534014
+      }
+    },
+    {
+      "id": 258,
+      "type": "mm_tba_action",
+      "at_ms": 534997,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.516,
+        "label": "Normal",
+        "video_ms": 534997
+      }
+    },
+    {
+      "id": 259,
+      "type": "mm_tba_action",
+      "at_ms": 535980,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.538,
+        "label": "Normal",
+        "video_ms": 535980
+      }
+    },
+    {
+      "id": 260,
+      "type": "mm_tba_action",
+      "at_ms": 537945,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.534,
+        "label": "Normal",
+        "video_ms": 537945
+      }
+    },
+    {
+      "id": 261,
+      "type": "mm_tba_action",
+      "at_ms": 538928,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.526,
+        "label": "Normal",
+        "video_ms": 538928
+      }
+    },
+    {
+      "id": 262,
+      "type": "mm_tba_action",
+      "at_ms": 539911,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.532,
+        "label": "Normal",
+        "video_ms": 539911
+      }
+    },
+    {
+      "id": 263,
+      "type": "mm_tba_action",
+      "at_ms": 540253,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.505,
+        "label": "Normal",
+        "video_ms": 540253
+      }
+    },
+    {
+      "id": 264,
+      "type": "mm_tba_action",
+      "at_ms": 542218,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.529,
+        "label": "Normal",
+        "video_ms": 542218
+      }
+    },
+    {
+      "id": 265,
+      "type": "mm_tba_action",
+      "at_ms": 543201,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.505,
+        "label": "Normal",
+        "video_ms": 543201
+      }
+    },
+    {
+      "id": 266,
+      "type": "mm_tba_action",
+      "at_ms": 545167,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.508,
+        "label": "Normal",
+        "video_ms": 545167
+      }
+    },
+    {
+      "id": 267,
+      "type": "mm_tba_action",
+      "at_ms": 546150,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.501,
+        "label": "Normal",
+        "video_ms": 546150
+      }
+    },
+    {
+      "id": 268,
+      "type": "mm_tba_action",
+      "at_ms": 547133,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.504,
+        "label": "Normal",
+        "video_ms": 547133
+      }
+    },
+    {
+      "id": 269,
+      "type": "mm_tba_action",
+      "at_ms": 549099,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.505,
+        "label": "Normal",
+        "video_ms": 549099
+      }
+    },
+    {
+      "id": 270,
+      "type": "mm_tba_action",
+      "at_ms": 551065,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.502,
+        "label": "Normal",
+        "video_ms": 551065
+      }
+    },
+    {
+      "id": 271,
+      "type": "mm_tba_action",
+      "at_ms": 554014,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.503,
+        "label": "Normal",
+        "video_ms": 554014
+      }
+    },
+    {
+      "id": 272,
+      "type": "mm_tba_action",
+      "at_ms": 554997,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.508,
+        "label": "Normal",
+        "video_ms": 554997
+      }
+    },
+    {
+      "id": 273,
+      "type": "mm_tba_action",
+      "at_ms": 555980,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.528,
+        "label": "Normal",
+        "video_ms": 555980
+      }
+    },
+    {
+      "id": 274,
+      "type": "mm_tba_action",
+      "at_ms": 556962,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.505,
+        "label": "Normal",
+        "video_ms": 556962
+      }
+    },
+    {
+      "id": 275,
+      "type": "mm_tba_action",
+      "at_ms": 557945,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.523,
+        "label": "Normal",
+        "video_ms": 557945
+      }
+    },
+    {
+      "id": 276,
+      "type": "mm_tba_action",
+      "at_ms": 559911,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.521,
+        "label": "Normal",
+        "video_ms": 559911
+      }
+    },
+    {
+      "id": 277,
+      "type": "mm_tba_action",
+      "at_ms": 560253,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.507,
+        "label": "Normal",
+        "video_ms": 560253
+      }
+    },
+    {
+      "id": 278,
+      "type": "mm_tba_action",
+      "at_ms": 569099,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.525,
+        "label": "Normal",
+        "video_ms": 569099
+      }
+    },
+    {
+      "id": 279,
+      "type": "mm_tba_action",
+      "at_ms": 570082,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.519,
+        "label": "Normal",
+        "video_ms": 570082
+      }
+    },
+    {
+      "id": 280,
+      "type": "mm_tba_action",
+      "at_ms": 571065,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.528,
+        "label": "Normal",
+        "video_ms": 571065
+      }
+    },
+    {
+      "id": 281,
+      "type": "mm_tba_action",
+      "at_ms": 572048,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.519,
+        "label": "Normal",
+        "video_ms": 572048
+      }
+    },
+    {
+      "id": 282,
+      "type": "mm_tba_action",
+      "at_ms": 589099,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.506,
+        "label": "Normal",
+        "video_ms": 589099
+      }
+    },
+    {
+      "id": 283,
+      "type": "mm_tba_action",
+      "at_ms": 592048,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.502,
+        "label": "Normal",
+        "video_ms": 592048
+      }
+    },
+    {
+      "id": 284,
+      "type": "mm_tba_action",
+      "at_ms": 594014,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.504,
+        "label": "Normal",
+        "video_ms": 594014
+      }
+    },
+    {
+      "id": 285,
+      "type": "mm_tba_action",
+      "at_ms": 595980,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.505,
+        "label": "Normal",
+        "video_ms": 595980
+      }
+    },
+    {
+      "id": 286,
+      "type": "mm_tba_action",
+      "at_ms": 596962,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.506,
+        "label": "Normal",
+        "video_ms": 596962
+      }
+    },
+    {
+      "id": 287,
+      "type": "mm_tba_action",
+      "at_ms": 597945,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.504,
+        "label": "Normal",
+        "video_ms": 597945
+      }
+    },
+    {
+      "id": 288,
+      "type": "mm_tba_action",
+      "at_ms": 598928,
+      "data": {
+        "model": "MM-TBA SlowFast ACRN",
+        "confidence": 0.514,
+        "label": "Normal",
+        "video_ms": 598928
+      }
+    }
+  ],
+  "duration_ms": 599008
+}
