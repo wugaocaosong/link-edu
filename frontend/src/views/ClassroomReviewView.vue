@@ -2,7 +2,7 @@
 import SceneLink from '../components/SceneLink.vue';
 import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Refresh, Printer, History } from '@vicons/tabler';
+import { Refresh, History } from '@vicons/tabler';
 import { api } from '../services/api';
 import { classroomDestination, formatReportDate, formatReportTime } from '../services/classroomReview.js';
 import ClassroomReport from '../components/ClassroomReport.vue';
@@ -134,7 +134,6 @@ async function regenerate(objection){
   } catch(e){if(!disposed)error.value=e.response?.data?.message||'评课请求未确认，请刷新状态后再决定是否重试。';}
   finally {if(!disposed)busy.value=false;}
 }
-function printReport(){window.print();}
 let printFolds=[];
 function preparePrint(){
   printFolds=[...document.querySelectorAll('.evidence-report :is(.report-fold,.dimension-sources):not([open])')];
@@ -199,7 +198,7 @@ onBeforeUnmount(()=>{disposed=true;requestId++;controller?.abort();clearTimeout(
       <template v-if="room">
         <div class="review-session-meta"><span>课堂 #{{ room.session_id }} · {{ room.topic }}</span><span>{{ formatReportDate(room.created_at) }} · {{ formatReportTime(Number.isFinite(room.elapsed)?room.elapsed*1000:NaN) }}</span></div>
         <section v-if="['active','paused'].includes(room.state)" class="review-empty-state"><h2>这节课堂还未结束</h2><p>课堂结束后再根据已保存的证据整理教练反馈。</p><router-link class="review-button" :to="classroomDestination(room)">返回课堂</router-link></section>
-        <ClassroomReport v-else :room="room" :busy="busy" @regenerate="regenerate" @plans-created="loadRoom(room.session_id)" @refresh="loadRoom(room.session_id)" @print="printReport" />
+        <ClassroomReport v-else :room="room" :busy="busy" @regenerate="regenerate" @plans-created="loadRoom(room.session_id)" @refresh="loadRoom(room.session_id)" />
       </template>
     </template>
   </div>

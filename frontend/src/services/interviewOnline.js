@@ -21,8 +21,8 @@ export class InterviewOnline {
     if(!event.type.startsWith('interview_'))return false
     if(event.request_id!==pending.id)return true
     if(event.type==='interview_delta')pending.onDraft(event.text)
-    if(event.type==='interview_result')pending.finish(null,event.result)
-    if(event.type==='interview_error')pending.finish(new Error(event.message))
+    if(event.type==='interview_result')pending.finish(null,{...event.result,usage:event.usage})
+    if(event.type==='interview_error')pending.finish(Object.assign(new Error(event.message),{usage:event.usage}))
     return true
   }
 

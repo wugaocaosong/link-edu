@@ -28,6 +28,7 @@
 .help-chat__log article { flex:none; padding:9px 11px; background:#2b2035; border-radius:12px 12px 12px 2px; }
 .help-chat__log article.user { align-self:flex-end; background:#4c2d26; border-radius:12px 12px 2px 12px; color:#ffe0bc; }
 .help-chat__log p { margin:0; font-size:12px; line-height:1.65; overflow-wrap:anywhere; }
+.help-chat__log .assistant-usage-line { display:block; margin-top:6px; color:#e2cfea; font-size:11px; }
 .help-dock .help-chat__form { flex:none; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; padding:12px; border-top:1px solid #ffffff10; }
 .help-chat__form button { background:linear-gradient(110deg,#653784,#a75626); color:#fff; border:1px solid #b98aff44; border-radius:10px; padding:8px 12px; font-size:12px; cursor:pointer; }
 .help-chat__form button:disabled { opacity:.5; cursor:wait; }

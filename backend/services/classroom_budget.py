@@ -6,6 +6,7 @@ from sqlalchemy import func, select
 from extensions import db
 from classroom_models import ApiUsage
 from services.classroom_locks import budget_file_lock
+from services.assistant_billing_context import assistant_turn
 
 lock = threading.RLock()
 
@@ -48,7 +49,8 @@ def reserve(service, amount, session_id=None, assistant_user_id=None):
                 from services.assistant_quota import check as check_quota
                 check_quota(connection, assistant_user_id, amount)
             result = connection.execute(ApiUsage.__table__.insert().values(
-                service=service, session_id=session_id, assistant_user_id=assistant_user_id, reserved_cny=amount))
+                service=service, session_id=session_id, assistant_user_id=assistant_user_id,
+                assistant_turn=assistant_turn.get() if assistant_user_id is not None else None, reserved_cny=amount))
             return result.inserted_primary_key[0]
 
 

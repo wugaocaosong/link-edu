@@ -11,7 +11,8 @@ import ClassroomDialog from './ClassroomDialog.vue';
 import ClassroomReplay from './ClassroomReplay.vue';
 const props=defineProps({room:Object,busy:Boolean});
 const auth=useAuthStore();
-const emit=defineEmits(['regenerate','plans-created','refresh','print']);
+const emit=defineEmits(['regenerate','plans-created','refresh']);
+const exportLocked=ref(false);
 const view=computed(()=>buildReview(props.room));
 const linkedCoachCount=computed(()=>view.value.coachingFocuses.filter(item=>item.evidence.length).length);
 const status=computed(()=>({idle:'待评课',running:'评课进行中',completed:'已完成',failed:'生成失败',insufficient:'证据不足 · 未生成'}[props.room.report_state]||'待评课'));
@@ -151,7 +152,7 @@ function regenerate(){
       <div class="report-actions-panel no-print">
         <router-link class="review-button" to="/classroom">模拟课堂<ArrowUpRight aria-hidden="true" /></router-link>
         <button class="review-button" :disabled="busy" @click="emit('refresh')"><Refresh aria-hidden="true" />刷新</button>
-        <button v-if="room?.report && room.report_state!=='insufficient'" class="review-button" @click="emit('print')"><Printer aria-hidden="true" />打印 / PDF</button>
+        <button v-if="room?.report && room.report_state!=='insufficient'" type="button" class="review-button" @click="exportLocked=true"><Printer aria-hidden="true" />PDF 导出 · 未开放</button>
       </div>
       <section class="review-panel report-profile" aria-labelledby="profile-heading">
         <div class="report-section-title"><div><p class="review-eyebrow">02 / OBSERVATION THEMES</p><h2 id="profile-heading"><Focus2 aria-hidden="true" />课堂观察与练习建议</h2></div><span>有证据才形成观察</span></div>
@@ -276,6 +277,10 @@ function regenerate(){
       </div>
     </div>
     <footer class="report-footer">LINK · 每一份判断，都应回到课堂本身。<span>教师自主复核 · AI 辅助成长</span></footer>
+    <ClassroomDialog v-model="exportLocked" title="PDF 导出尚未开放">
+      <p>报告 PDF 导出是规划中的个人进阶权益。你仍可免费查看当前报告和基础证据。</p>
+      <RouterLink to="/membership" @click="exportLocked=false">查看会员权益</RouterLink>
+    </ClassroomDialog>
     <ClassroomDialog v-model="drawerOpen" :title="drawerTitle">
       <ClassroomReplay v-if="drawerOpen" :room="room" :event="playbackEvent" />
       <div class="report-evidence-drawer"><p class="review-caption">本节课堂原始记录 · {{ evidence.length }} 条</p><label class="evidence-search">查找证据<input v-model="filter" type="search" placeholder="关键词、事件编号或时间" /></label>

@@ -6,6 +6,7 @@ from sqlalchemy import func, select
 from extensions import db
 from classroom_models import CreditUsage
 from services.classroom_locks import budget_file_lock
+from services.assistant_billing_context import assistant_turn
 
 ACCOUNTS = {'dialogue': ('模拟授课 / 评课', 30), 'vision': ('视觉', 40), 'test': ('测试', 30)}
 
@@ -63,7 +64,8 @@ def reserve(account, service, model, amount, session_id=None, assistant_user_id=
             from services.assistant_quota import check as check_quota
             check_quota(connection, assistant_user_id, amount, currency="USD")
         result = connection.execute(CreditUsage.__table__.insert().values(account=account,
-            service=service, model=model, session_id=session_id, assistant_user_id=assistant_user_id, reserved_usd=amount))
+            service=service, model=model, session_id=session_id, assistant_user_id=assistant_user_id,
+            assistant_turn=assistant_turn.get() if assistant_user_id is not None else None, reserved_usd=amount))
         return result.inserted_primary_key[0]
 
 
