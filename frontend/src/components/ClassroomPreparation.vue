@@ -8,6 +8,8 @@ const consent = defineModel('consent', { type: Boolean })
 const cameraConsent = defineModel('cameraConsent', { type: Boolean })
 const recordEnabled = defineModel('recordEnabled', { type: Boolean })
 const mode = defineModel('mode', { type: String })
+const topic = defineModel('topic', { type: String })
+const subject = defineModel('subject', { type: String })
 const props = defineProps({ capabilities: Object, practicePlan: Object, room: Object, state: String,
   busy: Boolean, active: Boolean, cameraEnabled: Boolean, pose: Object, blockers: Array,
   hint: String, loading: Boolean, needsSettings: Boolean })
@@ -18,7 +20,7 @@ const llm = computed(() => props.capabilities?.services?.dialogue?.provider === 
 <template>
   <ClassroomDialog v-model="open" title="课前准备">
     <div class="classroom-preparation">
-      <div class="preparation-topic"><div><small>{{ capabilities?.scenario?.grade || '小学数学' }}</small><h3>{{ capabilities?.scenario?.topic || '分数的初步认识' }}</h3></div>
+      <div class="preparation-topic"><div class="topic-fields"><label>学科<select v-model="subject" :disabled="!!room || busy"><option value="小学数学">小学数学</option><option value="信息科技">信息技术</option><option value="其他">其他</option></select></label><label>课程名称 / 本节课题<input v-model.trim="topic" maxlength="128" :disabled="!!room || busy" placeholder="例如：认识几分之一、Python变量与数据类型" /></label><small v-if="subject!=='小学数学' || topic!==capabilities?.scenario?.topic">自定义课题采用通用课堂反馈，虚拟学生不预设该学科的标准答案。</small></div>
         <label v-if="!room" class="lesson-mode"><span class="sr-only">训练时长</span><select id="class-mode" v-model="mode" :disabled="busy"><option value="full">10 分钟 · 完整课</option><option value="fragment">8 分钟 · 专项练习</option></select></label>
       </div>
       <section v-if="state !== 'ended'" class="preparation-permissions" aria-label="设备与授权">
@@ -34,7 +36,7 @@ const llm = computed(() => props.capabilities?.services?.dialogue?.provider === 
         <p>摄像头为授课必需条件，仍须浏览器授权。动作检测在本机运行，不做人脸识别或心理推断。云端截图分析需另行授权。</p>
         <p>暂停同时停止计时和录像。有效授课满 10 秒且转写、完整学生反馈充足才评课；动作或场景不足时教态不评分。</p>
       </details>
-      <details v-if="capabilities?.scenario" class="disclosure preparation-scenario"><summary>训练目标与学生设定</summary>
+      <details v-if="capabilities?.scenario && subject==='小学数学' && topic===capabilities.scenario.topic" class="disclosure preparation-scenario"><summary>训练目标与学生设定</summary>
         <p>{{ capabilities.scenario.objective }}</p>
         <ul><li v-for="(student,id) in capabilities.scenario.students" :key="id"><strong>{{ { ming:'小明', yu:'小雨', lin:'小林' }[id] }}</strong><span>{{ student.focus }}</span></li></ul>
         <p class="subtle-note">这些是模拟学生的初始设定，状态变化用于训练复盘，不代表真实儿童的学习测量。</p>
@@ -54,6 +56,10 @@ const llm = computed(() => props.capabilities?.services?.dialogue?.provider === 
 .classroom-preparation { display:grid; gap:16px; }
 .preparation-topic { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
 .preparation-topic h3 { margin:4px 0 0; font-size:20px; }
+.topic-fields{display:grid;grid-template-columns:minmax(140px,.35fr) minmax(260px,1fr);gap:10px;width:min(100%,680px)}
+.topic-fields label{display:grid;gap:5px;font-size:12px;color:var(--class-muted)}
+.topic-fields input,.topic-fields select{min-width:0;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--class-surface);color:var(--class-ink);font:inherit}
+.topic-fields small{grid-column:1/-1;color:var(--class-muted)}
 .preparation-topic small { color:var(--class-muted); }
 .preparation-permissions { display:grid; gap:8px; padding:16px; border:1px solid var(--line); border-radius:12px; background:linear-gradient(135deg,#b45cff0d,#ff7a1808); }
 .preparation-permissions h3 { margin:0 0 4px; }
@@ -69,5 +75,5 @@ const llm = computed(() => props.capabilities?.services?.dialogue?.provider === 
 .preparation-actions,.preparation-footer { display:flex; flex-wrap:wrap; gap:12px; }
 .preparation-footer { justify-content:flex-end; padding-top:8px; }
 .preparation-practice { padding:12px; background:var(--class-surface-raised); border-radius:8px; font-size:13px; }
-@media(max-width:480px) { .preparation-permissions { padding:12px; } }
+@media(max-width:560px) { .topic-fields{grid-template-columns:1fr}.preparation-permissions { padding:12px; } }
 </style>

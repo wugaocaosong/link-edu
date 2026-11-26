@@ -46,6 +46,8 @@ def install_policy(app):
             return
         if request.method in ('POST', 'PATCH', 'PUT'):
             limit = app.config.get('MAX_CONTENT_LENGTH') or 2000000
+            if request.endpoint == 'classroom.run_mm_tba':
+                limit = 260 * 1024 * 1024
             if request.endpoint == 'rag.upload_document':
                 from rag.settings import load_settings
                 try:

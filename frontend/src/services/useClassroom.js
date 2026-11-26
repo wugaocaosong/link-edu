@@ -252,7 +252,7 @@ export function useClassroom() {
     if (!cameraEnabled.value) await toggleCamera();
     if (!cameraEnabled.value) throw new Error(error.value || '摄像头不可用，无法开始课堂');
   }
-  async function begin(mode, consent, cameraConsent, practicePlanId = null) {
+  async function begin(mode, consent, cameraConsent, practicePlanId = null, topic = '分数的初步认识', subject = '小学数学') {
     if (busy.value) return;
     if (!consentReady(consent, cameraConsent)) return;
     busy.value = true;
@@ -264,6 +264,8 @@ export function useClassroom() {
       if (disposed) return;
       const { data } = await api.post("/classroom/sessions", {
         mode,
+        topic,
+        subject,
         audio_consent: consent,
         camera_consent: cameraConsent,
         cloud_vision: cloudVision.value,

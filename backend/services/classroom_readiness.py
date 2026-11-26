@@ -67,7 +67,11 @@ def report_readiness(events, elapsed, cloud_vision=False, active_elapsed=None):
         {'teacher_samples': 3, 'span_seconds': 4, 'cloud_observations': 1 if cloud_vision else 0}, scene_reason.strip())
     for check in checks:
         check['scope'] = 'posture' if check['key'] in ('motion', 'scene') else 'report'
-    return {'version': POLICY_VERSION, 'eligible': all(c['passed'] for c in checks if c['scope'] == 'report'), 'checks': checks,
+    # Readiness checks inform the report and identify text-only sections; they no
+    # longer block report generation when transcript, interaction, or visual
+    # evidence is missing. The classroom finish route already enforces the
+    # minimum session duration.
+    return {'version': POLICY_VERSION, 'eligible': duration >= MIN_CLASS_SECONDS, 'checks': checks,
             'dimension_eligibility': {'posture': enough_samples(motion_info) and scene_ok},
             'reasons': [c['reason'] for c in checks if not c['passed']],
             'scene_mode': 'local_teacher_frame_and_cloud' if cloud_vision else 'local_teacher_frame',

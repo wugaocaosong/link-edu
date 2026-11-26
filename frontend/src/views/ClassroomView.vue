@@ -32,6 +32,7 @@ async function enterClassroom() {
   classroomSurface.value?.focus({ preventScroll: true })
 }
 const selectedCourse = ref(null), courseContextError = ref(''), courseContextLoading = ref(false);
+const lessonTopic=ref('分数的初步认识'), lessonSubject=ref('小学数学');
 let courseRequest = 0;
 watch(() => route.query.courseId, async value => {
   const request = ++courseRequest;
@@ -45,6 +46,7 @@ watch(() => route.query.courseId, async value => {
     if (request !== courseRequest) return;
     selectedCourse.value = courses.find(course => Number(course.id) === id) || null;
     if (!selectedCourse.value) courseContextError.value = '课程不存在，请重新选课。';
+    else { lessonTopic.value=selectedCourse.value.title.replace(/（AI互动课堂）$/u,''); lessonSubject.value=['小学数学'].includes(selectedCourse.value.category)?selectedCourse.value.category:['信息科技','信息技术'].includes(selectedCourse.value.category)?'信息科技':'其他'; }
   } catch { if (request === courseRequest) courseContextError.value = '课程读取失败，请重新选课。'; }
   finally { if (request === courseRequest) courseContextLoading.value = false; }
 }, { immediate: true });
@@ -100,6 +102,7 @@ const startBlockers=computed(()=>[...classroomStartBlockers({capabilities:capabi
   capabilitiesLoading:capabilitiesLoading.value,capabilitiesError:capabilitiesError.value,
   consent:consent.value,cameraConsent:cameraConsent.value,busy:busy.value,state:state.value}),
   ...(practiceIssue.value ? [{code:'practice_plan',message:practiceIssue.value}] : []),
+  ...(!room.value && !lessonTopic.value.trim() ? [{code:'lesson_topic',message:'请填写课程名称或本节课题。'}] : []),
   ...(courseContextError.value || courseContextLoading.value ? [{code:'course_context',message:courseContextError.value || '正在读取课程…'}] : [])]);
 const startHint=computed(()=>startBlockers.value.length ? startBlockers.value.map(r=>r.message).join('\n') :
   '已就绪，点击开始授课');
@@ -150,7 +153,7 @@ async function start(){
     error.value='复练任务不可用或来源报告已更新，请从评课报告重新选择。';return;
   }
   window.dispatchEvent(new Event("link:classroom-capture"));
-  await begin(mode.value,consent.value,cameraConsent.value,practiceId.value);
+  await begin(mode.value,consent.value,cameraConsent.value,practiceId.value,lessonTopic.value,lessonSubject.value);
   if(room.value) router.replace({query:{session:room.value.session_id}});
 }
 async function resume(){
@@ -221,7 +224,7 @@ onBeforeRouteLeave(()=>{
         :teacher-text="partial || latestTeacher" :reply="reply" :messages="messages" :volume="volume" :resolution="cameraResolution"
         :resolution-busy="cameraAdjusting || busy" :camera-note="cameraNote" :progress="progress" :time-label="timeLabel"
         @volume="setVolume" @resolution="setCameraResolution" @video="camera=$event" @retry="retryMotion" @toggle="requestPreview" @prepare="preparationOpen=true" @fullscreen-target="helpTarget=$event">
-        <template #heading><span class="connection-label" :class="state"><i aria-hidden="true" />{{ stateLabel }}</span><p class="scene-topic">分数的初步认识</p></template>
+        <template #heading><span class="connection-label" :class="state"><i aria-hidden="true" />{{ stateLabel }}</span><p class="scene-topic">{{ room?.topic || lessonTopic }}</p></template>
         <template #timer><ClassroomCountdown :seconds="remaining" /></template>
         <template #students="{ presentation }">
           <PixelStudentStage ref="studentRef" :presentation="presentation" :students="students.length ? students : defaultStudents"
@@ -250,14 +253,14 @@ onBeforeRouteLeave(()=>{
         </template>
         <template #settings>
           <div class="vision-option">
-            <label><input type="checkbox" v-model="cloudVision" :disabled="state==='ended' || busy" @change="setVision" />云端画面分析</label>
-            <p class="subtle-note">默认关闭。开启后最多每 15 秒上传 1 张截图，每课最多 40 张，消耗视觉额度并私有保存用于证据核对。画面证据不足时仅教态不评分，其他维度照常评审。关闭时只检查本地教师入镜，不识别背景语义。</p>
+            <label><input type="checkbox" v-model="cloudVision" :disabled="state==='ended' || busy" @change="setVision" />边录边分析可见行为（云端画面）</label>
+            <p class="subtle-note">默认关闭。开启后最多每15秒上传1张截图、每课最多40张并消耗视觉额度；截图私有保存，可在报告中回看书写、指向和面部外观线索。线索只代表采样瞬间，不等于持续时长或教学评分；不判表情正常/异常。整段录像仍只保存在本机。</p>
           </div>
           <ClassroomSettings :capabilities="capabilities" :probing="probing" :active="active" @probe="probe" @refresh="refreshCapabilities" />
         </template>
         <template #windows>
           <ClassroomPreparation v-model="preparationOpen" v-model:consent="consent" v-model:camera-consent="cameraConsent"
-            v-model:record-enabled="recordEnabled" v-model:mode="mode" :capabilities="capabilities" :practice-plan="practicePlan"
+            v-model:record-enabled="recordEnabled" v-model:mode="mode" v-model:topic="lessonTopic" v-model:subject="lessonSubject" :capabilities="capabilities" :practice-plan="practicePlan"
             :room="room" :state="state" :busy="busy" :active="active" :camera-enabled="cameraEnabled" :pose="pose"
             :blockers="startBlockers" :hint="conciseHint" :loading="capabilitiesLoading" :needs-settings="needsSettings"
             @start="launchLesson" @preview="requestPreview" @refresh="refreshCapabilities" @settings="preparationSettings" />

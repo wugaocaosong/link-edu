@@ -46,12 +46,15 @@ def test_finish_is_idempotent_and_correction_has_no_fixed_bonus(app,monkeypatch)
     assert PracticePlan.query.filter_by(source_session_id=obj.sid,source_report_version=2).count()==1
     assert ClassroomEvent.query.filter_by(session_id=obj.sid,kind='correction').count()==1
 
-def test_empty_classroom_fails_without_cloud_or_demo(app,monkeypatch):
+def test_empty_classroom_still_generates_report_with_text_only_gaps(app,monkeypatch):
     obj=live(app)
-    monkeypatch.setattr(reports,'chat',lambda *a,**k: (_ for _ in ()).throw(AssertionError('Must not call cloud')))
+    monkeypatch.setattr(reports,'report_theory_context',lambda **k:([],{}))
+    monkeypatch.setattr(reports,'chat',lambda *a,**k:{'coaching_focuses':[]})
     app.test_client().post(f'/api/classroom/sessions/{obj.sid}/finish',headers=headers(1))
     room=wait_for_report(obj.sid)
-    assert room.report_state=='insufficient' and room.report is None and room.report_version==0
+    assert room.report_state=='completed' and room.report is not None and room.report_version==1
+    assert room.report['coaching_focuses']==[]
+    assert room.report['data_readiness']['reasons']
 
 
 def test_failed_report_needs_explicit_retry_not_repeated_finish(app, monkeypatch):

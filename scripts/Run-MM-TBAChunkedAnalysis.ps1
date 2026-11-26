@@ -6,7 +6,8 @@ param(
     [ValidateRange(1, 5)]
     [int]$ContextSeconds = 2,
     [ValidateSet('cpu', 'cuda:0')]
-    [string]$Device = 'cuda:0'
+    [string]$Device = 'cuda:0',
+    [switch]$SkipOverlay
 )
 
 $ErrorActionPreference = 'Stop'
@@ -132,6 +133,11 @@ for ($index = 0; $index -lt $segmentCount; $index++) {
 
 $eventsPath = Join-Path $OutputDirectory 'action-events.json'
 $allEvents | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $eventsPath -Encoding utf8
+
+if ($SkipOverlay) {
+    Write-Host "Saved timestamped events: $eventsPath"
+    return
+}
 $silentVideo = Join-Path $OutputDirectory 'annotated-silent.mp4'
 $finalVideo = Join-Path $OutputDirectory 'classroom-actions-annotated.mp4'
 $rendererLinux = Convert-ToWslPath $renderer

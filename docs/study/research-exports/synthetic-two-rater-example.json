@@ -1,0 +1,201 @@
+{
+  "sample_type": "合成测试数据，不对应任何真实参与者或真实测评录像",
+  "rubric_version": "fraction-blind-1",
+  "records": [
+    {
+      "clip_id": "K7M4Q2",
+      "rater_code": "R1",
+      "submitted_at": "synthetic-submit-r1-a",
+      "opportunities": [
+        {
+          "opportunity_no": 1,
+          "status": "present",
+          "scores": {
+            "概念指向": 4,
+            "理解诊断": 3,
+            "追问承接": 4,
+            "解释调整": 3
+          },
+          "rationale": "合成依据：回应提及整体与等分。",
+          "rationales": {
+            "概念指向": "合成依据：回应提及整体与等分。",
+            "理解诊断": "合成依据：回应提及整体与等分。",
+            "追问承接": "合成依据：回应提及整体与等分。",
+            "解释调整": "合成依据：回应提及整体与等分。"
+          }
+        },
+        {
+          "opportunity_no": 2,
+          "status": "present",
+          "scores": {
+            "概念指向": 5,
+            "理解诊断": 4,
+            "追问承接": 3,
+            "解释调整": 4
+          },
+          "rationale": "合成依据：承接学生给出的理由并安排检验。",
+          "rationales": {
+            "概念指向": "合成依据：承接学生给出的理由并安排检验。",
+            "理解诊断": "合成依据：承接学生给出的理由并安排检验。",
+            "追问承接": "合成依据：承接学生给出的理由并安排检验。",
+            "解释调整": "合成依据：承接学生给出的理由并安排检验。"
+          }
+        }
+      ]
+    },
+    {
+      "clip_id": "K7M4Q2",
+      "rater_code": "R2",
+      "submitted_at": "synthetic-submit-r2-a",
+      "opportunities": [
+        {
+          "opportunity_no": 1,
+          "status": "present",
+          "scores": {
+            "概念指向": 4,
+            "理解诊断": 4,
+            "追问承接": 3,
+            "解释调整": 3
+          },
+          "rationale": "合成依据：只记录可见语言行为。",
+          "rationales": {
+            "概念指向": "合成依据：只记录可见语言行为。",
+            "理解诊断": "合成依据：只记录可见语言行为。",
+            "追问承接": "合成依据：只记录可见语言行为。",
+            "解释调整": "合成依据：只记录可见语言行为。"
+          }
+        },
+        {
+          "opportunity_no": 2,
+          "status": "present",
+          "scores": {
+            "概念指向": 5,
+            "理解诊断": 4,
+            "追问承接": 4,
+            "解释调整": 4
+          },
+          "rationale": "合成依据：比较表征与后续核验明确。",
+          "rationales": {
+            "概念指向": "合成依据：比较表征与后续核验明确。",
+            "理解诊断": "合成依据：比较表征与后续核验明确。",
+            "追问承接": "合成依据：比较表征与后续核验明确。",
+            "解释调整": "合成依据：比较表征与后续核验明确。"
+          }
+        }
+      ]
+    },
+    {
+      "clip_id": "N8V5C3",
+      "rater_code": "R1",
+      "submitted_at": "synthetic-submit-r1-b",
+      "opportunities": [
+        {
+          "opportunity_no": 1,
+          "status": "present",
+          "scores": {
+            "概念指向": 3,
+            "理解诊断": 3,
+            "追问承接": 2,
+            "解释调整": 3
+          },
+          "rationale": "合成依据：可核对的第一机会表现。",
+          "rationales": {
+            "概念指向": "合成依据：可核对的第一机会表现。",
+            "理解诊断": "合成依据：可核对的第一机会表现。",
+            "追问承接": "合成依据：可核对的第一机会表现。",
+            "解释调整": "合成依据：可核对的第一机会表现。"
+          }
+        },
+        {
+          "opportunity_no": 2,
+          "status": "opportunity_not_provided",
+          "scores": {
+            "概念指向": null,
+            "理解诊断": null,
+            "追问承接": null,
+            "解释调整": null
+          },
+          "rationale": "",
+          "missing_reason": "主持人未提供该回应机会"
+        }
+      ]
+    },
+    {
+      "clip_id": "N8V5C3",
+      "rater_code": "R2",
+      "submitted_at": "synthetic-submit-r2-b",
+      "opportunities": [
+        {
+          "opportunity_no": 1,
+          "status": "present",
+          "scores": {
+            "概念指向": 3,
+            "理解诊断": 2,
+            "追问承接": 3,
+            "解释调整": 3
+          },
+          "rationale": "合成依据：独立判断，仅按第一机会录像评分。",
+          "rationales": {
+            "概念指向": "合成依据：独立判断，仅按第一机会录像评分。",
+            "理解诊断": "合成依据：独立判断，仅按第一机会录像评分。",
+            "追问承接": "合成依据：独立判断，仅按第一机会录像评分。",
+            "解释调整": "合成依据：独立判断，仅按第一机会录像评分。"
+          }
+        },
+        {
+          "opportunity_no": 2,
+          "status": "opportunity_not_provided",
+          "scores": {
+            "概念指向": null,
+            "理解诊断": null,
+            "追问承接": null,
+            "解释调整": null
+          },
+          "rationale": "",
+          "missing_reason": "主持人未提供该回应机会"
+        }
+      ]
+    },
+    {
+      "clip_id": "J6W2R9",
+      "rater_code": "R1",
+      "submitted_at": "synthetic-submit-r1-c",
+      "opportunities": [
+        {
+          "opportunity_no": 1,
+          "status": "present",
+          "scores": {
+            "概念指向": 4,
+            "理解诊断": 3,
+            "追问承接": 3,
+            "解释调整": 3
+          },
+          "rationale": "合成依据：第一机会记录完整。",
+          "rationales": {
+            "概念指向": "合成依据：第一机会记录完整。",
+            "理解诊断": "合成依据：第一机会记录完整。",
+            "追问承接": "合成依据：第一机会记录完整。",
+            "解释调整": "合成依据：第一机会记录完整。"
+          }
+        },
+        {
+          "opportunity_no": 2,
+          "status": "present",
+          "scores": {
+            "概念指向": 4,
+            "理解诊断": 3,
+            "追问承接": 3,
+            "解释调整": 3
+          },
+          "rationale": "合成依据：第二机会记录完整。",
+          "rationales": {
+            "概念指向": "合成依据：第二机会记录完整。",
+            "理解诊断": "合成依据：第二机会记录完整。",
+            "追问承接": "合成依据：第二机会记录完整。",
+            "解释调整": "合成依据：第二机会记录完整。"
+          }
+        }
+      ]
+    }
+  ]
+}

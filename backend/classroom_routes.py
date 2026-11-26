@@ -3,11 +3,15 @@ import os
 import secrets
 import threading
 import time
+import tempfile
+import uuid
 from datetime import datetime, timedelta
 from pathlib import Path
 from flask import Blueprint, abort, current_app, jsonify, request, send_file
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_sock import Sock
+from werkzeug.formparser import parse_form_data
+from werkzeug.exceptions import RequestEntityTooLarge
 from sqlalchemy import update
 from extensions import db
 from models import Course, TrainingSession, User
@@ -20,6 +24,7 @@ from services.classroom_readiness import MIN_CLASS_SECONDS, report_readiness
 from services.classroom_behaviors import analyze_behaviors
 from services.classroom_scenarios import scenario_brief
 from services.classroom_practice import ensure_plans
+from services.classroom_mm_tba import start_mm_tba, validate_segments
 from services.classroom_clock import timing, transition, clock_lock
 
 bp = Blueprint('classroom', __name__, url_prefix='/api/classroom')
@@ -32,7 +37,7 @@ probe_times = {}
 @bp.before_request
 def validate_body():
     if request.method == 'POST':
-        if request.content_length and request.content_length > 8192:
+        if request.endpoint != 'classroom.run_mm_tba' and request.content_length and request.content_length > 8192:
             return jsonify(message='请求内容过大'), 413
         data = request.get_json(silent=True)
         if data is not None and not isinstance(data, dict):
@@ -56,12 +61,14 @@ def owned(sid):
 
 def serialize(room, include_events=False):
     clock = timing(room)
+    training = db.session.get(TrainingSession, room.session_id)
+    subject = training.course.category if training and training.course else '其他'
     data = {'session_id': room.session_id, 'topic': room.topic, 'mode': room.mode, 'state': room.state,
             'elapsed': (datetime.utcnow() - room.started_at).total_seconds() if not room.ended_at else (room.ended_at - room.started_at).total_seconds(),
             'cloud_vision': room.cloud_vision, 'report_state': room.report_state,
             'report': room.report, 'report_error': room.report_error, 'report_version': room.report_version,
             'created_at': room.started_at.isoformat(), 'students': room.students,
-            'scenario': scenario_brief()}
+            'subject': subject, 'scenario': scenario_brief(room.topic, subject)}
     data.update(clock)
     data['elapsed'] = clock['active_elapsed']
     phase = ClassroomEvent.query.filter_by(session_id=room.session_id, kind='report_stage').order_by(ClassroomEvent.id.desc()).first()
@@ -156,6 +163,14 @@ def create():
     mode_value = data.get('mode', 'full')
     if mode_value not in ('full', 'fragment'):
         return jsonify(message='训练模式无效'), 400
+    topic = str(data.get('topic') or '分数的初步认识').strip()
+    subject = str(data.get('subject') or '小学数学').strip()
+    if not topic or len(topic) > 128:
+        return jsonify(message='请输入不超过128个字符的课程名称或课题'), 400
+    if subject not in ('小学数学', '信息科技', '其他'):
+        return jsonify(message='请选择有效的学科类别'), 400
+    from tenancy import tenant_id_for_request
+    tenant_id = tenant_id_for_request(db.session.get(User, uid))
     practice_id = data.get('practice_plan_id')
     plan = None
     if practice_id is not None:
@@ -180,19 +195,18 @@ def create():
             return jsonify(message='今日体验次数已用完，明天可继续训练', code='daily_quota'), 429
         if public_mode() and budget.status()['stopped']:
             return jsonify(message='体验额度已到停止线，已有报告仍可查看', code='budget_stopped'), 429
-        course = Course.query.filter_by(title='分数的初步认识（AI互动课堂）').first()
+        course_title = f'{topic}（AI互动课堂）'[:128]
+        course = Course.query.filter_by(title=course_title, category=subject, tenant_id=tenant_id).first()
         if not course:
-            course = Course(title='分数的初步认识（AI互动课堂）', category='小学数学', stage='综合12 · AI课堂',
-                description='三年级：平均分、几分之一、同一整体', is_active=True)
+            course = Course(title=course_title, category=subject, tenant_id=tenant_id, stage='AI课堂',
+                description=f'自定义课堂：{topic}', is_active=True)
             db.session.add(course)
             db.session.flush()
-        from tenancy import tenant_id_for_request
-        tenant_id = tenant_id_for_request(db.session.get(User, uid))
         session = TrainingSession(user_id=uid, tenant_id=tenant_id, course_id=course.id, status='in_progress',
             progress_percent=0, duration_minutes=0, started_at=datetime.utcnow(), last_trained_at=datetime.utcnow())
         db.session.add(session)
         db.session.flush()
-        room = Classroom(session_id=session.id, user_id=uid, tenant_id=tenant_id, mode=mode_value,
+        room = Classroom(session_id=session.id, user_id=uid, tenant_id=tenant_id, mode=mode_value, topic=topic,
                          cloud_vision=data.get('cloud_vision') is True)
         db.session.add(room)
         if plan:
@@ -207,6 +221,37 @@ def create():
 def history():
     return jsonify(items=[serialize(r) for r in Classroom.query.filter_by(user_id=int(get_jwt_identity()))
                          .order_by(Classroom.started_at.desc()).limit(50).all()])
+
+
+@bp.post('/sessions/<int:sid>/mm-tba')
+@jwt_required()
+def run_mm_tba(sid):
+    room = owned(sid)
+    if room.state != 'ended':
+        return jsonify(message='请先完成课堂并保存本机录像'), 409
+    limit = 260 * 1024 * 1024
+    incoming_dir = Path(current_app.instance_path) / 'mm-tba' / 'incoming'
+    incoming_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        _, form, files = parse_form_data(request.environ, max_content_length=limit, silent=False,
+            stream_factory=lambda **_: tempfile.TemporaryFile(mode='w+b', dir=incoming_dir))
+    except RequestEntityTooLarge:
+        return jsonify(message='录像超过260 MB，无法分析'), 413
+    segments = validate_segments(form.get('segments'))
+    upload = files.get('file')
+    if not segments or not upload or not upload.filename or not upload.filename.lower().endswith(('.mp4', '.webm')):
+        return jsonify(message='请提供已保存的 MP4/WebM 录像及时间映射'), 400
+    output_dir = Path(current_app.instance_path) / 'mm-tba' / str(sid) / uuid.uuid4().hex
+    output_dir.mkdir(parents=True, exist_ok=True)
+    video_path = output_dir / ('recording.mp4' if upload.filename.lower().endswith('.mp4') else 'recording.webm')
+    upload.save(video_path)
+    if video_path.stat().st_size > limit:
+        video_path.unlink(missing_ok=True)
+        return jsonify(message='录像超过260 MB，无法分析'), 413
+    if not start_mm_tba(current_app._get_current_object(), sid, video_path, output_dir, segments):
+        video_path.unlink(missing_ok=True)
+        return jsonify(message='本节课堂已有 MM-TBA 分析任务'), 409
+    return jsonify(status='running', message='MM-TBA 已开始分析'), 202
 
 
 @bp.get('/practice-plans')

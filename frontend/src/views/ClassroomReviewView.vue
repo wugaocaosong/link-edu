@@ -16,8 +16,11 @@ const room=ref(null), history=ref([]), loading=ref(true), busy=ref(false), error
 const historyLoading=ref(false);
 const archiveSceneElement=ref(null);
 const archivePaperOverlay=ref(null);
-const archivePapersVisible=ref(false);
-const archiveBagDone=ref(false);
+const archiveOpeningSeenKey='link.archive-opening-seen.v1';
+function hasSeenArchiveOpening(){try{return localStorage.getItem(archiveOpeningSeenKey)==='true'}catch{return false}}
+const archiveAlreadyOpened=hasSeenArchiveOpening();
+const archivePapersVisible=ref(archiveAlreadyOpened);
+const archiveBagDone=ref(archiveAlreadyOpened);
 const archiveBagResetKey=ref(0);
 const archiveVideoStarted=ref(false), archiveVideoVisible=ref(false), archiveOpeningVideo=ref(null);
 let archiveVideoEndTimer=null;
@@ -44,7 +47,8 @@ watch(archiveSceneOnly, isSceneOnly=>{
     clearTimeout(archiveVideoEndTimer);
     archiveOpeningVideo.value?.pause();
     archiveVideoStarted.value=false;archiveVideoVisible.value=false;
-    archivePapersVisible.value=false;archiveBagDone.value=false;
+    const seen=hasSeenArchiveOpening();
+    archivePapersVisible.value=seen;archiveBagDone.value=seen;
   }
 });
 async function playArchiveOpening(){
@@ -61,6 +65,7 @@ function resetArchiveOpening(){
 }
 function finishArchiveOpening(){
   if(!archiveVideoStarted.value)return;
+  try{localStorage.setItem(archiveOpeningSeenKey,'true')}catch{}
   archivePapersVisible.value=true;archiveBagDone.value=true;archiveVideoVisible.value=false;
   archiveOpeningVideo.value?.pause();
   clearTimeout(archiveVideoEndTimer);
@@ -187,7 +192,7 @@ onBeforeUnmount(()=>{disposed=true;requestId++;controller?.abort();clearTimeout(
       <SceneLink direction="right" v-if="archiveSceneOnly" class="archive-desk-return" to="/courses" aria-label="返回办公桌">
         <img src="/assets/desk/wood-arrow.webp" alt="" />
       </SceneLink>
-      <video v-if="archiveSceneOnly && archiveVideoStarted" ref="archiveOpeningVideo" class="archive-opening-video" :class="{'is-visible':archiveVideoVisible}" src="/assets/archive-opening.mp4" playsinline preload="auto" @ended="finishArchiveOpening" @error="resetArchiveOpening" />
+      <video v-if="archiveSceneOnly && archiveVideoStarted" ref="archiveOpeningVideo" class="archive-opening-video" :class="{'is-visible':archiveVideoVisible}" src="/assets/archive-opening.mp4?v=muted-20261125" playsinline muted preload="auto" @ended="finishArchiveOpening" @error="resetArchiveOpening" />
       <button v-if="archiveSceneOnly && archiveVideoVisible" type="button" class="archive-video-skip" @click.stop="finishArchiveOpening">跳过视频</button>
     </div>
     <template v-if="!archiveSceneOnly">
@@ -201,7 +206,7 @@ onBeforeUnmount(()=>{disposed=true;requestId++;controller?.abort();clearTimeout(
       <template v-if="room">
         <div class="review-session-meta"><span>课堂 #{{ room.session_id }} · {{ room.topic }}</span><span>{{ formatReportDate(room.created_at) }} · {{ formatReportTime(Number.isFinite(room.elapsed)?room.elapsed*1000:NaN) }}</span></div>
         <section v-if="['active','paused'].includes(room.state)" class="review-empty-state"><h2>这节课堂还未结束</h2><p>课堂结束后再根据已保存的证据整理教练反馈。</p><router-link class="review-button" :to="classroomDestination(room)">返回课堂</router-link></section>
-        <ClassroomReport v-else :room="room" :busy="busy" @regenerate="regenerate" @plans-created="loadRoom(room.session_id)" @refresh="initialize" @print="printReport" />
+        <ClassroomReport v-else :room="room" :busy="busy" @regenerate="regenerate" @plans-created="loadRoom(room.session_id)" @refresh="loadRoom(room.session_id)" @print="printReport" />
       </template>
     </template>
   </div>

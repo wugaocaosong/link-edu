@@ -94,6 +94,7 @@
 .report-score-ring strong{font-size:58px;line-height:1.1;font-weight:650;letter-spacing:-.07em;font-variant-numeric:tabular-nums;}.report-score-ring span{font-size:10px;color:var(--review-muted);margin-top:6px;}
 .report-score-block>p{font-size:11px;color:var(--review-muted);margin-top:12px;}.report-score-block b{color:var(--review-accent);}
 .report-overview-note{border-left:1px solid var(--review-line);padding-left:24px;}.report-overview-note h3{font-size:12px;}.report-overview-note p{font-size:11px;color:var(--review-muted);margin-top:10px;line-height:1.85;}
+.report-data-gaps{border-color:#d4a36666;background:linear-gradient(120deg,#d4a36612,transparent 60%),var(--review-bg);}.report-data-gaps h3{margin:0 0 8px;font-size:15px;color:var(--review-ink);}.report-data-gaps p,.report-data-gaps li{font-size:13px;line-height:1.75;color:var(--review-muted);}.report-data-gaps ul{margin:10px 0 0;padding-left:20px;}.report-data-gaps li+li{margin-top:6px;}.report-data-gaps strong{color:var(--review-ink);}
 .report-metrics{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--review-line);border-radius:12px;margin-top:12px;background:var(--review-bg);}
 .report-metrics>div{padding:17px 24px;display:flex;align-items:center;justify-content:space-between;gap:10px;}.report-metrics>div+div{border-left:1px solid var(--review-line);}.report-metrics span{font-size:11px;color:var(--review-muted);}.report-metrics strong{font-size:26px;font-weight:550;letter-spacing:-.04em;font-variant-numeric:tabular-nums;}.report-metrics small{font-size:10px;margin-left:5px;font-weight:400;color:var(--review-muted);}
 .report-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;}.report-section-title h2{margin-top:7px;}.report-section-title>span{font-size:11px;color:var(--review-muted);}
@@ -148,6 +149,7 @@
 .report-main-column{display:flex;flex-direction:column;min-height:0;overflow:hidden;}
 .report-main-column>.report-video-panel{flex:0 1 auto;}
 .report-main-column>.report-overview{flex:1 1 auto;min-height:190px;overflow:hidden;}
+.report-main-column:has(.report-video-panel):not(:has(video))>.report-overview{flex:0 0 auto;min-height:0;}
 .report-main-column>.report-overview .report-intro>p:not(.review-eyebrow),.report-main-column>.report-overview-note p:nth-of-type(2){display:none;}
 .report-main-column>.report-overview .report-overview-note{padding-left:18px;}
 .coach-summary{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;min-height:112px;border-left:1px solid var(--review-line);border-right:1px solid var(--review-line);padding:8px 16px;}

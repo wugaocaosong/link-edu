@@ -11,12 +11,39 @@ import re
 from services.classroom_learning import route_intent
 
 
-VERSION = 'teaching-behavior-1'
+VERSION = 'teaching-behavior-2'
 FOLLOWUP = re.compile(r'为什么|怎么|如何|依据|理由|再说|再解释|能举|举个例|你是怎样')
 FEEDBACK = re.compile(r'很好|说得对|答对|不对|补充|纠正|更准确|注意|刚才你|你的回答')
 SUMMARY = re.compile(r'总结|小结|今天我们|这节课|最后回顾|回顾一下')
 BOARD_POSITIVE = re.compile(r'(可见|看到|写有|展示|显示|呈现).{0,10}(板书|黑板|白板)|(板书|黑板|白板).{0,10}(可见|写有|显示|呈现)')
 BOARD_NEGATIVE = re.compile(r'(未见|未能|没有|无|看不清|无法辨认|不可见|被遮挡).{0,8}(板书|黑板|白板)|(板书|黑板|白板).{0,4}(不可见|被遮挡|看不清)')
+VISIBLE_ACTIONS = {'writing': 'teacher_writing_observation',
+                   'pointing': 'teacher_pointing_observation',
+                   'facial_expression': 'facial_appearance_observation'}
+
+
+def sanitize_visible_actions(value):
+    """Keep only short, validated labels grounded in a sampled frame."""
+    if not isinstance(value, list):
+        return []
+    result = []
+    for item in value[:3]:
+        if not isinstance(item, dict) or item.get('action') not in VISIBLE_ACTIONS:
+            continue
+        status = item.get('status')
+        if status not in ('observed', 'possible', 'unobservable'):
+            continue
+        description = re.sub(r'\s+', ' ', str(item.get('description') or '')).strip()[:240]
+        confidence = item.get('confidence')
+        if type(confidence) not in (int, float) or not math.isfinite(confidence):
+            confidence = None
+        else:
+            confidence = round(max(0.0, min(1.0, float(confidence))), 2)
+        if not description:
+            continue
+        result.append({'action': item['action'], 'status': status,
+                       'description': description, 'confidence': confidence})
+    return result
 
 
 def _valid(event):
@@ -140,6 +167,14 @@ def analyze_behaviors(events):
                     segments.append(_segment('board_speech_context', [teacher, event],
                         detail=str(teacher['data'].get('text') or '')[:160],
                         limitations=['教师发言与板书采样仅时间邻近，不证明二者语义一致。']))
+            for action in sanitize_visible_actions(data.get('visible_actions')):
+                if action['status'] == 'unobservable':
+                    continue
+                label = {'observed': '观察到', 'possible': '疑似'}[action['status']]
+                segments.append(_segment(VISIBLE_ACTIONS[action['action']], [event],
+                    detail=f"{label}：{action['description']}",
+                    limitations=['每15秒最多采样一帧，只代表该瞬间，不表示持续时长或行为意图。',
+                                  '面部描述仅为可见外观，不判断情绪、正常与否或教学质量。']))
         elif event.get('type') == 'pose' and event['data'].get('motion_version') == 2:
             data = event['data']
             if not any(isinstance(data.get(name), dict) and data[name].get('status') == 'observed'

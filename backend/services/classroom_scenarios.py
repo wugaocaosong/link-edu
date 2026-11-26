@@ -38,5 +38,18 @@ def supported_concepts(text):
     return found
 
 
-def scenario_brief():
-    return {key: FRACTIONS[key] for key in ('id', 'version', 'topic', 'grade', 'objective', 'concepts', 'students')}
+def scenario_brief(topic=None, subject='小学数学'):
+    topic = str(topic or FRACTIONS['topic']).strip()[:128] or FRACTIONS['topic']
+    if subject == '小学数学' and topic == FRACTIONS['topic']:
+        return {key: FRACTIONS[key] for key in ('id', 'version', 'topic', 'grade', 'objective', 'concepts', 'students')}
+    return {
+        'id': 'generic-classroom-v1', 'version': 1, 'topic': topic,
+        'subject': str(subject or '其他')[:64], 'grade': '按授课者填写',
+        'objective': f'围绕《{topic}》的课程目标组织课堂；系统不预设学科知识点或标准答案。',
+        'concepts': {},
+        'students': {
+            'ming': {'focus': '好奇，喜欢追问理由；只依据老师已经讲过的内容回应'},
+            'yu': {'focus': '可能对新概念理解不完整；需要老师提供线索后再修正'},
+            'lin': {'focus': '较少主动发言，点名后用简短语言表达当前理解'},
+        },
+    }

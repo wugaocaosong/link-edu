@@ -1,0 +1,98 @@
+{
+  "sample_type": "合成测试数据，不对应任何真实参与者或真实测评录像",
+  "rubric_version": "fraction-blind-1",
+  "results": [
+    {
+      "clip_id": "J6W2R9",
+      "status": "pending_second_rater",
+      "rater_totals": {
+        "R1": 13.0,
+        "R2": null
+      },
+      "coordinator_mean_total": null,
+      "dimension_means_by_rater": {
+        "R1": {
+          "概念指向": 4.0,
+          "理解诊断": 3.0,
+          "追问承接": 3.0,
+          "解释调整": 3.0
+        },
+        "R2": null
+      },
+      "missing_opportunities_by_rater": {
+        "R1": [],
+        "R2": null
+      },
+      "submission_times": {
+        "R1": "synthetic-submit-r1-c",
+        "R2": null
+      }
+    },
+    {
+      "clip_id": "K7M4Q2",
+      "status": "complete",
+      "rater_totals": {
+        "R1": 15.0,
+        "R2": 15.5
+      },
+      "coordinator_mean_total": 15.25,
+      "dimension_means_by_rater": {
+        "R1": {
+          "概念指向": 4.5,
+          "理解诊断": 3.5,
+          "追问承接": 3.5,
+          "解释调整": 3.5
+        },
+        "R2": {
+          "概念指向": 4.5,
+          "理解诊断": 4.0,
+          "追问承接": 3.5,
+          "解释调整": 3.5
+        }
+      },
+      "missing_opportunities_by_rater": {
+        "R1": [],
+        "R2": []
+      },
+      "submission_times": {
+        "R1": "synthetic-submit-r1-a",
+        "R2": "synthetic-submit-r2-a"
+      }
+    },
+    {
+      "clip_id": "N8V5C3",
+      "status": "incomplete_key_opportunity",
+      "rater_totals": {
+        "R1": null,
+        "R2": null
+      },
+      "coordinator_mean_total": null,
+      "dimension_means_by_rater": {
+        "R1": {
+          "概念指向": 3.0,
+          "理解诊断": 3.0,
+          "追问承接": 2.0,
+          "解释调整": 3.0
+        },
+        "R2": {
+          "概念指向": 3.0,
+          "理解诊断": 2.0,
+          "追问承接": 3.0,
+          "解释调整": 3.0
+        }
+      },
+      "missing_opportunities_by_rater": {
+        "R1": [
+          2
+        ],
+        "R2": [
+          2
+        ]
+      },
+      "submission_times": {
+        "R1": "synthetic-submit-r1-b",
+        "R2": "synthetic-submit-r2-b"
+      }
+    }
+  ]
+}
