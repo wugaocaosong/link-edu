@@ -104,6 +104,7 @@ async function openTools(){
 
     <!-- 本周训练 -->
     <button type="button" class="note hit" data-note="weekly" :style="[box(POS.weekly.box),{zIndex:POS.weekly.z}]"
+      data-assistant-detail="weekly" :data-assistant-value="`本周训练 ${weekly?.sessions ?? 0} 次，累计 ${weekly?.total_minutes ?? 0} 分钟。`"
       aria-label="本周训练：查看训练日志" @click="$emit('panel','weekly')"><img :src="noteImg('weekly')" alt="" /></button>
 
     <!-- 中间小猫便签（压住继续训练，层级最高） -->

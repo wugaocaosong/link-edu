@@ -110,6 +110,8 @@ export function eventLabel(event) {
       student: event.data.name || "学生",
       question: "学生举手",
       vision: "画面观察",
+      mm_tba_action: "MM-TBA 动作预测",
+      mm_tba_status: "MM-TBA 分析状态",
       pose: "动作观察",
       interrupt: "已打断",
       correction: "评课补充",
@@ -129,12 +131,18 @@ export function eventLabel(event) {
 
 export function eventText(event) {
   const data = event.data;
+  if(event.type==='mm_tba_action')return `${data.label} · 置信度 ${data.confidence} · 请回看录像核对`;
   if (event.type === 'pose' && data.motion_version === 2)
     return motionLabels(data).join(' · ') || '动作证据不足（未检测到、遮挡或模型不可用）';
   if (event.type === 'student_state_transition')
     return `${{ming:'小明',yu:'小雨',lin:'小林'}[data.student_id] || '虚拟学生'}：${data.after?.understanding || '状态已更新'}（仅供训练复盘）`;
   if (event.type === 'teacher_speech_start') return '语音活动开始（ASR 检测）';
   if (event.type === 'teacher_speech_stop') return `语音活动结束（约 ${data.speech_seconds ?? '未知'} 秒）`;
+  if (event.type === 'vision' && Array.isArray(data.visible_actions) && data.visible_actions.length) {
+    const labels = { writing: '书写', pointing: '指向', facial_expression: '面部外观' };
+    const statuses = { observed: '观察到', possible: '疑似', unobservable: '不可辨' };
+    return data.visible_actions.map((item) => `${statuses[item.status] || ''}${labels[item.action] || '画面线索'}：${item.description}`).join('；');
+  }
   if (data.text || data.observations || data.objection || data.message)
     return data.text || data.observations || data.objection || data.message;
   if (event.type === "latency") return `${data.latency_ms} ms`;

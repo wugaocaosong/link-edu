@@ -33,7 +33,7 @@
       <template v-if="dashboardStatus === 'ready'">
       <section class="glass weekly" role="button" tabindex="0" @click="openPanel('weekly')" @keydown.enter="openPanel('weekly')" @keydown.space.prevent="openPanel('weekly')">
         <h3>本周训练</h3>
-        <strong>{{ weekly.sessions }}<small> 次</small></strong>
+        <strong data-assistant-detail="weekly" :data-assistant-value="`本周训练 ${weekly.sessions} 次，累计 ${weekly.total_minutes} 分钟。`">{{ weekly.sessions }}<small> 次</small></strong>
         <span>累计 {{ weekly.total_minutes }} 分钟</span>
         <div class="spark">
           <i v-for="(height, index) in weekly.sparkline" :key="index" :style="{ height: `${height}px` }"></i>

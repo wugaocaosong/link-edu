@@ -19,6 +19,7 @@
     "@vueuse/core": "^14.4.0",
     "axios": "^1.7.9",
     "echarts": "^6.1.0",
+    "fflate": "0.8.2",
     "gsap": "^3.13.0",
     "motion-v": "^2.4.0",
     "naive-ui": "^2.40.3",

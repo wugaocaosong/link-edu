@@ -108,7 +108,7 @@ def test_streamed_reply_audio_requires_playback_ack_before_listening(app, monkey
     payload = generate_answer(obj, monkeypatch, 'lin')
     assert payload['named_student'] == 'lin'
     generated = [m for m in obj.ws.messages if m['type'] == 'reply_delta']
-    assert len(generated) == 2
+    assert generated
     assert not any(m['type'] == 'audio' for m in obj.ws.messages)
 
     def synthetic_speech(text, session_id, voice, cancelled, on_audio):

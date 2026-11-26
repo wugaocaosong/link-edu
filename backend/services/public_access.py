@@ -3,6 +3,7 @@ from collections import OrderedDict, deque
 from datetime import datetime, timedelta
 import threading
 import time
+from urllib.parse import urlsplit
 from flask import current_app, request, jsonify
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from classroom_models import Classroom
@@ -35,6 +36,29 @@ def public_budget(value):
     return {key: bool(value.get(key)) for key in ('stopped', 'warning', 'pricing_confirmed')}
 
 
+def hostname_of(value):
+    text = (value or '').strip()
+    if not text:
+        return ''
+    if '://' not in text:
+        text = '//' + text
+    return (urlsplit(text).hostname or '').lower().rstrip('.')
+
+
+def origin_allowed(app):
+    origin = (request.headers.get('Origin') or '').strip()
+    if not origin:
+        return True
+    allowed = {item.strip().rstrip('/') for item in app.config.get('PUBLIC_ORIGINS', []) if item.strip()}
+    if origin.rstrip('/') in allowed:
+        return True
+    parts = urlsplit(origin)
+    if parts.scheme not in ('http', 'https'):
+        return False
+    site = request.host or request.headers.get('X-Forwarded-Host') or ''
+    return bool(hostname_of(origin) and hostname_of(origin) == hostname_of(site.split(',')[0]))
+
+
 def install_policy(app):
     # Bounded process-local windows are sufficient because production has exactly one worker.
     windows, guard = OrderedDict(), threading.Lock()
@@ -46,6 +70,8 @@ def install_policy(app):
             return
         if request.method in ('POST', 'PATCH', 'PUT'):
             limit = app.config.get('MAX_CONTENT_LENGTH') or 2000000
+            if request.endpoint == 'classroom.run_mm_tba':
+                limit = 260 * 1024 * 1024
             if request.endpoint == 'rag.upload_document':
                 from rag.settings import load_settings
                 try:
@@ -59,8 +85,7 @@ def install_policy(app):
                 return jsonify(message='请求必须是JSON对象'), 400
         if request.method == 'OPTIONS':
             return
-        origin = request.headers.get('Origin')
-        if origin and origin not in app.config.get('PUBLIC_ORIGINS', []):
+        if not origin_allowed(app):
             return jsonify(message='不允许的页面来源'), 403
         # Paid legacy review routes bypass the classroom ledger and are unavailable in public mode.
         if request.path == '/api/classroom/probe' or (request.method == 'POST' and

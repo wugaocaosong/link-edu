@@ -1,0 +1,39 @@
+{
+  "record_type": "ordinary_classroom_demo",
+  "display_name": "第35节《分数的初步认识》",
+  "formal_study_session_link": null,
+  "participant_assignment": "not_applicable: demo classroom, no formal study session",
+  "stage_and_group": "not_applicable; not inferred",
+  "self_review_and_revision_goal": "not_applicable; not fabricated",
+  "blind_scores": "not_applicable; no human blind-rating record",
+  "capture_summary": {
+    "teacher_finalized_segments": {"count": 64, "source": "第35节课堂实验数据核查.md; ordinary classroom final transcript events"},
+    "student_reply_generated": {"count": 16, "source": "第35节课堂实验数据核查.md; generation records"},
+    "playback_started": {"count": 0, "source": "no recorded playback_started receipts; do not backfill from generation or completion"},
+    "playback_completed": {"count": 16, "source": "第35节课堂实验数据核查.md; playback completion receipts"},
+    "hand_visibility": {"observed_samples": 15, "total_samples": 263, "rate": 0.057034, "source": "local action samples as stated in the check memo", "interpretation": "sample coverage only; not teaching quality or share of lesson time"},
+    "body_visibility": {"observed_samples": 262, "total_samples": 263},
+    "face_visibility": {"observed_samples": 262, "total_samples": 263},
+    "cloud_vision_samples": 0
+  },
+  "response_chain": [
+    {"sequence": 1, "timecode": "1:08", "speaker": "teacher", "event_id": 1427, "quote": "嗯，同学说的很好，那这个1/2代表的是一张纸的多少面积呢？", "source": "original PDF page 5 timeline; reported event/time; recording not independently checked"},
+    {"sequence": 2, "timecode": "1:10", "speaker": "student", "event_id": 1429, "quote": "老师，不是把纸平均分成两份，其中一份就是1/2？", "source": "original PDF page 5 timeline; reported event/time; completion receipt event 1434 at 1:16; playback start missing"},
+    {"sequence": 3, "timecode": "1:23", "speaker": "teacher", "event_id": 1441, "quote": "是的，这位同学回答的非常好，我们要强调的就是平均这个概念，", "source": "original PDF page 5 timeline; reported event/time; recording not independently checked"}
+  ],
+  "still_requires_video_review": [
+    "Verify words, speaker attribution, and all timeline points against original audio/video.",
+    "Check whether the teacher actually compared or folded the two parts; text and motion samples cannot establish that action.",
+    "Check whether the student then demonstrated understanding of equal-sized parts.",
+    "No playback start time is available for the 16 completed student responses."
+  ],
+  "provenance": {
+    "check_memo": "User-provided 第35节课堂实验数据核查.md",
+    "original_report": "User-provided 分数的初步认识-第35节课堂评课报告(1).pdf, 13 pages; retain original separately",
+    "input_sha256": null,
+    "model_version": "not recorded in source report",
+    "rubric_version": "ordinary report identifies CLASS-Secondary reference; exact frozen study rubric is not applicable",
+    "template_version": "not recorded in source report",
+    "formal_report_issue_time": null
+  }
+}

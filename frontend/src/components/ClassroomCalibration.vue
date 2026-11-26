@@ -1,7 +1,7 @@
 <script setup>
 import {ref,computed,watch,onBeforeUnmount} from 'vue';
 import {calibrationSummary,CALIBRATION_LABELS} from '../services/classroomCalibration.js';
-const props=defineProps({enabled:Boolean,active:Boolean,motion:Object});
+const props=defineProps({enabled:Boolean,active:Boolean,motion:Object,study:Boolean});
 const samples=ref([]),remaining=ref(0),dismissed=ref(false);
 let timer;
 const summary=computed(()=>calibrationSummary(samples.value));
@@ -15,7 +15,8 @@ onBeforeUnmount(stop);
   <section v-if="enabled && !active && !dismissed" class="calibration" aria-label="开课取景校准">
     <header><strong>取景检查</strong><span role="status" aria-live="polite">{{ remaining?`${remaining} 秒`:'检查完成，可继续授课' }}</span></header>
     <div class="calibration-modalities"><span v-for="(label,key) in {body:'身体',hands:'手势',face:'面部'}" :key="key">{{ label }} · {{ CALIBRATION_LABELS[summary[key].status] || '未知' }}</span></div>
-    <small>坐姿上半身即可。手不在画面内无需调整；不足项仅影响相关评价，不阻止授课。</small>
+    <small v-if="study">把双手和整张纸放进画面，试着折一下或指向其中一份。请主持人从预览确认能看清纸边、折痕和指向，并试听师生双方声音。</small>
+    <small v-else>坐姿上半身即可。手不在画面内无需调整；不足项仅影响相关评价，不阻止授课。</small>
     <footer><button :disabled="remaining>0" @click="start">重新检查</button><button @click="stop();dismissed=true">继续</button></footer>
   </section>
 </template>

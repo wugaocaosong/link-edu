@@ -1,12 +1,14 @@
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 import DraggableResourceCard from "../components/DraggableResourceCard.vue";
 import MarkdownReader from "../components/MarkdownReader.vue";
 import CourseResourceCatalog from "../components/CourseResourceCatalog.vue";
 import { libraryResources } from "../data/libraryResources";
 import { SCENE_OPTIONS, MODULE_OPTIONS, LENGTH_OPTIONS, sceneOf, moduleOf, lengthOf } from "../data/libraryFacets";
 
-const query = ref("");
+const route = useRoute();
+const query = ref(typeof route.query.q === "string" ? route.query.q.slice(0, 200) : "");
 const collection = ref('library');
 const activeCard = ref(libraryResources[0].id);
 const selected = ref(null);
@@ -332,7 +334,12 @@ async function open(item) {
 
 }
 
+function askAboutResource() {
+  window.dispatchEvent(new CustomEvent("link-help", { detail: { reader: readerRef.value } }));
+}
+
 function closeReader() {
+  window.dispatchEvent(new CustomEvent("link-help", { detail: { readerClosed: true } }));
   readerRef.value?.close();
   requestId += 1;
   selected.value = null;
@@ -350,6 +357,11 @@ function handleKeydown(event) {
 watch(selected, (value) => {
   document.body.style.overflow = value ? "hidden" : "";
 });
+
+watch(() => route.query.resource, (id) => {
+  const item = typeof id === "string" && libraryResources.find((resource) => resource.id === id);
+  if (item && selected.value?.id !== item.id) void open(item);
+}, { immediate: true, flush: "post" });
 
 onMounted(() => window.addEventListener("keydown", handleKeydown));
 onUnmounted(() => {
@@ -575,7 +587,7 @@ onUnmounted(() => {
 
     <button v-if="previewBelow" type="button" class="shelf-preview-hint" aria-label="向下查看分类资料预览" @click="revealPreview"><span aria-hidden="true">⌄</span></button>
     <Teleport to="body">
-      <dialog v-if="selected" ref="readerRef" class="reader-mask" :aria-labelledby="`reader-title-${selected.id}`" @cancel.prevent="closeReader" @mousedown.self="closeReader">
+      <dialog v-if="selected" ref="readerRef" data-assistant-reader class="reader-mask" :aria-labelledby="`reader-title-${selected.id}`" @cancel.prevent="closeReader" @mousedown.self="closeReader">
         <section
           class="reader-dialog"
           tabindex="-1"
@@ -583,10 +595,13 @@ onUnmounted(() => {
           <header class="reader-head">
             <div>
               <span>{{ selected.category }} · {{ selected.source }} · {{ selected.year }}</span>
-              <h2 :id="`reader-title-${selected.id}`">{{ selected.title }}</h2>
-              <p>{{ selected.description }}</p>
+              <h2 :id="`reader-title-${selected.id}`" data-assistant-detail="resource-title">{{ selected.title }}</h2>
+              <p data-assistant-detail="resource-summary">{{ selected.description }}</p>
             </div>
-            <button type="button" aria-label="关闭阅读器" autofocus @click="closeReader">×</button>
+            <div class="reader-head__actions">
+              <button type="button" @click="askAboutResource">问阿贝贝</button>
+              <button type="button" aria-label="关闭阅读器" autofocus @click="closeReader">×</button>
+            </div>
           </header>
 
           <div class="reader-body">
@@ -628,7 +643,7 @@ onUnmounted(() => {
             </div>
             <div v-else-if="loading" class="reader-status">正在载入内容...</div>
             <div v-else-if="loadError" class="reader-status is-error">{{ loadError }}</div>
-            <MarkdownReader v-else :content="markdown" />
+            <MarkdownReader v-else data-assistant-detail="resource-summary" :content="markdown" />
           </div>
 
           <footer class="reader-foot">
@@ -1705,6 +1720,19 @@ button.resource-board-card {
 .reader-head button:hover {
   border-color: rgba(255, 151, 72, 0.5);
   color: #ffb67f;
+}
+
+.reader-head__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reader-head__actions button:first-child {
+  width: auto;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 12px;
 }
 
 .reader-body {

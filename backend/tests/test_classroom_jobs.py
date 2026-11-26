@@ -1,3 +1,4 @@
+import pytest
 import threading
 import time
 from extensions import db
@@ -6,6 +7,12 @@ from services import classroom_reports as reports
 from test_classroom_base import app
 from test_classroom_runtime import live
 from test_classroom_api import headers
+
+@pytest.fixture(autouse=True)
+def synthetic_report_context(monkeypatch):
+    monkeypatch.setattr(reports, 'report_theory_context', lambda **kwargs: ([], {}))
+    monkeypatch.setattr(reports, 'chat', lambda *args, **kwargs: {'coaching_focuses': []})
+
 
 def wait_for_report(sid):
     until=time.monotonic()+4
@@ -25,7 +32,8 @@ def test_finish_is_idempotent_and_correction_has_no_fixed_bonus(app,monkeypatch)
     started=threading.Event(); release=threading.Event(); calls=[]
     def fake_chat(*a,**kw):
         calls.append(1);started.set();release.wait(timeout=3)
-        return {'dimensions':[{'key':'clarity','score':70,'reason':'合成单元测试','event_ids':[eid]}]}
+        return {'coaching_focuses': [{'key': 'analysis_inquiry', 'observation': '合成课堂观察',
+            'recommendation': '请学生解释为什么需要平均分。', 'evidence_ids': [eid]}]}
     monkeypatch.setattr(reports,'chat',fake_chat)
     c=app.test_client();url=f'/api/classroom/sessions/{obj.sid}'
     assert c.post(url+'/finish',headers=headers(1)).status_code==202
@@ -33,25 +41,28 @@ def test_finish_is_idempotent_and_correction_has_no_fixed_bonus(app,monkeypatch)
     assert c.post(url+'/finish',headers=headers(1)).status_code==202
     release.set()
     room=wait_for_report(obj.sid)
-    assert len(calls)==1 and room.report_version==1 and room.report['overall_score']==70
+    assert len(calls)==1 and room.report_version==1 and room.report['overall_score'] is None
     first_plan=PracticePlan.query.filter_by(source_session_id=obj.sid,source_report_version=1).one()
     assert first_plan.source_event_ids==[eid] and first_plan.status=='suggested'
     c.post(url+'/finish',headers=headers(1))
     assert len(calls)==1
     c.post(url+'/report',headers=headers(1),json={'objection':'请核对时间20秒'})
     room=wait_for_report(obj.sid)
-    assert len(calls)==2 and room.report_version==2 and room.report['overall_score']==70
+    assert len(calls)==2 and room.report_version==2 and room.report['overall_score'] is None
     db.session.refresh(first_plan)
     assert first_plan.status=='superseded'
     assert PracticePlan.query.filter_by(source_session_id=obj.sid,source_report_version=2).count()==1
     assert ClassroomEvent.query.filter_by(session_id=obj.sid,kind='correction').count()==1
 
-def test_empty_classroom_fails_without_cloud_or_demo(app,monkeypatch):
+def test_empty_classroom_still_generates_report_with_text_only_gaps(app,monkeypatch):
     obj=live(app)
-    monkeypatch.setattr(reports,'chat',lambda *a,**k: (_ for _ in ()).throw(AssertionError('Must not call cloud')))
+    monkeypatch.setattr(reports,'report_theory_context',lambda **k:([],{}))
+    monkeypatch.setattr(reports,'chat',lambda *a,**k:{'coaching_focuses':[]})
     app.test_client().post(f'/api/classroom/sessions/{obj.sid}/finish',headers=headers(1))
     room=wait_for_report(obj.sid)
-    assert room.report_state=='insufficient' and room.report is None and room.report_version==0
+    assert room.report_state=='completed' and room.report is not None and room.report_version==1
+    assert room.report['coaching_focuses']==[]
+    assert room.report['data_readiness']['reasons']
 
 
 def test_failed_report_needs_explicit_retry_not_repeated_finish(app, monkeypatch):

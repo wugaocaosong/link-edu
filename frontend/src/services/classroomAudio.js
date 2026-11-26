@@ -17,6 +17,7 @@ export class ClassroomAudio {
   setVolume(value) {
     if (typeof value !== 'number' || !Number.isFinite(value)) return;
     this.volume = Math.max(0, Math.min(1, value));
+    if (this.reply && this.volume===0) this.mutedDuringReply=true;
     this.outputGain?.gain.setTargetAtTime(this.volume, this.ctx.currentTime, .02);
   }
   recordingStream() {
@@ -93,6 +94,7 @@ export class ClassroomAudio {
       this.reply = id;
       this.endAt = this.ctx.currentTime + 0.06;
       this.first = true;
+      this.mutedDuringReply = this.volume===0;
     }
     const raw = Uint8Array.from(atob(encoded), (x) => x.charCodeAt(0));
     const view = new DataView(raw.buffer);
@@ -109,8 +111,11 @@ export class ClassroomAudio {
       clearTimeout(this.playingTimer);
       this.playingTimer = setTimeout(
         () => {
-          if (!this.disposed && !this.cancelled.has(id) && this.reply === id)
+          if (!this.disposed && !this.cancelled.has(id) && this.reply === id) {
+            if (this.ctx.state && this.ctx.state!=='running') this.mutedDuringReply=true;
+            this.send('playback_onset',{reply_id:id});
             this.onPlayback(id, "playing");
+          }
         },
         Math.max(0, start - this.ctx.currentTime) * 1000,
       );
@@ -146,9 +151,11 @@ export class ClassroomAudio {
         if (!this.disposed && !this.cancelled.has(id)) {
           // Terminal replies must not be replayed or acknowledge completion twice.
           this.cancelled.add(id);
-          this.onPlayback(id, ok && this.reply === id ? "done" : "failed");
+          const completed=ok && this.reply===id && !this.mutedDuringReply &&
+            (!this.ctx.state || (this.ctx.state==='running' && this.ctx.currentTime>=this.endAt));
+          this.onPlayback(id, completed ? "done" : "failed");
           this.send(
-            ok && this.reply === id ? "playback_done" : "playback_failed",
+            completed ? "playback_done" : "playback_failed",
             { reply_id: id },
           );
           if (this.reply === id) this.reply = null;

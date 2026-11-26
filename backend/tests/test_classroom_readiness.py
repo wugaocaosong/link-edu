@@ -34,13 +34,15 @@ def test_report_gate_all_reasons_and_success():
     empty = report_readiness([], 9)
     assert not empty['eligible']
     assert {c['key'] for c in empty['checks'] if not c['passed']} == {'duration', 'transcript', 'interaction', 'motion', 'scene'}
+    missing = report_readiness([], 30)
+    assert missing['eligible'] and len(missing['reasons']) == 4
     good = report_readiness(sufficient_events(), 30)
     assert good['eligible'] and good['reasons'] == []
     assert good['scene_mode'] == 'local_teacher_frame'
 
 
 @pytest.mark.parametrize('kind', ['missing_playback', 'interrupted', 'failed', 'too_short', 'future', 'low_confidence', 'multiple', 'cloud_missing'])
-def test_report_gate_cannot_treat_failed_or_missing_evidence_as_sufficient(kind):
+def test_missing_or_failed_evidence_is_a_textual_gap_not_a_report_gate(kind):
     events = sufficient_events()
     if kind == 'missing_playback': events = [e for e in events if e['type'] != 'playback']
     if kind in ('interrupted', 'failed'):
@@ -55,10 +57,10 @@ def test_report_gate_cannot_treat_failed_or_missing_evidence_as_sufficient(kind)
         for e in events:
             if e['type'] == 'pose': e['data']['body']['status'] = kind
     result = report_readiness(events, 30, cloud_vision=kind == 'cloud_missing')
+    assert result['eligible']
+    assert result['reasons'] or kind in ('low_confidence', 'multiple')
     if kind in ('low_confidence', 'multiple', 'cloud_missing'):
-        assert result['eligible'] and not result['dimension_eligibility']['posture']
-    else:
-        assert not result['eligible']
+        assert not result['dimension_eligibility']['posture']
 
 
 def test_empty_or_invalid_cloud_observations_do_not_count():
@@ -90,21 +92,22 @@ def test_finish_ten_seconds_enforced_for_rest_and_websocket(app):
     assert obj.finish_requested
 
 
-def test_insufficient_report_does_not_schedule_job_search_or_model(app, monkeypatch):
+def test_missing_evidence_is_reported_but_does_not_block_generation(app, monkeypatch):
     obj = live(app)
-    def forbidden(*args, **kwargs): raise AssertionError('Insufficient evidence must not reach paid work')
-    monkeypatch.setattr(reports, 'chat', forbidden)
-    monkeypatch.setattr(reports, 'search', forbidden)
+    readiness = report_readiness([], 30, False)
+    assert readiness['eligible'] is True
+    assert len(readiness['reasons']) == 4
+    monkeypatch.setattr(reports, 'report_theory_context', lambda **kwargs: ([], {}))
+    monkeypatch.setattr(reports, 'chat', lambda *args, **kwargs: {'coaching_focuses': []})
     url = f'/api/classroom/sessions/{obj.sid}'
     client = app.test_client()
     client.post(url + '/finish', headers=headers(1))
-    row = db.session.get(Classroom, obj.sid)
-    assert row.report_state == 'insufficient' and row.report is None and row.report_version == 0
-    assert obj.sid not in reports.jobs
     data = client.get(url, headers=headers(1)).json
     assert len(data['report_readiness']['reasons']) == 4
-    client.post(url + '/report', headers=headers(1), json={'objection': '直接给我满分'})
-    assert row.report_state == 'insufficient' and row.report is None
+    from test_classroom_jobs import wait_for_report
+    row = wait_for_report(obj.sid)
+    assert row.report_state == 'completed' and row.report is not None
+    assert row.report['data_readiness']['reasons']
 
 
 def test_camera_consent_is_required_before_creating_session(app):

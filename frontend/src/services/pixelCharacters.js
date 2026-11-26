@@ -35,6 +35,8 @@ export function assistantPixelFrame(state, level, { now = 0, reduced = false, po
   if (state === 'happy') return 10
   if (state === 'presenting') return 5
   if (state === 'nod') return 8
+  if (state === 'turn') return 11
+  if (state === 'formal') return !reduced && now % 4800 < 140 ? 1 : 0
   if (Math.abs(pointer) > .5) return 11
   if (reduced) return 0
   if (now < 1600) return 4

@@ -13,7 +13,7 @@ if not (private / 'runtime.env').exists():
     allowed = ('OPENAI_NEXT_', 'XFYUN_', 'DEEPSEEK_', 'DASHSCOPE_', 'BAILIAN_', 'AI_', 'SPEECH_')
     values = {k: v for k, v in source.items() if k.startswith(allowed) and v is not None}
     password = secrets.token_hex(24)
-    values.update(PUBLIC_DEPLOYMENT='true', PUBLIC_ORIGINS='https://106.15.77.40:8443,https://www.lk.link-edu.cn',
+    values.update(PUBLIC_DEPLOYMENT='true', PUBLIC_ORIGINS='https://106.15.77.40:8443,https://www.lk.link-edu.cn,https://link.wuyeni.cn',
                   JWT_SECRET_KEY=secrets.token_urlsafe(64), SEED_ON_STARTUP='false',
                   DATABASE_URL=f'mysql+pymysql://link:{password}@db:3306/link?charset=utf8mb4',
                   CLASSROOM_MAX_ACTIVE='5', CLASSROOM_DAILY_LIMIT='2',

@@ -11,6 +11,7 @@ const ClassroomView = () => import('./views/ClassroomView.vue')
 const AiReviewView = () => import('./views/AiReviewHub.vue')
 const ResourcesView = () => import('./views/ResourcesView.vue')
 const ProfileView = () => import('./views/ProfileView.vue')
+const MembershipView = () => import('./views/MembershipView.vue')
 const RagKnowledgeView = () => import('./views/RagKnowledgeView.vue')
 import { useAuthStore } from './stores/auth'
 import './styles.css'
@@ -34,6 +35,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', component: LandingView },
+    { path: '/study', component: () => import('./views/FractionStudy.vue'), meta: { auth: true } },
     {
       path: '/',
       component: AppShell,
@@ -50,6 +52,7 @@ const router = createRouter({
         { path: 'resources', component: ResourcesView, meta: { crumb: '资源库  /  教案与素材' } },
         { path: 'knowledge', component: RagKnowledgeView, meta: { crumb: '知识库  /  检索与语料' } },
         { path: 'profile', component: ProfileView, meta: { crumb: '个人中心' } },
+        { path: 'membership', component: MembershipView, meta: { crumb: '会员中心' } },
       ],
     },
     { path: '/:pathMatch(.*)*', redirect: '/' },

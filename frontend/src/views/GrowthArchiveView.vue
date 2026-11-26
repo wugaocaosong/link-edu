@@ -121,7 +121,7 @@
             </p>
 
             <ol v-if="visibleRecords.length" class="growth-record-list">
-              <li v-for="item in visibleRecords" :key="item.id">
+              <li v-for="item in visibleRecords" :key="item.id" data-assistant-detail="training">
                 <button type="button" @click="openRecord(item)">
                   <span class="growth-record__mark" :data-tier="scoreTier(item.overall_score)" aria-hidden="true">
                     {{ scoreMark(item.overall_score) }}
