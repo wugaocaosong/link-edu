@@ -30,7 +30,7 @@ from services.classroom_mm_tba import start_mm_tba, validate_segments
 from services.classroom_clock import timing, transition, clock_lock
 
 bp = Blueprint('classroom', __name__, url_prefix='/api/classroom')
-from services.public_access import capacity, daily_quota, public_mode, public_budget
+from services.public_access import capacity, public_mode, public_budget
 probe_results = {}
 probe_lock = threading.Lock()
 probe_times = {}
@@ -109,7 +109,7 @@ def capabilities():
             'status': probe_results.get(service, {}).get('status', 'unverified') if info['configured'] else 'unconfigured',
             'message': info.get('message') or probe_results.get(service, {}).get('message', '')}
     return jsonify(services=services, budget=public_budget(budget.status()), scenario=scenario_brief(),
-        capacity=capacity(), quota=daily_quota(int(get_jwt_identity())), can_probe=not public_mode(),
+        capacity=capacity(), can_probe=not public_mode(),
         motion_assets={name: (Path(current_app.root_path).parent / 'frontend/public/models' / filename).exists()
                        for name, filename in {'body': 'pose_landmarker_lite.task', 'hands': 'gesture_recognizer.task', 'face': 'face_landmarker.task'}.items()},
         pose_assets=(Path(current_app.root_path).parent / 'frontend/public/models/pose_landmarker_lite.task').exists())
@@ -220,8 +220,6 @@ def create():
             return jsonify(serialize(active)), 200
         if capacity()['available'] == 0:
             return jsonify(message='当前5个课堂名额已满，请稍后重试', code='classroom_capacity'), 503
-        if public_mode() and daily_quota(uid)['remaining_today'] == 0:
-            return jsonify(message='今日体验次数已用完，明天可继续训练', code='daily_quota'), 429
         if public_mode() and budget.status()['stopped']:
             return jsonify(message='体验额度已到停止线，已有报告仍可查看', code='budget_stopped'), 429
         course_title = f'{topic}（AI互动课堂）'[:128]

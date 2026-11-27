@@ -82,7 +82,7 @@ const accounts = computed(() =>
     </details>
     <h3 class="settings-subtitle">额度详情</h3>
     <template v-if="capabilities?.can_probe === false">
-      <p>每日 {{ capabilities?.quota?.daily_limit }} 场，今日剩余 {{ capabilities?.quota?.remaining_today }} 场；每场最长10分钟。</p>
+      <p>每场最长 10 分钟，开放情况以平台容量和总预算为准。</p>
       <p>同时开放 {{ capabilities?.capacity?.limit }} 间课堂，当前空闲 {{ capabilities?.capacity?.available }} 间。</p>
       <p>{{ budget?.stopped ? '体验额度暂已用完，已有报告仍可查看。' : '体验额度由平台提供，以进入课堂时的检查结果为准。' }}</p>
     </template>

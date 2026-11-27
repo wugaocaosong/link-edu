@@ -21,7 +21,6 @@ class Config:
     PUBLIC_DEPLOYMENT = os.getenv('PUBLIC_DEPLOYMENT', '').lower() == 'true'
     PUBLIC_ORIGINS = [v.strip() for v in os.getenv('PUBLIC_ORIGINS', '').split(',') if v.strip()]
     CLASSROOM_MAX_ACTIVE = int(os.getenv('CLASSROOM_MAX_ACTIVE', '5'))
-    CLASSROOM_DAILY_LIMIT = int(os.getenv('CLASSROOM_DAILY_LIMIT', '2'))
     MAX_CONTENT_LENGTH = 2000000
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'link-demo-change-me')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=8)

@@ -1,12 +1,10 @@
 """Small-instance admission and public API policy; no provider calls here."""
 from collections import OrderedDict, deque
-from datetime import datetime, timedelta
 import threading
 import time
 from urllib.parse import urlsplit
 from flask import current_app, request, jsonify
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
-from classroom_models import Classroom
 
 
 def public_mode():
@@ -18,16 +16,6 @@ def capacity():
     with active_lock:
         limit = current_app.config.get('CLASSROOM_MAX_ACTIVE', 5)
         return {'limit': limit, 'active': len(ACTIVE), 'available': max(0, limit - len(ACTIVE))}
-
-
-def daily_quota(uid):
-    # Database timestamps are UTC; the public daily allowance resets at Shanghai midnight.
-    now = datetime.utcnow()
-    start = (now + timedelta(hours=8)).replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(hours=8)
-    limit = current_app.config.get('CLASSROOM_DAILY_LIMIT', 2)
-    used = Classroom.query.filter(Classroom.user_id == uid, Classroom.started_at >= start).count()
-    return {'daily_limit': limit, 'used_today': used, 'remaining_today': max(0, limit - used),
-            'reset_at': (start + timedelta(days=1)).isoformat() + 'Z'}
 
 
 def public_budget(value):
