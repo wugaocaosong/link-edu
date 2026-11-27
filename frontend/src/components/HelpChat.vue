@@ -22,21 +22,13 @@ import { formatInterviewRubric, InterviewOnline } from '../services/interviewOnl
 import { isToolRequest, toolResourceRoute } from '../services/assistantTools.js'
 import { motionEnabled, replyPose } from '../services/assistantPersona.js'
 import { useReducedMotion } from '../utils/useReducedMotion.js'
+import { usageLabel } from '../services/assistantUsage.js'
 const route=useRoute(),router=useRouter()
 const pageLabel=computed(()=>platformPageLabel(route.path))
 const context=inject(classroomHelpKey,ref(null)),auth=useAuthStore()
 const fab=ref(null),panel=ref(null),logRef=ref(null),fullscreenTarget=ref(null)
 const open=ref(false),mode=ref('bot'),query=ref(''),draft=ref(''),sending=ref(false),voice=ref(false),status=ref('idle'),level=ref(0),notice=ref(''),partial=ref('')
 const toolsOpen=ref(false), connectionError=ref('')
-const quota=ref(null)
-async function refreshQuota(){
- const owner=auth.user?.id
- if(!owner)return
- try {
-  const {data}=await api.get('/assistant/quota',{skipBusy:true,timeout:5000})
-  if(owner===auth.user?.id&&Number.isFinite(data?.remaining_cny))quota.value=data
- } catch { /* Keep the last confirmed amount while the API is unavailable. */ }
-}
 const attachment=ref(null), pendingAttachment=ref(null)
 const attachmentUrls=new Set()
 const cardFaces={
@@ -110,11 +102,11 @@ async function selectPractice(id, offline=false){
   const question=await onlineRequest({action:'question',mode:id,topic:topic.value},controller)
   if(controller.signal.aborted)return
   practice.value={id,question:question.question,questionId:question.id,topic:question.topic,online:true,stage:'initial'}
-  messages.value.push({role:'bot',text:`${question.question}\n\n目标口述时长 ${question.target_seconds} 秒`})
- }catch{
+  messages.value.push({role:'bot',text:`${question.question}\n\n目标口述时长 ${question.target_seconds} 秒`,usage:question.usage})
+ }catch(error){
   if(controller.signal.aborted)return
   practice.value=local
-  messages.value.push({role:'bot',text:`离线练习｜${local.message}`})
+  messages.value.push({role:'bot',text:`离线练习｜${local.message}`,usage:error.usage})
  }finally{
   practiceReview=null;sending.value=false;practiceBusy.value=false;onlineDraft.value=''
  }
@@ -155,8 +147,13 @@ async function buildStudyPlan(kind){
  sending.value=true;practiceBusy.value=true;notice.value=''
  try{
   const plan=await onlineRequest({action:'plan',kind,report_id:selectedReport.value},controller)
-  if(!controller.signal.aborted)plans.value=[plan,...plans.value.filter(item=>item.id!==plan.id)]
- }catch{if(!controller.signal.aborted)notice.value='暂时无法生成计划，请重试；已保存的计划不会丢失。'}
+  if(!controller.signal.aborted){
+   plans.value=[plan,...plans.value.filter(item=>item.id!==plan.id)]
+   messages.value.push({role:'bot',text:'备考计划已保存。',usage:plan.usage})
+  }
+ }catch(error){if(!controller.signal.aborted){notice.value='暂时无法生成计划，请重试；已保存的计划不会丢失。'
+  if(error.usage)messages.value.push({role:'bot',text:'计划生成未完成。',usage:error.usage})
+ }}
  finally{planRequest=null;sending.value=false;practiceBusy.value=false;onlineDraft.value=''}
 }
 async function checkStudyPlan(plan, day){
@@ -176,7 +173,7 @@ async function generatePlan(online=false){
  const turn=crypto.randomUUID()
  messages.value.push({role:'user',turn,text:input})
  if(!online){
-  messages.value.push({role:'bot',turn,complete:true,text:lessonPlanFramework(input)})
+  messages.value.push({role:'bot',turn,complete:true,text:lessonPlanFramework(input),free:true})
   return
  }
  const request=planRequest=new AbortController()
@@ -184,15 +181,14 @@ async function generatePlan(online=false){
  practiceBusy.value=true
  try{
   const data=await onlineRequest({action:'framework',brief:input},request)
-  if(!request.signal.aborted&&typeof data?.text==='string')messages.value.push({role:'bot',turn,complete:true,text:data.text})
+  if(!request.signal.aborted&&typeof data?.text==='string')messages.value.push({role:'bot',turn,complete:true,text:data.text,usage:data.usage})
  }catch(error){
   if(!request.signal.aborted){
    notice.value=error.response?.data?.message||'在线润色暂不可用。'
-   messages.value.push({role:'bot',turn,complete:true,text:lessonPlanFramework(input)})
+   messages.value.push({role:'bot',turn,complete:true,text:lessonPlanFramework(input),usage:error.usage})
   }
  }finally{
   if(planRequest===request){planRequest=null;practiceBusy.value=false;sending.value=false;onlineDraft.value=''}
-  void refreshQuota()
  }
 }
 function rememberPractice(result,text){
@@ -345,7 +341,6 @@ const shortcuts=[{key:'prepare',label:'课前准备'},{key:'settings',label:'设
 const matches=computed(()=>{const key=query.value.trim();return faqs.filter(item=>!key||`${item.q}${item.a}`.includes(key))})
 function eventReceived(event){
  if(interviewOnline.receive(event))return
- if(['answer','error','cancel','closed'].includes(event.type))void refreshQuota()
  if(event.type==='level'){level.value=event.level;return}
  if(event.type==='state'){connectionError.value='';status.value=event.state}
  if(event.type==='recognition'){
@@ -373,7 +368,8 @@ function eventReceived(event){
  if(['tool_result','tool_resolution','tool_followup'].includes(event.type)){
   let message=messages.value.find(m=>m.turn===event.turn_id&&m.role==='bot')
   if(!message){messages.value.push({role:'bot',turn:event.turn_id,text:'',complete:false});message=messages.value.at(-1)}
-  if(event.type==='tool_followup'){message.toolFollowup=event.text;react(replyPose(event.text));void refreshQuota();return}
+  if(event.usage)message.usage=event.usage
+  if(event.type==='tool_followup'){message.toolFollowup=event.text;react(replyPose(event.text));return}
   message.tool=event.card
   if(event.card?.status==='failed')react(replyPose('',{failed:true}))
   if(event.card?.name==='quiz_me'&&event.card.question){latestToolQuestion=event.card.question;practice.value=null}
@@ -391,10 +387,13 @@ function eventReceived(event){
   if(event.type==='answer'&&!voice.value)status.value='idle'
   let message=messages.value.find(m=>m.turn===event.turn_id&&m.role==='bot');if(!message){message={role:'bot',turn:event.turn_id,text:''};messages.value.push(message);message=messages.value.at(-1)}
   message.text=event.text;message.sources=event.sources||[];message.complete=event.type==='answer';message.tier=event.tier
+  if(event.usage)message.usage=event.usage
   if(message.complete)react(replyPose(event.text,{tier:event.tier}))
  }
  if(event.type==='cancel'){expirePendingTools();status.value=voice.value?'listening':'idle';level.value=0;const message=messages.value.find(m=>m.turn===event.cancelled_turn_id&&m.role==='bot');if(message&&!message.complete)message.text+='（已停止）'}
- if(event.type==='error'){connectionError.value=event.mode||'';notice.value=event.message;status.value='error';level.value=0;react(replyPose('',{failed:true}));if(!client.session)voice.value=false}
+ if(event.type==='error'){connectionError.value=event.mode||'';notice.value=event.message;status.value='error';level.value=0;react(replyPose('',{failed:true}));if(!client.session)voice.value=false
+  if(event.usage?.calls)messages.value.push({role:'bot',turn:event.turn_id,text:'本次回复未完成。',usage:event.usage})
+ }
  if(event.type==='closed'){expirePendingTools();voice.value=false;status.value='idle';notice.value=event.message;partial.value=''}
 }
 const client=new AssistantClient({api,onEvent:eventReceived,depth:depth.value})
@@ -407,7 +406,7 @@ function stopVoice(message=''){expirePendingTools();pendingAttachment.value=null
 function close(){toolsOpen.value=false;clearTimeout(interruptionTimer);interruptionTimer=null;practiceReview?.abort();planRequest?.abort();clearReaction();stopVoice();open.value=false;nextTick(()=>fab.value?.focus())}
 function toggle(event){if(!suppressClick(event))open.value?close():open.value=true}
 function switchMode(value){practiceReview?.abort();planRequest?.abort();stopVoice();historyOpen.value=false;clearTimeout(interruptionTimer);interruptionTimer=null;practice.value=null;mode.value=value;if(value==='human')notice.value='问题会保存到你的训练日志，不会发送给外部客服'}
-function answer(item){messages.value.push({role:'bot',text:item.a,sources:[{id:'system:'+item.id,title:item.q,source:'LINK 功能说明'}]});react(replyPose(item.a))}
+function answer(item){messages.value.push({role:'bot',text:item.a,free:true,sources:[{id:'system:'+item.id,title:item.q,source:'LINK 功能说明'}]});react(replyPose(item.a))}
 function replay(){if(context.value?.active){notice.value='结束授课后可以重新查看导览';return}close();startTour()}
 function runAction(key){if(key==='call'){answer(faqs.find(x=>x.id==='students'));return}const action=context.value?.actions?.[key];if(action){close();nextTick(action)}}
 async function startVoice(){if(context.value?.active||sending.value)return;historyOpen.value=false;practice.value=null;notice.value='';voice.value=true;mode.value='bot';if(!await client.start('voice',style.value))voice.value=false}
@@ -482,24 +481,25 @@ async function send(){
      if(review.signal.aborted||practice.value!==current)return
      const missing=result.missing.map(index=>({label:`要点 ${index}`,advice:result.citation.points[index-1]}))
      const total=result.citation.points.length
-     next={...current,stage:'complete',message:formatInterviewRubric(result),rubric:result,
+     next={...current,stage:'complete',message:formatInterviewRubric(result),rubric:result,usage:result.usage,
       assessment:{missing,total,covered:total-missing.length},reaction:missing.length?'encourage':'cheer'}
-    }catch{
+    }catch(error){
      if(review.signal.aborted||practice.value!==current)return
      const local=startInterview(current.id,current.question,{pressure:pressure.value,topic:topic.value})
      if(current.id==='structured'){
       practice.value=local
-      messages.value.push({role:'bot',turn,text:`在线评分暂不可用；离线规则不能给这道真题打分，已换成离线练习题。\n\n${local.message}`})
+      messages.value.push({role:'bot',turn,text:`在线评分暂不可用；离线规则不能给这道真题打分，已换成离线练习题。\n\n${local.message}`,usage:error.usage})
       return
      }
      next=respondToInterview(local,text)
      next.message='离线参考｜'+next.message
+     next.usage=error.usage
     }
    }else next=respondToInterview(current,text)
    if(review.signal.aborted||practice.value!==current)return
    rememberPractice(next,text)
    practice.value=next
-   messages.value.push({role:'bot',turn,text:next.message})
+   messages.value.push({role:'bot',turn,text:next.message,usage:next.usage,free:!current.online})
    if(next.reaction)react(next.reaction)
   }else if(mode.value==='human'){
    await addJournal({entry_date:new Date().toISOString().slice(0,10),body:`[帮助/问题记录] ${text}`});messages.value.push({role:'bot',text:'问题已保存到你的训练日志。'})
@@ -511,7 +511,7 @@ async function send(){
    if(local){
     if(status.value==='error'){connectionError.value='';status.value='idle'}
     const turn=crypto.randomUUID()
-    messages.value.push({role:'user',turn,text},{role:'bot',turn,complete:true,...local})
+    messages.value.push({role:'user',turn,text},{role:'bot',turn,complete:true,free:true,...local})
     react(replyPose(local.text))
     return
    }
@@ -541,7 +541,6 @@ function captureStarted(){stopVoice('课堂采集中，请使用文字帮助')}
 watch(open,async value=>{
  suggestedTopic.value=''
  if(!value)return
- void refreshQuota()
  const uid=auth.user?.id
  if(uid)void api.get('/assistant/profile',{skipBusy:true,timeout:4000}).then(({data})=>{
   if(open.value&&uid===auth.user?.id)suggestedTopic.value=data.weaknesses?.includes('人际关系')?'人际关系':data.weaknesses?.[0]||''
@@ -558,7 +557,7 @@ watch(open,async value=>{
 watch(()=>messages.value.map(m=>m.text).join(''),async()=>{await nextTick();if(logRef.value)logRef.value.scrollTop=logRef.value.scrollHeight})
 watch(()=>context.value?.active,active=>{if(active)stopVoice('授课中，请使用文字助手')})
 watch(()=>route.path,()=>{if(readerTarget.value){close();readerTarget.value=null}})
-watch(()=>auth.user?.id,()=>{clearTimeout(interruptionTimer);interruptionTimer=null;history.value=[];clearAttachmentUrls();quota.value=null;historyOpen.value=false;plansOpen.value=false;plans.value=[];planReports.value=[];selectedReport.value=null;draft.value='';practiceReview?.abort();planRequest?.abort();clearReaction();stopVoice();practice.value=null;messages.value=[];open.value=false})
+watch(()=>auth.user?.id,()=>{clearTimeout(interruptionTimer);interruptionTimer=null;history.value=[];clearAttachmentUrls();historyOpen.value=false;plansOpen.value=false;plans.value=[];planReports.value=[];selectedReport.value=null;draft.value='';practiceReview?.abort();planRequest?.abort();clearReaction();stopVoice();practice.value=null;messages.value=[];open.value=false})
 watch([open,plansOpen],([opened,showPlans])=>{if(opened&&showPlans)void loadPlans()})
 watch(historyOpen,value=>{if(value)void loadSavedMistakes()})
 watch(()=>auth.user?.id,()=>{savedMistakes.value=[];latestToolQuestion=''})
@@ -576,7 +575,7 @@ onUnmounted(()=>{stopVoice();window.removeEventListener('link-help',openFromEven
  <Transition name="assistant-panel"><section v-if="open" id="link-help-panel" ref="panel" class="help-chat" :style="panelStyle" role="dialog" aria-label="阿贝贝老师" @keydown.esc.stop.prevent="close">
   <header class="help-chat__bar" @pointerdown="onPanelDown">
    <div v-if="!role" class="assistant-header-character"><AssistantCharacter :pose="pose" :level="level" :quiet="context?.active" :animated="animateCharacter" /></div>
-   <div><strong>阿贝贝老师</strong><p role="status">{{ statusText }}</p><p v-if="quota">在线问答余额 ¥{{ quota.remaining_cny.toFixed(4).replace(/0+$/, '').replace(/\.$/, '') }} / ¥{{ quota.allowance_cny }}</p></div>
+   <div><strong>阿贝贝老师</strong><p role="status">{{ statusText }}</p></div>
    <button class="assistant-tools-toggle" type="button" aria-controls="assistant-tools" :aria-expanded="toolsOpen" @pointerdown.stop @click="toolsOpen=!toolsOpen">工具</button>
    <button type="button" class="close-x" aria-label="关闭小助手" @click="close">×</button>
   </header>
@@ -654,6 +653,8 @@ onUnmounted(()=>{stopVoice();window.removeEventListener('link-help',openFromEven
   <div v-show="!historyOpen" ref="logRef" class="help-chat__log" aria-label="帮助对话">
    <article v-for="(item,index) in messages" :key="index" :class="item.role">
     <p v-if="item.text">{{ item.text }}</p>
+    <small v-if="item.usage" class="assistant-usage-line">{{ usageLabel(item.usage) }}</small>
+    <small v-else-if="item.free" class="assistant-usage-line">本地处理 · 免费</small>
     <a v-if="item.attachment" :href="item.attachment.url" :download="item.attachment.file.name" class="assistant-attachment"><img v-if="item.attachment.image" :src="item.attachment.url" :alt="item.attachment.file.name">{{ item.attachment.file.name }}</a>
     <p v-if="item.attachmentSummary" class="assistant-attachment-summary">附件摘录 · {{ item.attachmentSummary }}</p>
     <dl v-if="item.attachmentSections" class="help-sources"><template v-for="(value,label) in item.attachmentSections" :key="label"><dt>{{ label }}</dt><dd>{{ value }}</dd></template></dl>

@@ -6,6 +6,7 @@ from sqlalchemy import func, select
 from extensions import db
 from classroom_models import CreditUsage
 from services.classroom_locks import budget_file_lock
+from services.assistant_billing_context import assistant_turn
 
 ACCOUNTS = {'dialogue': ('模拟授课 / 评课', 30), 'vision': ('视觉', 40), 'test': ('测试', 30)}
 
@@ -47,7 +48,7 @@ def status():
             'pricing_confirmed': os.getenv('OPENAI_NEXT_PRICING_CONFIRMED', '').lower() == 'true'}
 
 
-def reserve(account, service, model, amount, session_id=None, assistant_user_id=None):
+def reserve(account, service, model, amount, session_id=None, assistant_user_id=None, *, enforce_assistant_quota=True):
     if os.getenv('OPENAI_NEXT_PRICING_CONFIRMED', '').lower() != 'true':
         raise ValueError('请先核对 OpenAI Next 美元单价并配置 OPENAI_NEXT_PRICING_CONFIRMED=true')
     ceiling = limit(account)
@@ -59,11 +60,12 @@ def reserve(account, service, model, amount, session_id=None, assistant_user_id=
             raise ValueError(f'{ACCOUNTS[account][0]}美元预算达到90%停止线，本次未发起云请求')
         from services.delivery_budget import check
         check(connection, amount, 'USD')
-        if assistant_user_id is not None:
+        if assistant_user_id is not None and enforce_assistant_quota:
             from services.assistant_quota import check as check_quota
             check_quota(connection, assistant_user_id, amount, currency="USD")
         result = connection.execute(CreditUsage.__table__.insert().values(account=account,
-            service=service, model=model, session_id=session_id, assistant_user_id=assistant_user_id, reserved_usd=amount))
+            service=service, model=model, session_id=session_id, assistant_user_id=assistant_user_id,
+            assistant_turn=assistant_turn.get() if assistant_user_id is not None else None, reserved_usd=amount))
         return result.inserted_primary_key[0]
 
 

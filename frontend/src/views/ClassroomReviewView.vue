@@ -146,9 +146,9 @@ onMounted(()=>{archiveOverlayResizeObserver=new ResizeObserver(placeArchivePaper
 onBeforeUnmount(()=>{disposed=true;requestId++;controller?.abort();clearTimeout(pollTimer);clearTimeout(archiveVideoEndTimer);archiveOpeningVideo.value?.pause();archiveOverlayResizeObserver?.disconnect();window.removeEventListener('beforeprint',preparePrint);window.removeEventListener('afterprint',restorePrint);});
 </script>
 <template>
-  <div class="classroom-review-page" :class="{'classroom-review-page--scene-only':archiveSceneOnly}">
+  <div class="classroom-review-page" :class="{'classroom-review-page--scene-only':archiveSceneOnly,'classroom-review-page--paper':!archiveSceneOnly}">
     <div ref="archiveSceneElement" class="archive-scene" :class="{'archive-scene--full':archiveSceneOnly}" :aria-hidden="archiveSceneOnly?undefined:'true'">
-      <img class="archive-scene-base" :class="{'is-hidden':archivePapersVisible}" :src="archiveSceneOnly?'/assets/archive-cover.png':'/assets/archive-reports-scene.png'" alt="" />
+      <img class="archive-scene-base" :class="{'is-hidden':archivePapersVisible}" :src="archiveSceneOnly?'/assets/archive-cover.png':'/assets/report-paper-background.png'" alt="" />
       <img v-if="archiveSceneOnly" class="archive-scene-papers" :class="{'is-visible':archivePapersVisible}" src="/assets/growth-archive-desk.png" alt="" @load="placeArchivePaperOverlay" />
       <ArchivePlantGlow v-if="archiveSceneOnly" :scene-element="archiveSceneElement" />
       <ArchiveCoverBag v-if="archiveSceneOnly && !archiveBagDone" :scene-element="archiveSceneElement" @play-video="playArchiveOpening" />
@@ -191,7 +191,7 @@ onBeforeUnmount(()=>{disposed=true;requestId++;controller?.abort();clearTimeout(
     <template v-if="!archiveSceneOnly">
       <header class="review-masthead">
         <h1 class="sr-only">AI 评课</h1>
-        <router-link class="review-button" :to="{path:'/ai-review',query:{demo:'gmq'}}">GMQ 试讲报告示例</router-link>
+        <router-link v-if="/GMQ/i.test(String(room?.topic||''))" class="review-button" :to="{path:'/ai-review',query:{demo:'gmq'}}">GMQ 试讲报告示例</router-link>
       </header>
       <p v-if="historyError" class="review-inline-alert" role="alert">{{ historyError }}</p>
       <div v-if="error" class="review-inline-alert" role="alert">{{ error }}<button class="review-button" :disabled="loading || busy" @click="initialize">重新读取</button><router-link to="/">重新登录</router-link></div>

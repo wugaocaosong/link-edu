@@ -38,7 +38,7 @@ def test_migrations_target_flask_instance_for_relative_sqlite(tmp_path, monkeypa
         command.upgrade(cfg,'head')
         assert not (tmp_path/'relative.db').exists()
         with db.engine.connect() as conn:
-            assert conn.execute(text('select version_num from alembic_version')).scalar()=='20261123_01'
+            assert conn.execute(text('select version_num from alembic_version')).scalar()=='20261126_01'
         command.downgrade(cfg,'20261120_01')
         assert 'study_attempts' not in inspect(db.engine).get_table_names()
         db.engine.dispose()

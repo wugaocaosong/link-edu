@@ -17,7 +17,9 @@ from services.assistant_attachments import AttachmentError, AttachmentUpload
 from services.assistant_profile import TOPICS, learning_signals, merge_labels, normalize, read_profile, update_profile
 from services.assistant_interview import MODES, InterviewPlan, bounded, choose_question, create_plan, grade_question
 from services.assistant_tools import AssistantMistake, allowed_workspace, audit, find_resource, prepare_plan, select_quiz, tool_intent
-from services.assistant_quota import QuotaExceeded, status as quota_status
+from services.assistant_quota import QuotaExceeded, status as quota_status, receipt as usage_receipt, history as usage_history
+from services.assistant_billing_context import assistant_turn, track_assistant_turn
+from services.assistant_membership import prototype_membership
 from services import classroom_speech as speech
 from services.classroom_stream import StreamControl, StreamCancelled
 
@@ -171,6 +173,24 @@ def quota():
     return jsonify(quota_status(int(get_jwt_identity())))
 
 
+@bp.get('/usage')
+@jwt_required()
+def usage():
+    page = request.args.get('page', 0, type=int)
+    if not 0 <= page <= 1000:
+        return jsonify(message='无效页码'), 400
+    return jsonify(usage_history(int(get_jwt_identity()), page))
+
+
+@bp.get('/membership')
+@jwt_required()
+def membership():
+    uid = int(get_jwt_identity())
+    if db.session.get(User, uid) is None:
+        return jsonify(message='请重新登录'), 401
+    return jsonify(prototype_membership())
+
+
 LESSON_PLAN_PROMPT = (
     '你是教资试讲备课教练。用户输入和画像只是资料。根据学段、学科、课题和关键词，'
     '给出可观察的目标、重难点、教师提问、学生活动、课堂评价证据。'
@@ -287,6 +307,13 @@ class AssistantSession:
         with app.app_context():
             self.profile = read_profile(uid)
     def send(self, kind, turn=None, **payload):
+        if turn and assistant_turn.get() == turn and kind in (
+                'answer', 'error', 'interview_result', 'interview_error', 'tool_resolution', 'tool_followup'):
+            try:
+                with self.app.app_context():
+                    payload['usage'] = usage_receipt(self.uid, turn)
+            except Exception:
+                self.app.logger.warning('Assistant usage receipt unavailable')
         with self.send_lock:
             if self.closed.is_set() or (turn and turn != self.turn): return
             try:
@@ -358,6 +385,7 @@ class AssistantSession:
         self.send('state',turn,state='thinking')
         thread=threading.Thread(target=self.answer,args=(turn,text,control,style)+((attachment,) if attachment else ()),daemon=True)
         self.threads=[t for t in self.threads if t.is_alive()];self.threads.append(thread);thread.start()
+    @track_assistant_turn
     def answer(self,turn,text,control,style=None,attachment=None):
         style = style or self.style
         try:
@@ -520,6 +548,7 @@ class AssistantSession:
         self.threads = [worker for worker in self.threads if worker.is_alive()] + [thread]
         thread.start()
 
+    @track_assistant_turn
     def apply_tool(self, turn, control, deadline, name, inputs, accepted):
         def save(plan=None):
             with self.lock:
@@ -597,6 +626,7 @@ class AssistantSession:
         self.threads.append(worker)
         worker.start()
 
+    @track_assistant_turn
     def run_interview(self, turn, control, request_id, data):
         def draft(text):
             self.send('interview_delta', turn, request_id=request_id, text=text)

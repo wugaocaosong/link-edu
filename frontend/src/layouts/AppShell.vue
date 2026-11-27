@@ -1,5 +1,5 @@
 <template>
-  <main v-ambient-ui="!isAcademy && !isStudio" class="dashboard app-shell" :class="{ immersive: immersive, 'sidebar-folded': sidebarFolded, 'protected-shell': protectedShell, 'studio-ui': isStudio, 'desk-fullscreen': isStudio && (['/courses','/dashboard','/growth'].includes(route.path) || archiveCoverPage) }">
+  <main v-ambient-ui="!isAcademy && !isStudio" class="dashboard app-shell" :class="{ immersive: immersive, 'sidebar-folded': sidebarFolded, 'protected-shell': protectedShell, 'studio-ui': isStudio, 'membership-shell': route.path === '/membership', 'desk-fullscreen': isStudio && (['/courses','/dashboard','/growth'].includes(route.path) || archiveCoverPage) }">
     <a class="skip-content" href="#workspace-content">跳到页面内容</a>
     <AmbientVideo
       v-if="!immersive && !protectedShell && !isAcademy && !isStudio"
@@ -37,7 +37,7 @@
           <option v-if="!nav.some(item => item.to === route.path)" :value="route.path" disabled>{{ crumb }}</option>
           <option v-for="item in nav" :key="item.to" :value="item.to">{{ item.label }}</option>
         </select>
-        <form v-if="route.path !== '/courses' || !isStudio" class="cir-search" role="search" @submit.prevent="goSearch">
+        <form v-if="route.path !== '/membership' && (route.path !== '/courses' || !isStudio)" class="cir-search" role="search" @submit.prevent="goSearch">
           <svg class="cir-search__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.8"/>
             <path d="M16.2 16.2L20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -71,6 +71,7 @@
           </button>
           <div v-if="menuOpen" id="profile-menu" class="profile-menu" @click.stop>
             <button type="button" @click="goProfile('archive')">个人中心</button>
+            <button type="button" @click="menuOpen = false; router.push('/membership')">会员中心</button>
             <button type="button" @click="goProfile('settings')">设置</button>
             <button type="button" @click="goProfile('contact')">留言板</button>
             <button type="button" @click="menuOpen = false; productsOpen = true">谱联产品</button>
@@ -259,6 +260,12 @@ html[data-desk-travel=up] {--travel-y:-7%;}
 html[data-desk-travel=left] {--travel-x:-7%;--travel-y:0%;}
 html[data-desk-travel=right] {--travel-x:7%;--travel-y:0%;}
 html[data-desk-travel] .page-frame {view-transition-name:studio-scene;}
+@media (min-width: 901px) {
+ html[data-ui-theme] .app-shell.membership-shell .workspace { position:relative; padding:0!important; }
+ html[data-ui-theme] .app-shell.membership-shell :is(.page-frame,.page-slot) { height:100%!important; padding:0; border-radius:0; }
+ html[data-ui-theme] .app-shell.membership-shell .topbar { position:absolute; inset:12px 16px auto auto; z-index:8; width:auto; margin:0; background:transparent!important; }
+ html[data-ui-theme] .app-shell.membership-shell .topbar :is(.page-crumb,.mobile-page-nav) { display:none; }
+}
 ::view-transition-old(studio-scene),
 html[data-desk-travel] .scene-pan-leave-active {animation:scene-out .26s cubic-bezier(.4,0,1,1) both;}
 ::view-transition-new(studio-scene),

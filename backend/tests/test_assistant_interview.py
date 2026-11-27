@@ -12,10 +12,12 @@ from flask_jwt_extended import create_access_token
 from app import create_app
 from assistant_routes import AssistantSession, COMMON_LABEL, DEPTHS, classify_answer
 from extensions import db
+from classroom_models import ApiUsage, CreditUsage
 from models import AiFeedback, User
 from services.assistant_interview import bank
 from services.assistant_dialogue import attachment_reference, chat_with_tool, lesson_plan_sections, parse_tool_call
 from services.assistant_tools import AssistantMistake, AssistantToolAudit, find_resource, tool_intent
+from services.assistant_quota import receipt
 from services.classroom_stream import StreamControl
 from tenancy import personal_tenant_for
 
@@ -177,6 +179,46 @@ class AssistantInterviewTest(unittest.TestCase):
         self.assertEqual(answer['tier'], 'common_teaching')
         self.assertIn(COMMON_LABEL, answer['text'])
         self.assertEqual(self.owner.history[-1]['content'], answer['text'])
+
+    def test_reply_receipt_combines_calls_but_not_other_accounts_or_turns(self):
+        db.session.add_all([
+            ApiUsage(service='dialogue', assistant_user_id=self.user.id, assistant_turn='test-turn',
+                     reserved_cny=.1, charged_cny=.03, state='settled'),
+            CreditUsage(account='vision', service='vision', model='mock', assistant_user_id=self.user.id,
+                        assistant_turn='test-turn', reserved_usd=.02),
+            ApiUsage(service='dialogue', assistant_user_id=self.user.id, assistant_turn='older', reserved_cny=.05),
+            ApiUsage(service='dialogue', assistant_user_id=self.other.id, assistant_turn='test-turn', reserved_cny=.9),
+        ])
+        db.session.commit()
+        with patch.dict('os.environ', {'USD_CNY_BUDGET_RATE': '8'}):
+            current = receipt(self.user.id, 'test-turn')
+            self.assertEqual(current['charged_cny'], .03)
+            self.assertEqual(current['pending_cny'], .16)
+            self.assertEqual(current['remaining_cny'], 1.76)
+            self.assertEqual(current['calls'], 2)
+            headers = {'Authorization': 'Bearer ' + create_access_token(identity=str(self.user.id))}
+            details = self.app.test_client().get('/api/assistant/usage', headers=headers).json
+            self.assertEqual(len(details['items']), 3)
+            self.assertEqual(sum(row['status'] == 'settled' for row in details['items']), 1)
+
+    def test_registration_grants_once_and_advanced_is_locked(self):
+        from services.assistant_quota import AssistantTrialGrant
+        client = self.app.test_client()
+        credentials = {'account':'trial-teacher','password':'test-only-secret','name':'Demo','role':'teacher'}
+        result = client.post('/api/auth/register', json=credentials)
+        self.assertEqual(result.status_code, 201)
+        uid = result.json['user']['id']
+        headers = {'Authorization': 'Bearer ' + create_access_token(identity=str(uid))}
+        self.assertEqual(db.session.get(AssistantTrialGrant, uid).amount_cents, 200)
+        self.assertEqual(client.post('/api/auth/register', json=credentials).status_code, 409)
+        db.session.add(ApiUsage(service='dialogue', assistant_user_id=uid, reserved_cny=.3, charged_cny=.2))
+        db.session.commit()
+        for _ in range(2):
+            self.assertEqual(client.post('/api/auth/login', json=credentials).status_code, 200)
+            self.assertEqual(client.get('/api/assistant/quota', headers=headers).json['remaining_cny'], 1.8)
+        self.assertTrue(client.get('/api/assistant/membership', headers=headers).json['advanced_locked'])
+        self.assertEqual(client.post('/api/assistant/membership/check_in', headers=headers).status_code, 404)
+        self.assertEqual(client.post('/api/assistant/membership/redeem', headers=headers).status_code, 404)
 
     def test_plan_reload_check_in_and_scope(self):
         own_report = AiFeedback(user_id=self.user.id, tenant_id=self.tenant_id, overall_score=68, suggestion='补充退出题')

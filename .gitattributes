@@ -1,3 +1,4 @@
 frontend/public/library/archive/** filter=lfs diff=lfs merge=lfs -text
 frontend/public/library/files/** filter=lfs diff=lfs merge=lfs -text
 frontend/public/library/videos/** filter=lfs diff=lfs merge=lfs -text
+frontend/public/assets/image-digitization-lesson-2026-11-25.webm filter=lfs diff=lfs merge=lfs -text

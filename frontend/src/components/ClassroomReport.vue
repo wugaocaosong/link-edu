@@ -1,6 +1,6 @@
 <script setup>
-import { computed, ref, onBeforeUnmount, watch } from 'vue';
-import { ArrowUpRight, Focus2, ListDetails, ShieldCheck, Bulb, Photo, Refresh, Printer } from '@vicons/tabler';
+import { computed, ref, onBeforeUnmount, onMounted, watch } from 'vue';
+import { ArrowUpRight, Focus2, ListDetails, ShieldCheck, Bulb, Photo, Refresh, Printer, MoodSmile, School, Book2 } from '@vicons/tabler';
 import { api } from '../services/api';
 import { buildReview, formatReportTime as time, formatReportDate } from '../services/classroomReview.js';
 import { fetchRagChunk } from '../services/rag.js';
@@ -14,6 +14,19 @@ const auth=useAuthStore();
 const emit=defineEmits(['regenerate','plans-created','refresh','print']);
 const view=computed(()=>buildReview(props.room));
 const linkedCoachCount=computed(()=>view.value.coachingFocuses.filter(item=>item.evidence.length).length);
+const coachDomainChart=computed(()=>{
+  const domains=[
+    {key:'emotional_support',label:'情感支持',tone:'emotion'},
+    {key:'classroom_organization',label:'课堂组织',tone:'organization'},
+    {key:'instructional_support',label:'教学支持',tone:'instruction'},
+  ];
+  const rows=domains.map(domain=>{
+    const focuses=view.value.coachingFocuses.filter(item=>item.domain===domain.key);
+    return {...domain,count:focuses.length,evidenceCount:focuses.reduce((sum,item)=>sum+item.evidence.length,0)};
+  });
+  const total=rows.reduce((sum,row)=>sum+row.count,0);
+  return rows.map(row=>({...row,share:total?Math.round(row.count/total*100):0}));
+});
 const status=computed(()=>({idle:'待评课',running:'评课进行中',completed:'已完成',failed:'生成失败',insufficient:'证据不足 · 未生成'}[props.room.report_state]||'待评课'));
 const drawerOpen=ref(false), drawerTitle=ref('课堂证据'), evidence=ref([]), filter=ref('');
 const playbackEvent=ref(null);
@@ -26,13 +39,44 @@ const filtered=computed(()=>evidence.value.filter(e=>!filter.value || `${eventLa
 const motion=computed(()=>props.room.report?.motion_evidence);
 const sources=computed(()=>props.room.report?.sources||[]);
 const behaviorLabels={teacher_question:'教师提问',student_response:'学生完整回应',question_response:'提问与回应',teacher_followup:'教师追问',teacher_feedback:'教师反馈',teacher_summary:'课堂小结',post_question_silence:'提问后的静默间隔',board_observation:'可见板书',board_speech_context:'板书与授课发言',motion_speech_context:'动作与授课发言',teacher_writing_observation:'书写动作线索',teacher_pointing_observation:'指向动作线索',facial_appearance_observation:'面部外观描述'};
+const coachingVisuals={
+  emotional_support:{icon:MoodSmile,caption:'师生回应与支持',tone:'emotion'},
+  classroom_organization:{icon:School,caption:'流程组织与课堂节奏',tone:'organization'},
+  instructional_support:{icon:Book2,caption:'讲解、反馈与思维支持',tone:'instruction'},
+};
 const behaviors=computed(()=>props.room.behavior_analysis?.segments||[]);
-const mmEvents=computed(()=>(props.room.events||[]).filter(event=>event.type==='mm_tba_action'));
+const teachingProfileSummary=computed(()=>{
+  const evidencedFocuses=view.value.coachingFocuses.filter(item=>item.evidence.length);
+  const positiveKeys=new Set(['positive_climate','teacher_sensitivity','student_perspective','concept_development','analysis_inquiry','instructional_dialogue','productivity','learning_formats']);
+  const positive=evidencedFocuses.find(item=>positiveKeys.has(item.key))||evidencedFocuses[0];
+  const improvement=evidencedFocuses.find(item=>item!==positive&&item.recommendation)||evidencedFocuses.find(item=>item.recommendation);
+  const concise=value=>withEvidenceTimes(value).replace(/\s+/g,' ').trim().replace(/[；。]+$/,'').slice(0,52);
+  const praise=positive
+    ? `做得好的地方：${positive.label}方面有值得肯定的表现，${concise(positive.observation)||'课堂中呈现了相应的教学实践'}`
+    : '做得好的地方：本节课堂记录中有可供复盘的教学内容与课堂表现';
+  const next=improvement
+    ? `可以改进的地方：${improvement.label}方面，${concise(improvement.recommendation)||'可结合本节教学目标进一步打磨'}`
+    : '可以改进的地方：本节暂未形成明确的改进建议，可结合教学目标、课堂节奏和师生互动继续复盘';
+  return `${praise}。${next}。`;
+});
+const projectMmEvents=ref([]),projectMmSummary=ref(null);
+onMounted(async()=>{try{const r=await fetch('/assets/mm-tba/image-digitization-2026-11-25.json');if(r.ok){const d=await r.json();projectMmSummary.value=d;projectMmEvents.value=d.events||[];}}catch{}});
+const mmEvents=computed(()=>[...(props.room.events||[]).filter(event=>event.type==='mm_tba_action'),...projectMmEvents.value]);
 const mmStatus=computed(()=>(props.room.events||[]).filter(event=>event.type==='mm_tba_status').at(-1)?.data);
-const mmCounts=computed(()=>mmEvents.value.reduce((counts,event)=>{const label=event.data.label;counts[label]=(counts[label]||0)+1;return counts;},{Normal:0,Writing:0,Pointing:0}));
+const mmCounts=computed(()=>projectMmSummary.value?.counts||mmEvents.value.reduce((counts,event)=>{const label=event.data.label;counts[label]=(counts[label]||0)+1;return counts;},{Normal:0,Writing:0,Pointing:0}));
+const mmActionStats=computed(()=>{
+  const total=['Normal','Writing','Pointing'].reduce((sum,label)=>sum+(Number(mmCounts.value[label])||0),0);
+  return [
+    {key:'Normal',label:'正常状态',color:'normal',count:Number(mmCounts.value.Normal)||0},
+    {key:'Writing',label:'书写动作',color:'writing',count:Number(mmCounts.value.Writing)||0},
+    {key:'Pointing',label:'指向动作',color:'pointing',count:Number(mmCounts.value.Pointing)||0},
+  ].map(item=>({...item,percent:total?Math.round(item.count/total*100):0}));
+});
+const mmActionTotal=computed(()=>mmActionStats.value.reduce((sum,item)=>sum+item.count,0));
 const mmFilter=ref('Writing');
 const mmShown=computed(()=>mmEvents.value.filter(event=>mmFilter.value==='all'||event.data.label===mmFilter.value));
 const mmBusy=ref(false),mmMessage=ref('');
+const mmAdvice=ref(''),mmAdviceBusy=ref(false),mmAdviceError=ref('');
 let mmPoll=null;
 async function analyzeMmTba(){
   if(mmBusy.value || mmStatus.value?.status==='running')return;
@@ -49,6 +93,17 @@ async function analyzeMmTba(){
   }catch(error){mmMessage.value=error.response?.data?.message||'分析启动失败，请检查本机模型环境后重试。';}
   finally{mmBusy.value=false;}
 }
+async function requestMmAdvice(){
+  if(mmAdviceBusy.value||!mmActionTotal.value)return;
+  mmAdviceBusy.value=true;mmAdviceError.value='';mmAdvice.value='';
+  try{
+    const samples=mmEvents.value.slice(0,12).map(event=>({label:event.data?.label,at_ms:event.at_ms}));
+    const {data}=await api.post(`/classroom/sessions/${props.room.session_id}/mm-tba-advice`,
+      {counts:mmCounts.value,samples},{timeout:60000,skipBusy:true});
+    mmAdvice.value=data.advice;
+  }catch(error){mmAdviceError.value=error.response?.data?.message||'AI 建议生成失败，请稍后重试。';}
+  finally{mmAdviceBusy.value=false;}
+}
 watch(mmStatus,status=>{if(status?.status==='completed'||status?.status==='failed'){clearInterval(mmPoll);mmPoll=null;mmMessage.value=status.message||'';}});
 function behaviorEvents(segment){return view.value.events.filter(event=>segment.event_ids?.includes(event.id));}
 function evidenceExplanation(event){
@@ -64,6 +119,22 @@ function evidenceExplanation(event){
   return messages[event.type]||'这是一条已保存的课堂事件，建议结合视频画面和前后文一起复核。';
 }
 const evidenceStatusLabel=status=>({supported:'有课堂证据',partial:'部分证据',insufficient:'证据不足'}[status]||'待复核');
+function withEvidenceTimes(value){
+  const eventTimes=new Map(view.value.events.map(event=>[String(event.id),time(event.at_ms)]));
+  return String(value||'').replace(/事件\s*(\d+(?:\s*(?:、|，|,|和|及)\s*(?:事件\s*)?\d+)*)/g,(_match,ids)=>{
+    const stamps=[...ids.matchAll(/\d+/g)].map(([id])=>eventTimes.get(id)||'时间未记录');
+    return stamps.length?`在 ${[...new Set(stamps)].join('、')} 时`:'';
+  });
+}
+const evidenceTimes=items=>[...new Set((items||[]).map(event=>time(event.at_ms)).filter(value=>value!=='时间未记录'))].join('、');
+function focusTimeline(focus){
+  const duration=Math.max(Number(view.value.duration)||0,Number(view.value.span)||0,1);
+  return focus.evidence.filter(event=>Number.isFinite(event.at_ms)&&event.at_ms>=0).map(event=>({
+    event,
+    label:time(event.at_ms),
+    position:Math.max(0,Math.min(100,event.at_ms/duration*100)),
+  }));
+}
 const transitions=computed(()=>view.value.events.filter(event=>event.type==='student_state_transition'));
 const studentNames={ming:'小明',yu:'小雨',lin:'小林'};
 const plans=computed(()=>props.room.practice_plans||[]);
@@ -130,42 +201,80 @@ function regenerate(){
       <ul><li v-for="reason in room.report_readiness?.reasons || [room.report_error || '请核对课堂采集记录。']" :key="reason">{{ reason }}</li></ul>
       <p class="review-caption">{{ room.report_readiness?.notice }}</p>
     </section>
-    <div v-if="view.hasReport" class="report-workspace">
-      <div class="report-main-column">
-      <p v-if="room.report_state!=='completed'" class="review-inline-alert">以下保留的是上一版报告，本次尚未生成成功。</p>
-      <section class="review-panel report-video-panel" aria-labelledby="report-video-heading">
-        <ClassroomReplay :room="room" :event="null" />
-      </section>
-      <section class="report-overview review-panel" aria-labelledby="report-heading">
-        <div class="report-intro"><p class="review-eyebrow">01 / CLASSROOM COACH</p><h2 id="report-heading">本节课堂教练反馈</h2><p>从可回看的课堂事实出发，整理观察与下一步练习。</p><span class="report-method-tag"><ShieldCheck aria-hidden="true" />CLASS-Secondary 相关观察主题 · LINK 辅助复盘</span></div>
-        <div class="coach-summary"><strong>{{ view.coachingFocuses.length }}</strong><span>条观察反馈</span><small>{{ linkedCoachCount }} 条关联到课堂事件</small></div>
-        <div class="report-overview-note"><h3>阅读说明</h3><p>这里呈现的是 LINK 基于课堂记录生成的教练建议，不是 CLASS 正式评分或验证结果。</p><p>虚拟学生回应会单独标明；证据不足时不推断教师或真实学生的状态。</p></div>
-      </section>
-      <section v-if="missingReadiness.length" class="review-panel report-data-gaps" aria-label="本次材料缺项说明">
-        <h3>本次材料缺项说明</h3>
-        <p>报告已生成。以下项目缺少相应材料，本次以文字说明代替判断；其他有依据的内容照常反馈。</p>
-        <ul><li v-for="item in missingReadiness" :key="item.key"><strong>{{ item.label }}：</strong>{{ item.reason }}补充相关课堂记录后，可再生成完整反馈。</li></ul>
-      </section>
-      </div>
-      <div class="report-detail-column">
-      <div class="report-actions-panel no-print">
+      <div v-if="view.hasReport" class="report-actions-panel report-toolbar no-print">
         <router-link class="review-button" to="/classroom">模拟课堂<ArrowUpRight aria-hidden="true" /></router-link>
         <button class="review-button" :disabled="busy" @click="emit('refresh')"><Refresh aria-hidden="true" />刷新</button>
         <button v-if="room?.report && room.report_state!=='insufficient'" class="review-button" @click="emit('print')"><Printer aria-hidden="true" />打印 / PDF</button>
       </div>
+    <div v-if="view.hasReport" class="report-workspace">
+      <div class="report-main-column">
+      <section class="review-panel report-video-panel" aria-labelledby="report-video-heading">
+        <ClassroomReplay :room="room" :event="null" recording-title="本节课堂录像" />
+      </section>
+      <section class="report-video-suggestions" aria-labelledby="video-suggestions-heading">
+        <div class="report-video-suggestions__heading"><p class="review-eyebrow">NEXT PRACTICE</p><h2 id="video-suggestions-heading">优先练习建议</h2></div>
+        <article v-for="(item,index) in view.reflections" :key="item.key" class="report-video-suggestion">
+          <span class="report-video-suggestion__number">0{{index+1}}</span>
+          <div><h3>{{item.label}}</h3><p>{{item.reflection}}</p><button type="button" class="report-video-suggestion__evidence no-print" :disabled="!item.evidence.length" @click="showEvidence(item.evidence,item.label+' · 复盘证据')">查看 {{item.evidence.length}} 条证据 ↗</button></div>
+        </article>
+        <p v-if="!view.reflections.length" class="report-video-suggestions__empty">本节暂未形成有课堂证据支持的优先建议。可在下方查看观察详情与材料说明。</p>
+      </section>
+
+      </div>
+      <div class="report-detail-column">
+      <p v-if="room.report_state!=='completed'" class="review-inline-alert">以下保留的是上一版报告，本次尚未生成成功。</p>
+
+      <section class="report-overview review-panel" aria-labelledby="report-heading">
+        <div class="report-intro"><p class="review-eyebrow">CLASSROOM COACH</p><h2 id="report-heading">本节课堂教练反馈</h2><p>从可回看的课堂事实出发，整理观察与下一步练习。</p><span class="report-method-tag"><ShieldCheck aria-hidden="true" />CLASS-Secondary 相关观察主题 · LINK 辅助复盘</span></div>
+        <div class="coach-summary"><strong>{{ view.coachingFocuses.length }}</strong><span>条观察反馈</span><small>{{ linkedCoachCount }} 条关联到课堂事件</small></div>
+        <div class="report-overview-note"><h3>阅读说明</h3><p>这里呈现的是 LINK 基于课堂记录生成的教练建议，不是 CLASS 正式评分或验证结果。</p><p>提到课堂表现时会标注录像时间，便于回看；虚拟学生回应会单独说明。</p></div>
+      </section>
+      <section v-if="view.hasReport" class="review-panel report-visual-summary" aria-labelledby="visual-summary-heading">
+        <div class="report-section-title"><div><p class="review-eyebrow">REPORT AT A GLANCE</p><h2 id="visual-summary-heading">本节概览</h2></div><span>建议条目与证据数量</span></div>
+        <div class="report-summary-metrics">
+          <div><strong>{{view.coachingFocuses.length}}</strong><span>观察建议</span></div>
+          <div><strong>{{linkedCoachCount}}</strong><span>有课堂证据</span></div>
+          <div><strong>{{view.metrics.transcripts}}</strong><span>教师转写</span></div>
+          <div><strong>{{view.metrics.completed}}</strong><span>完整播放</span></div>
+        </div>
+        <div class="report-domain-chart" role="img" aria-label="课堂观察建议在三个组织领域中的条目数量分布">
+          <div v-for="domain in coachDomainChart" :key="domain.key" class="report-domain-row" :class="'tone-'+domain.tone">
+            <div class="report-domain-label"><span>{{domain.label}}</span><b>{{domain.count}} 条</b></div>
+            <div class="report-domain-track"><i :style="{width:domain.share+'%'}" /></div>
+            <small>{{domain.evidenceCount}} 条证据引用</small>
+          </div>
+        </div>
+        <p class="review-caption">图表展示报告建议条目和被引用的记录数量，不是教学表现分数；点击左侧建议卡片可查看原始课堂证据。</p>
+      </section>
+      <section v-if="view.hasReport" class="review-panel report-teaching-profile" aria-labelledby="teaching-profile-heading">
+        <div class="report-section-title"><div><p class="review-eyebrow">TEACHING PROFILE</p><h2 id="teaching-profile-heading">本节授课特点</h2></div><span>依据本节记录归纳</span></div>
+        <p>{{ teachingProfileSummary }}</p>
+        <small>结合本节课堂表现与评课建议生成，具体内容会随测评结果变化。</small>
+      </section>
+      </div>
+    </div>
+    <div v-if="view.hasReport" class="report-full-width">
       <section class="review-panel report-profile" aria-labelledby="profile-heading">
         <div class="report-section-title"><div><p class="review-eyebrow">02 / OBSERVATION THEMES</p><h2 id="profile-heading"><Focus2 aria-hidden="true" />课堂观察与练习建议</h2></div><span>有证据才形成观察</span></div>
         <p class="review-caption">观察主题参考 CLASS-Secondary 的领域组织；LINK 未经过该量表的正式培训、认证或本地信效度验证。</p>
         <template v-if="view.hasCoaching">
-          <section v-for="group in view.coachingGroups" :key="group.key" class="coach-domain-group">
-            <h3>{{ group.label }}</h3>
+          <section v-for="group in view.coachingGroups" :key="group.key" class="coach-domain-group" :class="`tone-${coachingVisuals[group.key]?.tone||'instruction'}`">
+            <header class="coach-domain-heading"><span class="coach-domain-icon"><component :is="coachingVisuals[group.key]?.icon||Book2" aria-hidden="true" /></span><div><h3>{{ group.label }}</h3><small>{{coachingVisuals[group.key]?.caption||'课堂观察与练习方向'}}</small></div><span class="coach-domain-count">{{group.focuses.length}} 项观察</span></header>
             <article v-for="focus in group.focuses" :key="focus.key" class="coach-focus-card">
               <header><strong>{{ focus.label }}</strong><span>{{ evidenceStatusLabel(focus.evidence_status) }}</span></header>
-              <p><b>课堂观察</b>{{ focus.observation }}</p>
+              <div class="coach-focus-block coach-focus-observation"><span class="coach-focus-block-icon"><Focus2 aria-hidden="true" /></span><div><b>课堂观察</b><p>{{ withEvidenceTimes(focus.observation) }}</p></div></div>
               <small v-if="focus.validation_notice" class="review-caption">{{ focus.validation_notice }}</small>
               <small v-if="focus.evidence.some(event=>event.type==='student')" class="review-caption">本条引用含 LINK 虚拟学生生成的模拟回应，不代表真实学生表现。</small>
-              <p><b>下一步练习</b>{{ focus.recommendation }}</p>
-              <div class="kb-source-actions"><button type="button" class="review-button" :disabled="!focus.evidence.length" @click="showEvidence(focus.evidence,focus.label+' · 课堂证据')">查看 {{ focus.evidence.length }} 条课堂证据</button><span v-if="focus.sources.length">教学依据 {{ focus.sources.length }} 项</span></div>
+              <div class="coach-focus-block coach-focus-practice"><span class="coach-focus-block-icon"><Bulb aria-hidden="true" /></span><div><b>下一步练习</b><p>{{ withEvidenceTimes(focus.recommendation) }}</p></div></div>
+              <div v-if="focusTimeline(focus).length" class="coach-evidence-timeline">
+                <div class="coach-evidence-timeline__heading"><span>录像回看位置</span><small>点击时间点查看片段</small></div>
+                <div class="coach-evidence-timeline__track" role="group" :aria-label="focus.label+'对应的录像时间点'">
+                  <button v-for="(point,index) in focusTimeline(focus)" :key="point.event.id??`${point.label}-${index}`" type="button" class="coach-evidence-timeline__point" :style="{left:`${point.position}%`}" :aria-label="`回看 ${point.label}`" :title="`回看 ${point.label}`" @click="showEvidence([point.event],`${focus.label} · ${point.label}`)" />
+                </div>
+                <div class="coach-evidence-timeline__axis"><span>0:00</span><span>{{time(Math.max(view.duration||0,view.span||0))}}</span></div>
+                <div class="coach-evidence-timeline__labels"><button v-for="(point,index) in focusTimeline(focus)" :key="`time-${point.event.id??index}`" type="button" @click="showEvidence([point.event],`${focus.label} · ${point.label}`)">{{point.label}}</button></div>
+              </div>
+              <div class="kb-source-actions"><button type="button" class="review-button" :disabled="!focus.evidence.length" @click="showEvidence(focus.evidence,focus.label+' · 课堂片段')">回看课堂片段</button><span v-if="focus.evidence.length" class="coach-evidence-times">录像时间：{{evidenceTimes(focus.evidence)||'时间未记录'}}</span><span v-if="focus.sources.length">教学依据 {{ focus.sources.length }} 项</span></div>
               <details v-if="focus.sources.length" class="dimension-sources"><summary>查看依据原文</summary><article v-for="source in focus.sources" :key="source.id"><strong>{{ source.title }}</strong><p>{{ source.text }}</p><button v-if="source.isKb" type="button" class="review-button" @click="showKbSource(source,focus.evidence)">知识库原文</button></article></details>
             </article>
           </section>
@@ -193,6 +302,9 @@ function regenerate(){
       <button v-if="mmStatus?.status!=='completed'" type="button" class="review-button no-print" :disabled="mmBusy||mmStatus?.status==='running'" @click="analyzeMmTba">{{mmBusy?'准备中…':mmStatus?.status==='running'?'分析中…':'用 MM-TBA 分析本机录像'}}</button>
       <p v-if="mmMessage||mmStatus?.message" role="status">{{mmMessage||mmStatus?.message}}</p>
       <p v-if="mmEvents.length">动作采样：Normal {{mmCounts.Normal}} · Writing {{mmCounts.Writing}} · Pointing {{mmCounts.Pointing}}。每条保留置信度与录像时间点；若要让 AI 教练建议参考这些动作线索，可在分析完成后重新生成报告。</p>
+      <button v-if="mmActionTotal" type="button" class="review-button no-print" :disabled="mmAdviceBusy" @click="requestMmAdvice">{{mmAdviceBusy?'AI 正在整理建议…':'单独生成 AI 动作建议'}}</button>
+      <p v-if="mmAdvice" class="mm-advice-result"><strong>AI 动作建议</strong>{{mmAdvice}}<small>仅供录像复核参考；动作分类本身不代表教学质量评分。</small></p>
+      <p v-if="mmAdviceError" class="review-inline-alert" role="alert">{{mmAdviceError}}</p>
       <label v-if="mmEvents.length">查看类别 <select v-model="mmFilter"><option value="Writing">Writing · 书写</option><option value="Pointing">Pointing · 指向</option><option value="Normal">Normal · 其他常态动作</option><option value="all">全部</option></select></label>
       <ol v-if="mmShown.length" class="behavior-list"><li v-for="event in mmShown.slice(0,60)" :key="event.id"><time>{{time(event.at_ms)}}</time><strong>{{event.data.label}}</strong><p>置信度 {{Number(event.data.confidence).toFixed(3)}} · 模型预测，需回看确认</p><button type="button" class="review-button no-print" @click="showEvidence([event],event.data.label+' · 原始录像')">回看录像</button></li></ol>
       <p v-if="mmShown.length>60" class="review-caption">当前类别只展示前60条；全部结果保存在课堂事件中。</p>
@@ -225,17 +337,23 @@ function regenerate(){
     <section v-if="view.hasReport && motion?.sample_count" class="review-panel report-motion">
       <div class="report-section-title"><div><p class="review-eyebrow">04 / OBSERVABILITY</p><h2><Focus2 aria-hidden="true" />先看证据质量，再谈教态</h2></div><span>动作摘要 · {{ motion.observed_samples }} 个可观察样本</span></div>
       <div class="modality-grid"><div v-for="(m,key) in motion.modalities" :key="key"><header><span>{{ modalityLabels[key] || key }}</span><b>{{ m.observed_samples }} / {{ m.total_samples }}</b></header><div class="modality-track" :aria-label="(modalityLabels[key]||key)+'可观察样本 '+m.observed_samples+' / '+m.total_samples"><i :key="ratio(m)" :style="{width:ratio(m)+'%'}" /></div><small>可观察样本 / 采样总数</small></div></div>
+      <div class="mm-inline-summary">
+        <div class="mm-summary-heading"><strong>MM‑TBA 动作分类</strong><span>样本数与占比 · 共 {{mmActionTotal}} 个分类样本</span></div>
+        <div class="mm-action-chart" role="img" aria-label="MM-TBA 动作类别样本数量与比例">
+          <div v-for="item in mmActionStats" :key="item.key" class="mm-action-row" :class="`is-${item.color}`">
+            <div class="mm-action-label"><span>{{item.label}}</span><b>{{item.count}}</b><small>{{item.percent}}%</small></div>
+            <div class="mm-action-track"><i :style="{width:item.percent+'%'}" /></div>
+          </div>
+        </div>
+        <button v-if="mmEvents.length" type="button" class="review-button no-print" @click="showEvidence(mmEvents,'MM‑TBA 动作分类 · 录像时间点')">查看 {{mmEvents.length}} 个动作时间点</button>
+        <span v-if="!mmActionTotal" class="review-caption">尚无分类结果；在下方“录像动作分析”运行 MM‑TBA 后，这里会显示三个类别及可回看的时间点。</span>
+      </div>
       <p class="review-caption">采样可观察率不是教态得分，也不是整课时长占比。面部几何不用于推断情绪、性格或自信程度。</p>
       <details class="report-fold"><summary>查看动作线索与检测边界</summary>
         <p v-if="motion.status!=='observed'">动作证据不足，本节不形成非语言行为观察。</p>
         <article v-for="o in motion.observations" :key="o.code"><h3>{{ o.description }}</h3><p>{{ o.matched_samples }} / {{ o.observed_samples }} 个有效样本出现该线索；连续采样跨度 {{ (o.longest_observed_span_ms/1000).toFixed(1) }} 秒（非持续动作测量）。</p><p>启发式提示：{{ o.suggestion }}</p><p v-if="o.context_notice">{{o.context_notice}}</p><p v-for="c in o.context||[]" :key="c.event_id">#{{c.event_id}} · {{time(c.at_ms)}}：{{c.text}}</p><button class="review-button no-print" @click="showEvidence(view.events.filter(e=>o.event_ids?.includes(e.id)||o.context?.some(c=>c.event_id===e.id||c.playback_event_id===e.id)),o.description+' · 证据')">查看相关记录</button></article>
         <p v-for="note in motion.limitations" :key="note">{{ note }}</p>
       </details>
-    </section>
-    <section v-if="view.hasReport && view.reflections.length" class="report-reflections review-panel">
-      <div class="report-section-title"><div><p class="review-eyebrow">03 / NEXT PRACTICE</p><h2><Bulb aria-hidden="true" />本节优先练习</h2></div><span>来自有证据的观察主题</span></div>
-      <div class="reflection-grid"><article v-for="(d,index) in view.reflections" :key="d.key"><span class="reflection-number">0{{ index+1 }}</span><h3>{{ d.label }}</h3><p>{{ d.reflection }}</p><button class="reflection-link no-print" :disabled="!d.evidence.length" @click="showEvidence(d.evidence,d.label+' · 复盘证据')">带着证据复盘<ArrowUpRight aria-hidden="true" /></button></article></div>
-      <p class="review-caption">练习建议来自有课堂事件支持的观察主题；复练记录只核对目标行为是否出现，不代表能力分数变化。</p>
     </section>
     <section v-if="view.hasReport" class="review-panel" aria-labelledby="practice-heading">
       <div class="report-section-title"><div><p class="review-eyebrow">NEXT PRACTICE</p><h2 id="practice-heading"><Bulb aria-hidden="true" />带着目标再练一次</h2></div><span>同一情境 · 同一行为识别规则</span></div>
@@ -273,7 +391,11 @@ function regenerate(){
       <summary><Refresh aria-hidden="true" />补充证据 / 重新评课</summary>
       <div class="correction-form"><label for="report-objection">补充说明（可选，不会直接加分）</label><textarea id="report-objection" v-model="objection" maxlength="2000" rows="3" placeholder="例如：02:15 我已更正前面的表述，请结合该段重新核对。" /><button class="review-button" :disabled="busy" @click="regenerate">{{ busy?'请求中…':view.hasReport?'重新评课':room.report_state==='failed'?'重试生成':'生成报告' }}</button><small>仅主动确认后调用 AI，会消耗授课额度。成功后更新报告。</small></div>
     </details>
-      </div>
+      <section v-if="missingReadiness.length" class="review-panel report-data-gaps" aria-label="本次材料缺项说明">
+        <h3>本次材料缺项说明</h3>
+        <p>报告已生成。以下项目缺少相应材料，本次以文字说明代替判断；其他有依据的内容照常反馈。</p>
+        <ul><li v-for="item in missingReadiness" :key="item.key"><strong>{{ item.label }}：</strong>{{ item.reason }}补充相关课堂记录后，可再生成完整反馈。</li></ul>
+      </section>
     </div>
     <footer class="report-footer">LINK · 每一份判断，都应回到课堂本身。<span>教师自主复核 · AI 辅助成长</span></footer>
     <ClassroomDialog v-model="drawerOpen" :title="drawerTitle">

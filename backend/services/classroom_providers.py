@@ -62,9 +62,12 @@ def model(service):
                       'asr': 'qwen3-asr-flash-realtime', 'tts': 'qwen3-tts-flash-realtime'}[service])
 
 
-def chat(system, payload, session_id=None, image=None, max_tokens=600, *, test=False, user_id=None):
+def chat(system, payload, session_id=None, image=None, max_tokens=600, *, test=False, user_id=None,
+         enforce_assistant_quota=True):
     if llm_provider() == 'openai_next':
-        return next_chat(system, payload, session_id, image, max_tokens, test=test, **({'user_id': user_id} if user_id is not None else {}))
+        return next_chat(system, payload, session_id, image, max_tokens, test=test,
+                         **({'user_id': user_id} if user_id is not None else {}),
+                         enforce_assistant_quota=enforce_assistant_quota)
     credential = deepseek_credential('vision' if image else 'dialogue', test=test)
     token = key(credential)
     endpoint = os.getenv('DEEPSEEK_BASE_URL', 'https://api.deepseek.com').rstrip('/')
@@ -77,7 +80,8 @@ def chat(system, payload, session_id=None, image=None, max_tokens=600, *, test=F
     upper_input = len((system + content).encode('utf-8')) + (4096 if image else 0) + 1024
     usage_id = reserve('vision' if image else 'dialogue',
                        (upper_input * input_price + max_tokens * output_price) / 1e6, session_id,
-                       *((user_id,) if user_id is not None else ()))
+                       *((user_id,) if user_id is not None else ()),
+                       enforce_assistant_quota=enforce_assistant_quota)
     if image:
         content = [{'type': 'text', 'text': content},
                    {'type': 'image_url', 'image_url': {'url': image}}]
@@ -106,7 +110,8 @@ def chat(system, payload, session_id=None, image=None, max_tokens=600, *, test=F
         raise ProviderError('DeepSeek 返回JSON结构无效，请重试') from None
 
 
-def next_chat(system, payload, session_id, image, max_tokens, *, test=False, user_id=None):
+def next_chat(system, payload, session_id, image, max_tokens, *, test=False, user_id=None,
+              enforce_assistant_quota=True):
     from services import classroom_credits as credits
     service = 'vision' if image else 'dialogue'
     account = 'test' if test or current_app.config.get('CLASSROOM_API_PROFILE') == 'test' else service
@@ -125,7 +130,8 @@ def next_chat(system, payload, session_id, image, max_tokens, *, test=False, use
     upper_input = len((system + content).encode('utf-8')) + (4096 if image else 0) + 1024
     usage_id = credits.reserve(account, service, selected_model,
         (upper_input * input_price + max_tokens * output_price) / 1e6, session_id,
-                       *((user_id,) if user_id is not None else ()))
+                       *((user_id,) if user_id is not None else ()),
+                       enforce_assistant_quota=enforce_assistant_quota)
     if image:
         content = [{'type': 'text', 'text': content}, {'type': 'image_url', 'image_url': {'url': image}}]
     try:

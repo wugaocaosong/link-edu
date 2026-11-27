@@ -6,6 +6,7 @@ from sqlalchemy import func, select
 from extensions import db
 from classroom_models import ApiUsage
 from services.classroom_locks import budget_file_lock
+from services.assistant_billing_context import assistant_turn
 
 lock = threading.RLock()
 
@@ -32,7 +33,7 @@ def status():
     return result
 
 
-def reserve(service, amount, session_id=None, assistant_user_id=None):
+def reserve(service, amount, session_id=None, assistant_user_id=None, *, enforce_assistant_quota=True):
     if os.getenv('AI_PRICING_CONFIRMED', '').lower() != 'true':
         raise ValueError('请先核对云服务单价并配置 AI_PRICING_CONFIRMED=true')
     with lock, budget_file_lock():
@@ -44,11 +45,12 @@ def reserve(service, amount, session_id=None, assistant_user_id=None):
                 raise ValueError('调用预算已到停止阈值，本次未发起云请求')
             from services.delivery_budget import check
             check(connection, amount)
-            if assistant_user_id is not None:
+            if assistant_user_id is not None and enforce_assistant_quota:
                 from services.assistant_quota import check as check_quota
                 check_quota(connection, assistant_user_id, amount)
             result = connection.execute(ApiUsage.__table__.insert().values(
-                service=service, session_id=session_id, assistant_user_id=assistant_user_id, reserved_cny=amount))
+                service=service, session_id=session_id, assistant_user_id=assistant_user_id,
+                assistant_turn=assistant_turn.get() if assistant_user_id is not None else None, reserved_cny=amount))
             return result.inserted_primary_key[0]
 
 

@@ -27,6 +27,8 @@ from services.classroom_behaviors import analyze_behaviors
 from services.classroom_scenarios import scenario_brief
 from services.classroom_practice import ensure_plans
 from services.classroom_mm_tba import start_mm_tba, validate_segments
+from services.classroom_providers import chat as classroom_chat, ProviderError
+from services.assistant_quota import QuotaExceeded
 from services.classroom_clock import timing, transition, clock_lock
 
 bp = Blueprint('classroom', __name__, url_prefix='/api/classroom')
@@ -288,6 +290,58 @@ def run_mm_tba(sid):
         video_path.unlink(missing_ok=True)
         return jsonify(message='本节课堂已有 MM-TBA 分析任务'), 409
     return jsonify(status='running', message='MM-TBA 已开始分析'), 202
+
+
+@bp.post('/sessions/<int:sid>/mm-tba-advice')
+@jwt_required()
+def mm_tba_advice(sid):
+    room = owned(sid)
+    data = request.get_json(silent=True) or {}
+    counts = data.get('counts')
+    if not isinstance(counts, dict):
+        return jsonify(message='缺少 MM-TBA 动作分类数据'), 400
+    allowed = ('Normal', 'Writing', 'Pointing')
+    if any(type(counts.get(label, 0)) is not int or counts.get(label, 0) < 0 for label in allowed):
+        return jsonify(message='动作分类数量无效'), 400
+    clean_counts = {label: counts.get(label, 0) for label in allowed}
+    total = sum(clean_counts.values())
+    if total == 0:
+        return jsonify(message='当前没有可供分析的动作分类结果'), 400
+    samples = data.get('samples', [])
+    if not isinstance(samples, list):
+        return jsonify(message='动作时间点格式无效'), 400
+    clean_samples = []
+    for item in samples[:12]:
+        if not isinstance(item, dict) or item.get('label') not in allowed:
+            continue
+        at_ms = item.get('at_ms')
+        if type(at_ms) is int and at_ms >= 0:
+            clean_samples.append({'label': item['label'], 'at_ms': at_ms})
+    payload = {
+        '课堂主题': room.topic,
+        '分类模型': 'MM-TBA SlowFast ACRN',
+        '动作样本数量': clean_counts,
+        '动作时间点摘录': clean_samples,
+    }
+    system = ('你是课堂录像复盘助手。仅根据提供的 MM-TBA 动作分类摘要，给教师一条简短、具体、可执行的观察建议。'
+              '动作类别只是模型线索，不能单独推断教学质量、意图或学生学习效果；Normal 不代表表情正常。'
+              '请建议教师结合对应录像片段和课堂转写核对，再给一个下一步做法。不得编造未提供的课堂事实。'
+              '只返回 JSON：{"advice":"..."}，建议不超过120个汉字。')
+    demo_user = db.session.get(User, room.user_id)
+    is_demo_account = bool(demo_user and demo_user.account == 'demo')
+    try:
+        result = classroom_chat(system, payload, session_id=sid, max_tokens=220,
+                                user_id=int(get_jwt_identity()),
+                                enforce_assistant_quota=not is_demo_account)
+    except QuotaExceeded as exc:
+        return jsonify(message=str(exc), code='assistant_quota_exceeded'), 402
+    except ProviderError as exc:
+        return jsonify(message=str(exc)), 503
+    advice = result.get('advice') if isinstance(result, dict) else None
+    if not isinstance(advice, str) or not advice.strip():
+        return jsonify(message='AI 没有返回有效建议，请重试'), 502
+    return jsonify(advice=advice.strip()[:600], model='classroom-dialogue',
+                   demo_quota_bypass=is_demo_account)
 
 
 @bp.get('/practice-plans')
