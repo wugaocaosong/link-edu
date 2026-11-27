@@ -1,6 +1,6 @@
 """Release acceptance. Synthetic providers; real HTTP/WebSocket and database."""
 import base64
-from datetime import datetime, timedelta
+from datetime import datetime
 import json
 import os
 import queue
@@ -14,7 +14,6 @@ from models import User, Course, Resource
 from classroom_models import Classroom, ClassroomEvent
 from services import classroom_runtime as runtime, classroom_reports as reports
 from services.classroom_budget import reserve, settle
-from services.public_access import daily_quota
 from test_classroom_base import app
 from test_classroom_api import headers
 
@@ -38,8 +37,8 @@ def test_catalog_is_idempotent_without_users(app):
     assert min(counts) > 0 and User.query.count() == 0
 
 
-def test_public_privacy_quota_origin_and_paid_entrypoints(app):
-    app.config.update(PUBLIC_DEPLOYMENT=True, PUBLIC_ORIGINS=['https://demo.example'], CLASSROOM_DAILY_LIMIT=2)
+def test_public_privacy_origin_and_no_daily_classroom_limit(app):
+    app.config.update(PUBLIC_DEPLOYMENT=True, PUBLIC_ORIGINS=['https://demo.example'])
     user(1)
     client = app.test_client()
     caps = client.get('/api/classroom/capabilities', headers=headers(1)).json
@@ -57,10 +56,7 @@ def test_public_privacy_quota_origin_and_paid_entrypoints(app):
         room = db.session.get(Classroom, response.json['session_id'])
         room.state = 'ended'
         db.session.commit()
-    assert create_room(client, 1).status_code == 429
-    room.started_at -= timedelta(days=1)
-    db.session.commit()
-    assert daily_quota(1)['remaining_today'] == 1
+    assert create_room(client, 1).status_code == 201
 
 
 def test_public_rate_limit_and_malformed_registration(app):
