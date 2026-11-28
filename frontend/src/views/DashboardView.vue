@@ -112,7 +112,7 @@
     </div>
 
     <div v-if="panel" class="help-mask" @click="panel = null"></div>
-    <aside v-if="panel && panel !== 'growth'" class="dash-sheet" :class="{ wide: panel === 'feedback' }" role="dialog">
+    <aside v-if="panel && panel !== 'growth'" class="dash-modal dash-dialog" role="dialog">
       <header>
         <h2>{{ sheetTitle }}</h2>
         <button type="button" class="close-x" aria-label="关闭" @click="panel = null">×</button>

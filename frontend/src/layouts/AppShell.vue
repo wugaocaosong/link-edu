@@ -142,7 +142,7 @@ const profileTrigger = ref(null)
 
 const nav = [
   ...(import.meta.env.VITE_ADAPTIVE_ENABLED === 'true' ? [{ label: '自适应学习', to: '/adaptive', icon: 'M4 19V5h16v14H4zm4-9h8M8 14h5' }] : []),
-  { label: '标签墙', to: '/dashboard', icon: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z' },
+  { label: '工作台', to: '/dashboard', icon: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z' },
   { label: '办公桌', to: '/courses', icon: 'M12 5C9 3 6 3 3 4v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1zm0 0v15' },
   { label: '演绎厅', to: '/classroom', icon: 'M3 3h18v15H3zM10 7l5 3.5-5 3.5zM8 21h8m-4-3v3' },
   { label: '档案袋', to: '/ai-review', icon: 'M4 3v17h17M9 15V9m5 6V5m5 10v-5' },

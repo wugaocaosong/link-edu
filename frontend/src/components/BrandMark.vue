@@ -2,7 +2,7 @@
 defineProps({ homeLink: Boolean })
 </script>
 <template>
-  <component :is="homeLink ? 'router-link' : 'div'" :to="homeLink ? '/dashboard' : undefined" class="brand" :aria-label="homeLink ? '临客 LINK，返回标签墙' : '临客 LINK'">
+  <component :is="homeLink ? 'router-link' : 'div'" :to="homeLink ? '/dashboard' : undefined" class="brand" :aria-label="homeLink ? '临客 LINK，返回工作台' : '临客 LINK'">
     <img
       class="brand-icon"
       src="/assets/brand-icon.png"
