@@ -51,7 +51,11 @@
           />
           <kbd class="cir-search__kbd">Enter</kbd>
         </form>
-        <details ref="appearance" class="shell-appearance" @click.stop @keydown.esc.stop.prevent="closeAppearance">
+        <template v-if="route.path === '/resources'">
+          <ThemeSwitcher />
+          <UiVersionSwitcher />
+        </template>
+        <details v-else ref="appearance" class="shell-appearance" @click.stop @keydown.esc.stop.prevent="closeAppearance">
           <summary><span aria-hidden="true">◐</span> 外观</summary>
           <div class="appearance-panel"><strong>界面外观</strong><ThemeSwitcher /><UiVersionSwitcher /></div>
         </details>
@@ -251,14 +255,12 @@ html[data-ui-theme] .app-shell.studio-ui:has(.hall-entry) :is(.page-frame,.page-
   border-radius: 0;
 }
  .page-frame {position:relative;}
-.page-frame:has(.scene-pan-leave-active) {overflow:clip;}
-.page-frame :is(.scene-pan-enter-active,.scene-pan-leave-active) {backface-visibility:hidden;}
-.page-frame .scene-pan-leave-active {position:absolute;inset:0;z-index:1;pointer-events:none;animation:desk-lower .26s cubic-bezier(.4,0,1,1) both;}
-.page-frame .scene-pan-enter-active {position:relative;z-index:2;animation:tablet-rise .38s cubic-bezier(.16,1,.3,1) both;}
-html[data-desk-travel] {--travel-x:0%;--travel-y:7%;}
-html[data-desk-travel=up] {--travel-y:-7%;}
-html[data-desk-travel=left] {--travel-x:-7%;--travel-y:0%;}
-html[data-desk-travel=right] {--travel-x:7%;--travel-y:0%;}
+.page-frame .scene-pan-leave-active {position:absolute;inset:0;pointer-events:none;animation:desk-lower .7s ease-in-out both;}
+.page-frame .scene-pan-enter-active {animation:tablet-rise .7s ease-in-out both;}
+html[data-desk-travel] {--travel-x:0%;--travel-y:17%;}
+html[data-desk-travel=up] {--travel-y:-17%;}
+html[data-desk-travel=left] {--travel-x:-17%;--travel-y:0%;}
+html[data-desk-travel=right] {--travel-x:17%;--travel-y:0%;}
 html[data-desk-travel] .page-frame {view-transition-name:studio-scene;}
 @media (min-width: 901px) {
  html[data-ui-theme] .app-shell.membership-shell .workspace { position:relative; padding:0!important; }
@@ -266,26 +268,22 @@ html[data-desk-travel] .page-frame {view-transition-name:studio-scene;}
  html[data-ui-theme] .app-shell.membership-shell .topbar { position:absolute; inset:12px 16px auto auto; z-index:8; width:auto; margin:0; background:transparent!important; }
  html[data-ui-theme] .app-shell.membership-shell .topbar :is(.page-crumb,.mobile-page-nav) { display:none; }
 }
-::view-transition-old(studio-scene),
-html[data-desk-travel] .scene-pan-leave-active {animation:scene-out .26s cubic-bezier(.4,0,1,1) both;}
-::view-transition-new(studio-scene),
-html[data-desk-travel] .scene-pan-enter-active {animation:scene-in .38s cubic-bezier(.16,1,.3,1) both;}
-@keyframes scene-out {to {transform:translate3d(calc(-1 * var(--travel-x)), calc(-1 * var(--travel-y)), 0) scale(1.015);opacity:0;}}
-@keyframes scene-in {from {transform:translate3d(var(--travel-x), var(--travel-y), 0) scale(.985);opacity:0;}}
+::view-transition-old(studio-scene) {animation:scene-out .65s ease-in-out both;}
+::view-transition-new(studio-scene) {animation:scene-in .65s ease-in-out both;}
+html[data-desk-travel] .scene-pan-leave-active {animation:scene-out .65s ease-in-out both;}
+html[data-desk-travel] .scene-pan-enter-active {animation:scene-in .65s ease-in-out both;}
+@keyframes scene-out {to {transform:translate(calc(-1 * var(--travel-x)), calc(-1 * var(--travel-y))) scale(1.07);opacity:0;}}
+@keyframes scene-in {from {transform:translate(var(--travel-x),var(--travel-y)) scale(.97);opacity:0;}}
 .workspace:has(.hall-entry) .topbar {pointer-events:none;}
 .workspace:has(.hall-entry) .topbar > * {pointer-events:auto;}
 .scene-pan-enter-active .hall-scene {animation:none;}
-@media(prefers-reduced-motion:reduce){
-  .page-frame :is(.scene-pan-enter-active,.scene-pan-leave-active),
-  ::view-transition-old(studio-scene),
-  ::view-transition-new(studio-scene){animation:none;}
-}
+@media(prefers-reduced-motion:reduce){.page-frame :is(.scene-pan-enter-active,.scene-pan-leave-active){animation:none;}}
 .shelf-desk-return {position:absolute;z-index:3;left:4px;top:50%;translate:0 -50%;width:clamp(44px,5vw,76px);display:grid;place-items:center;border-radius:12px;}
 .shelf-desk-return img {width:100%;filter:drop-shadow(0 3px 3px #29170880);}
 .shelf-desk-return:is(:hover,:focus-visible) img {scale:1.06;}
 
-@keyframes desk-lower{to{transform:translate3d(0,-6%,0) scale(1.015);opacity:0}}
-@keyframes tablet-rise{from{transform:translate3d(0,7%,0) scale(.985);opacity:0}}
+@keyframes desk-lower{to{transform:translateY(-17%) scale(1.07);opacity:0}}
+@keyframes tablet-rise{from{transform:translateY(17%) scale(.97);opacity:0}}
 html[data-ui-theme] .app-shell.studio-ui.desk-fullscreen:has(.tag-wall) .workspace {position:relative;padding:0!important;height:100dvh}
 html[data-ui-theme] .app-shell.studio-ui.desk-fullscreen:has(.tag-wall) .topbar {position:absolute;inset:6px 10px auto auto;width:auto;max-width:100%;padding:0;min-height:0;margin:0;background:transparent;z-index:8}
 .app-shell:has(.tag-wall) .topbar :is(.page-crumb,.cir-search){display:none}

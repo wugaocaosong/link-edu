@@ -16,6 +16,18 @@ const markdown = ref("");
 const loading = ref(false);
 const loadError = ref("");
 const videoError = ref(false);
+const videoRetry = ref(0);
+const videoSrc = computed(() => {
+  const url = selected.value?.readUrl || "";
+  return videoRetry.value ? `${url}${url.includes("?") ? "&" : "?"}retry=${videoRetry.value}` : url;
+});
+function handleVideoError() {
+  if (videoRetry.value < 1) {
+    videoRetry.value += 1;
+    return;
+  }
+  videoError.value = true;
+}
 const layoutKey = ref(0);
 const readerRef = ref(null);
 let readerTrigger = null;
@@ -309,6 +321,7 @@ async function open(item) {
   markdown.value = "";
   loadError.value = "";
   videoError.value = false;
+  videoRetry.value = 0;
   const currentRequest = ++requestId;
   await nextTick();
   if (currentRequest !== requestId) return;
@@ -346,6 +359,7 @@ function closeReader() {
   markdown.value = "";
   loadError.value = "";
   videoError.value = false;
+  videoRetry.value = 0;
   loading.value = false;
   readerTrigger?.focus();
 }
@@ -612,18 +626,23 @@ onUnmounted(() => {
             />
             <div v-else-if="selected.readType === 'video' && !videoError" class="reader-video-wrap">
               <video
+                :key="videoRetry"
                 class="reader-video"
-                :src="selected.readUrl"
+                :src="videoSrc"
                 :poster="selected.thumbnail || selected.boardImage || undefined"
                 controls
                 playsinline
                 preload="metadata"
                 :aria-label="selected.title"
-                @error="videoError = true"
+                @error="handleVideoError"
               ></video>
             </div>
             <div v-else-if="selected.readType === 'video'" class="reader-status is-error">
-              这段视频无法在当前浏览器播放。可以试试下载原文件，或改成外链条目。
+              <p>这段视频暂时播不了，可以重试或直接打开视频文件：</p>
+              <p class="reader-video-actions">
+                <button type="button" @click="videoError = false; videoRetry = 0">重试播放</button>
+                <a :href="selected.downloadUrl || selected.readUrl" target="_blank" rel="noopener noreferrer">在新标签页打开 ↗</a>
+              </p>
             </div>
             <div v-else-if="selected.readType === 'image'" class="reader-image-wrap">
               <img
@@ -1812,6 +1831,8 @@ button.resource-board-card {
   color: #ffaf7c;
 }
 
+.reader-video-actions { display: flex; gap: 14px; align-items: center; }
+.reader-video-actions button, .reader-video-actions a { color: #ffad70; text-decoration: underline; background: none; border: 0; cursor: pointer; font-size: inherit; }
 .reader-foot-hint { color: inherit; opacity: 0.65; font-size: 12px; }
 
 .reader-foot {
